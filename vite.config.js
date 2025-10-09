@@ -16,6 +16,16 @@ export default defineConfig({
     "@services": path.resolve(__dirname, "./src/services"),
     "@utils": path.resolve(__dirname, "./src/utils")
   }
-}
+},server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:6000", // your backend
+        changeOrigin: true,
+      },
+    },
+  },
 
 })
+
+
+
