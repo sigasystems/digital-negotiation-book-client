@@ -4,6 +4,7 @@ import Testimonials from "../components/Testimonials";
 import CTA from "../components/CTA";
 import Footer from "../components/Footer";
 import Navbar from "@/components/layout/Navbar";
+import PlansPage from "../components/Plan";
 
 export default function LandingPage() {
   return (
@@ -13,6 +14,7 @@ export default function LandingPage() {
       <Features />
       <Testimonials />
       <CTA />
+      <PlansPage/>
       <Footer />
     </div>
   );
