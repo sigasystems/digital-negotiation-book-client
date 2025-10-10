@@ -48,7 +48,6 @@ const navigate = useNavigate();
   const handlePlanSelect = (planId) => {
     const selectedPlan = plans.find((p) => p.id === planId);
     if (!selectedPlan) return;
-    console.log("Selected Plan:", selectedPlan);
 
     // If you want to redirect to a checkout page:
         navigate("/checkout", { state: { selectedPlan: plans, billingCycle } });

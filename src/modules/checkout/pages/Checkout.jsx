@@ -99,7 +99,6 @@ import SelectedPlanCard from "../components/SelectedPlanCard";
           }
         );
 
-        console.log("Checkout Response:", res.data);
 
         if (res.data.success) {
           navigate("/success");
