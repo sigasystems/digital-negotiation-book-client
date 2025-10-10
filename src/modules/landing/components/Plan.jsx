@@ -40,7 +40,7 @@ export default function PlansPage() {
       }
     }
     fetchPlans();
-  });
+  }, []);
 
   if (loading) {
     return (

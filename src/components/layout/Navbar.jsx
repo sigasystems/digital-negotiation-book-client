@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -16,7 +17,6 @@ export default function Navbar() {
   ];
 
   const handleLogout = () => {
-    console.log("User logged out");
     setLogoutOpen(false);
     // Add real logout logic here (e.g., clear token & redirect)
   };
@@ -44,9 +44,9 @@ export default function Navbar() {
             </a>
           ))}
 
-          <Button className="bg-indigo-600 text-white hover:bg-indigo-700 transition">
-            Sign Up
-          </Button>
+          <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-3 rounded-lg">
+            Login
+          </Link>
 
           {/* User Menu */}
           <div className="relative">
@@ -103,12 +103,12 @@ export default function Navbar() {
               </a>
             ))}
 
-            <Button
-              className="bg-indigo-600 text-white hover:bg-indigo-700"
+            <Link
+              to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg text-center"
               onClick={() => setMobileOpen(false)}
             >
-              Sign Up
-            </Button>
+              Login
+            </Link>
 
             <button
               className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md cursor-pointer"
