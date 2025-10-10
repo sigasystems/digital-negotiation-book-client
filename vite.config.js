@@ -10,6 +10,7 @@ export default defineConfig({
    optimizeDeps: {
     include: ["react-hot-toast"]
   },
+  base: './' ,
   resolve: {
   alias: {
     "@": path.resolve(__dirname, "./src"),
