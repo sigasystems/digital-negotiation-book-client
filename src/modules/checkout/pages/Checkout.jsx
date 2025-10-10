@@ -10,6 +10,7 @@
   import axios from "axios";
 import OrderSummary from "../components/OrderSummary";
 import SelectedPlanCard from "../components/SelectedPlanCard";
+import { becomeBusinessOwner } from "../services/paymentService";
 
   export default function CheckoutPage() {
     const location = useLocation();
@@ -76,42 +77,32 @@ import SelectedPlanCard from "../components/SelectedPlanCard";
     };
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
+  e.preventDefault();
 
-      if (!validateForm()) {
-        return;
-      }
+  if (!validateForm()) return;
 
-      setLoading(true);
+  setLoading(true);
 
-      try {
-        const payload = {
-          planId: selectedPlan.id,
-          billingCycle,
-          ...formData,
-        };
-
-        const res = await axios.post(
-          "/api/business-owner/become-business-owner",
-          payload,
-          {
-            withCredentials: true,
-          }
-        );
-
-
-        if (res.data.success) {
-          navigate("/success");
-        } else {
-          alert(res.data.message || "Something went wrong!");
-        }
-      } catch (err) {
-        console.error("Error submitting checkout:", err);
-        alert("Failed to submit checkout. Please try again.");
-      } finally {
-        setLoading(false);
-      }
+  try {
+    const payload = {
+      planId: selectedPlan.id,
+      billingCycle,
+      ...formData,
     };
+
+    const res = await becomeBusinessOwner(payload);
+
+    if (res.success) {
+      navigate("/success");
+    } else {
+      alert(res.message || "Something went wrong!");
+    }
+  } catch (err) {
+    alert(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
     const calculateTotal = () => {
       const price = billingCycle === "monthly" ? selectedPlan.priceMonthly : selectedPlan.priceYearly;
@@ -432,6 +423,9 @@ import SelectedPlanCard from "../components/SelectedPlanCard";
   billingCycle={billingCycle}
   calculateTotal={calculateTotal}
   handleSubmit={handleSubmit}
+   formData={formData}       // ✅ pass formData
+  // userId={userId}           // optional
+  userId="3893289d-0ac9-444d-9b57-34591581f58f"         // optional
   loading={loading}
 />
 

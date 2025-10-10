@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { formateCurrency } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { getAllPlans } from "../services/planService";
 
 export default function PlansPage() {
   const [plans, setPlans] = useState([]);
@@ -16,43 +17,28 @@ export default function PlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-const navigate = useNavigate();
-  useEffect(() => {
-    async function fetchPlans() {
-      try {
-        const res = await fetch(`/api/plans/getall-plans`, {
-          credentials: "include",
-        });
+console.log("plans", plans);
+useEffect(() => {
+  async function fetchPlans() {
+    try {
+      const data = await getAllPlans();
+      const customeKey = ["trail", "basic", "pro"];
+      const sorted = data.sort(
+        (a, b) => customeKey.indexOf(a.key) - customeKey.indexOf(b.key)
+      );
 
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-
-        const json = await res.json();
-        if (json.success) {
-          const sorted = json.data.sort((a, b) => a.sortOrder - b.sortOrder);
-          setPlans(sorted);
-        } else {
-          throw new Error(json.message || "Failed to load plans");
-        }
-      } catch (err) {
-        console.error("Error fetching plans:", err);
-        setError("Unable to load plans. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
+      setPlans(sorted);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    fetchPlans();
-  },[]);
+  }
 
-  
-  // Handle plan selection
-  const handlePlanSelect = (planId) => {
-    const selectedPlan = plans.find((p) => p.id === planId);
-    if (!selectedPlan) return;
+  fetchPlans();
+}, []);
 
-    // If you want to redirect to a checkout page:
-        navigate("/checkout", { state: { selectedPlan: plans, billingCycle } });
 
-  };
 
   if (loading) {
     return (
@@ -81,6 +67,14 @@ const navigate = useNavigate();
     );
   }
 
+  if (!plans || plans.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-500 text-lg">No plans available at the moment.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-6">
       {/* Header */}
@@ -104,9 +98,7 @@ const navigate = useNavigate();
           </span>
           <button
             onClick={() =>
-              setBillingCycle(
-                billingCycle === "monthly" ? "yearly" : "monthly"
-              )
+              setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")
             }
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition ${
               billingCycle === "yearly" ? "bg-indigo-600" : "bg-gray-300"
@@ -137,7 +129,7 @@ const navigate = useNavigate();
               plan.isDefault ? "border-indigo-600" : "border-gray-200"
             }`}
           >
-            {plan.priceMonthly >200 && plan.priceYearly > 200 && (
+            {plan.priceMonthly > 200 && plan.priceYearly > 200 && (
               <span className="absolute top-3 right-3 text-xs font-semibold text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
                 Popular
               </span>
@@ -152,9 +144,7 @@ const navigate = useNavigate();
               {/* Price */}
               <p className="text-4xl font-extrabold text-gray-900 mb-2">
                 {formateCurrency(
-                  billingCycle === "monthly"
-                    ? plan.priceMonthly
-                    : plan.priceYearly,
+                  billingCycle === "monthly" ? plan.priceMonthly : plan.priceYearly,
                   plan.currency
                 )}
                 <span className="text-sm font-medium text-gray-500 ml-1">
@@ -199,19 +189,21 @@ const navigate = useNavigate();
             </CardContent>
 
             <CardFooter className="flex justify-center mt-6">
-              <Button onClick={() => handlePlanSelect(plan.id)}
-                className={`w-full py-2 font-semibold rounded-lg ${
+              <Link
+                to="/checkout"
+                state={{ selectedPlan: plan, billingCycle }}
+                className={`inline-flex items-center justify-center w-full py-2 font-semibold rounded-lg ${
                   plan.isDefault
                     ? "bg-indigo-600 hover:bg-indigo-700 text-white"
                     : "bg-gray-800 hover:bg-gray-900 text-white"
                 }`}
               >
                 Choose {plan.name}
-              </Button>
+              </Link>
             </CardFooter>
           </Card>
         ))}
       </div>
     </div>
   );
-}  
+}
