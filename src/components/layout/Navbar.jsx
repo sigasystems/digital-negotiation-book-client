@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
+import LogoutDialog from "../common/LogoutModal";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const links = [
@@ -13,38 +16,51 @@ export default function Navbar() {
     { name: "Contact", href: "#contact" },
   ];
 
+  const handleLogout = () => {
+    setLogoutOpen(false);
+    // Add real logout logic here (e.g., clear token & redirect)
+  };
+
   return (
-    <header className="fixed w-full z-50 bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <a href="/" className="text-2xl font-bold text-indigo-600 tracking-tight">
-            Digital Negotiation Book
-          </a>
+    <header className="fixed w-full z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+        {/* Logo */}
+        <a
+          href="/"
+          className="text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition cursor-pointer"
+        >
+          Digital Negotiation Book
+        </a>
 
-          {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {links.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-indigo-600 transition font-medium"
-              >
-                {link.name}
-              </a>
-            ))}
-            <Button className="cursor-pointer  bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
-              Sign Up
-            </Button>
-          </nav>
-
-          {/* Mobile Hamburger */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setOpen(!open)}
-              className="text-gray-700 hover:text-indigo-600 focus:outline-none"
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex items-center gap-6">
+          {links.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              className="cursor-pointer text-gray-700 hover:text-indigo-600 font-medium transition cursor-pointer"
             >
-              {open ? <X size={24} /> : <Menu size={24} />}
+              {link.name}
+            </a>
+          ))}
+
+          <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-3 rounded-lg">
+            Login
+          </Link>
+
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
+            >
+              <User className="w-5 h-5 text-gray-700" />
+              <span className="text-gray-700 font-medium">John Doe</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  userMenuOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
 
             {userMenuOpen && (
@@ -61,34 +77,58 @@ export default function Navbar() {
               </div>
             )}
           </div>
-        </div>
+        </nav>
+
+        {/* Mobile Button */}
+        <button
+          className="md:hidden text-gray-700 hover:text-indigo-600 transition cursor-pointer"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`md:hidden bg-white shadow-md transition-transform duration-300 ${
-          open ? "max-h-screen" : "max-h-0 overflow-hidden"
-        }`}
-      >
-        <nav className="flex flex-col px-6 py-4 space-y-3">
-          {links.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-gray-700 hover:text-indigo-600 font-medium"
-              onClick={() => setOpen(false)}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 shadow-md animate-slideDown">
+          <nav className="flex flex-col px-6 py-4 space-y-3">
+            {links.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className="text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.name}
+              </a>
+            ))}
+
+            <Link
+              to="/login" className="cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg text-center"
+              onClick={() => setMobileOpen(false)}
             >
-              {link.name}
-            </a>
-          ))}
-          <Button
-            className="cursor-pointer  bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition"
-            onClick={() => setOpen(false)}
-          >
-            Sign Up
-          </Button>
-        </nav>
-      </div>
+              Login
+            </Link>
+
+            <button
+              className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md cursor-pointer"
+              onClick={() => {
+                setMobileOpen(false);
+                setLogoutOpen(true);
+              }}
+            >
+              <LogOut className="w-5 h-5" /> Logout
+            </button>
+          </nav>
+        </div>
+      )}
+
+      {/* Logout Dialog */}
+      <LogoutDialog
+        isOpen={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        onLogout={handleLogout}
+      />
     </header>
   );
 }

@@ -3,13 +3,16 @@ import { ArrowRight } from "lucide-react";
 
 export default function CTA() {
   return (
-    <section className="bg-indigo-600 py-16 text-white text-center">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold mb-4">
-          Ready to elevate your team’s productivity?
+    <section className="bg-gray-100 py-20 text-gray-900">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Heading */}
+        <h2 className="text-4xl sm:text-5xl font-extrabold mb-4">
+          Take Your Team to the Next Level
         </h2>
-        <p className="mb-6 text-lg">
-          Sign up today and start managing your projects like a pro.
+
+        {/* Subheading */}
+        <p className="text-lg sm:text-xl mb-8 text-gray-700">
+          Join thousands of teams worldwide who are managing projects efficiently and collaborating seamlessly.
         </p>
 
         {/* Buttons */}

@@ -1,5 +1,7 @@
+import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import Login from '@/modules/auth/pages/Login';
+import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
 // Pages
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
@@ -11,13 +13,16 @@ import SuccessPage from "@/modules/checkout/components/SuccessPage";
 
 export default function App() {
   return (
+    <>
     <Router>
-      <Layout>
+<Layout>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/success" element={<SuccessPage />} />
+           <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ResetPassword />} />
 
           {/* Protected routes */}
           <Route
@@ -32,5 +37,7 @@ export default function App() {
         </Routes>
       </Layout>
     </Router>
-  );
+    <Toaster position="top-center" reverseOrder={false} />
+    </>
+  )
 }

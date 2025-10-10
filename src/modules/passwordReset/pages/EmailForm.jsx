@@ -1,0 +1,72 @@
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { validateField } from "@/utils/validation";
+import { forgotPassword } from "../services.js";
+
+export default function EmailForm({ setIsOtpSent, setEmail }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const form = useForm({ defaultValues: { email: "" } });
+
+  const onSubmit = async (values) => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await forgotPassword({ email: values.email });
+      toast.success("OTP sent to your email!");
+      setIsOtpSent(true);
+      setEmail(values.email);
+    } catch (err) {
+      setError(err);
+      toast.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h1 className="text-4xl font-bold mb-4 text-gray-800 text-center">Forgot Password 🔐</h1>
+      <p className="text-gray-600 mb-8 text-center text-lg">
+        Enter your registered email to receive an OTP.
+      </p>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="email"
+            rules={{ validate: validateField.email }}
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...field}
+                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </FormControl>
+                {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+              </FormItem>
+            )}
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg cursor-pointer transition"
+            disabled={loading}
+          >
+            {loading ? "Sending..." : "Send OTP"}
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+}

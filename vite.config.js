@@ -7,6 +7,9 @@ import path from "path";
 export default defineConfig({
   plugins: [react(), tailwindcss(),
   ],
+   optimizeDeps: {
+    include: ["react-hot-toast"]
+  },
   resolve: {
   alias: {
     "@": path.resolve(__dirname, "./src"),
@@ -19,7 +22,7 @@ export default defineConfig({
 },server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5000", // your backend
+        target: "http://localhost:5000",
         changeOrigin: true,
       },
     },
