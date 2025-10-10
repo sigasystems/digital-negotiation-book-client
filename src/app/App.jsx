@@ -2,32 +2,40 @@ import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from '@/modules/auth/pages/Login';
 import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
+// Pages
+import LandingPage from "@/modules/landing/pages/LandingPage";
+import CheckoutPage from "@/modules/checkout/pages/Checkout";
 
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
-import LandingPage from "@/modules/landing/pages/LandingPage";
+import Layout from "@/components/layout/Layout";
+import SuccessPage from "@/modules/checkout/components/SuccessPage";
 
 export default function App() {
   return (
     <>
-     <Router>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
+    <Router>
+<Layout>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+           <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
-        {/* <Route path="/register" element={<Register />} />  */}
 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              {/* <DashboardHome /> */}
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                {/* <DashboardHome /> */}
+                <div>Dashboard</div>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Layout>
     </Router>
     <Toaster position="top-center" reverseOrder={false} />
     </>

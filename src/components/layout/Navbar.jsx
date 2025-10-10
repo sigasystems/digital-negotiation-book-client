@@ -38,7 +38,7 @@ export default function Navbar() {
             <a
               key={link.name}
               href={link.href}
-              className="text-gray-700 hover:text-indigo-600 font-medium transition cursor-pointer"
+              className="cursor-pointer text-gray-700 hover:text-indigo-600 font-medium transition cursor-pointer"
             >
               {link.name}
             </a>
@@ -72,7 +72,7 @@ export default function Navbar() {
                   }}
                   className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer text-sm"
                 >
-                  <LogOut className="w-4 h-4" /> Logout
+                  <LogOut className= "w-4 h-4" /> Logout
                 </button>
               </div>
             )}
@@ -104,7 +104,7 @@ export default function Navbar() {
             ))}
 
             <Link
-              to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg text-center"
+              to="/login" className="cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg text-center"
               onClick={() => setMobileOpen(false)}
             >
               Login

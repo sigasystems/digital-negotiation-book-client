@@ -18,7 +18,7 @@ export default function CTA() {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
           <Button
-            className="bg-blue-600 text-white px-8 py-3 text-lg font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-200 flex items-center justify-center"
+            className="cursor-pointer bg-blue-600 text-white px-8 py-3 text-lg font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-200 flex items-center justify-center"
           >
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -26,7 +26,7 @@ export default function CTA() {
 
           <Button
             variant="outline"
-            className="border-blue-600 text-blue-600 px-8 py-3 text-lg font-medium rounded-lg hover:bg-blue-50 transition-all duration-200"
+            className="cursor-pointer border-blue-600 text-blue-600 px-8 py-3 text-lg font-medium rounded-lg hover:bg-blue-50 transition-all duration-200"
           >
             Learn More
           </Button>
