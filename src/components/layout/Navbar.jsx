@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const links = [
     { name: "Features", href: "#features" },
@@ -32,7 +33,7 @@ export default function Navbar() {
                 {link.name}
               </a>
             ))}
-            <Button className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <Button className="cursor-pointer  bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
               Sign Up
             </Button>
           </nav>
@@ -45,6 +46,20 @@ export default function Navbar() {
             >
               {open ? <X size={24} /> : <Menu size={24} />}
             </button>
+
+            {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-white rounded-md shadow-lg border border-gray-100 overflow-hidden z-50">
+                <button
+                  onClick={() => {
+                    setLogoutOpen(true);
+                    setUserMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer text-sm"
+                >
+                  <LogOut className= "w-4 h-4" /> Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -67,7 +82,7 @@ export default function Navbar() {
             </a>
           ))}
           <Button
-            className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition"
+            className="cursor-pointer  bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition"
             onClick={() => setOpen(false)}
           >
             Sign Up

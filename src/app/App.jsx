@@ -1,29 +1,36 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+// Pages
+import LandingPage from "@/modules/landing/pages/LandingPage";
+import CheckoutPage from "@/modules/checkout/pages/Checkout";
 
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
-import LandingPage from "@/modules/landing/pages/LandingPage";
+import Layout from "@/components/layout/Layout";
+import SuccessPage from "@/modules/checkout/components/SuccessPage";
 
 export default function App() {
   return (
     <Router>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        {/* <Route path="/login" element={<LogIn />} />
-        <Route path="/register" element={<Register />} /> */}
+      <Layout>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/success" element={<SuccessPage />} />
 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              {/* <DashboardHome /> */}
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                {/* <DashboardHome /> */}
+                <div>Dashboard</div>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Layout>
     </Router>
   );
 }

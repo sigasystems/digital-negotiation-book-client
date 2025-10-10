@@ -30,7 +30,7 @@ export default function Hero() {
           {/* Left Column - Content */}
           <div className="lg:col-span-6 space-y-8">
             {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full border border-indigo-100">
+            <div className="inline-flex items-center gap-2 px-4 mt-10 py-2 bg-indigo-50 rounded-full border border-indigo-100">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span className="text-xs font-medium text-indigo-700">
                 Trusted by 50,000+ professionals
@@ -64,6 +64,9 @@ export default function Hero() {
               Streamline collaboration, optimize resources, and accelerate
               delivery with our intelligent platform designed for modern
               fish-selling businesses.
+              Streamline collaboration, optimize resources, and accelerate
+              delivery with our intelligent platform designed for modern
+              fish-selling businesses.
             </p>
 
             {/* Feature Tags */}
@@ -73,9 +76,15 @@ export default function Hero() {
                 <span className="text-xs font-medium text-emerald-700">
                   Real-time Sync
                 </span>
+                <span className="text-xs font-medium text-emerald-700">
+                  Real-time Sync
+                </span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
                 <Zap className="w-3.5 h-3.5 text-blue-600" />
+                <span className="text-xs font-medium text-blue-700">
+                  Lightning Fast
+                </span>
                 <span className="text-xs font-medium text-blue-700">
                   Lightning Fast
                 </span>
@@ -85,16 +94,19 @@ export default function Hero() {
                 <span className="text-xs font-medium text-purple-700">
                   Secure & Safe
                 </span>
+                <span className="text-xs font-medium text-purple-700">
+                  Secure & Safe
+                </span>
               </div>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Button className="group px-6 py-3 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button className="cursor-pointer group px-6 py-3 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg flex items-center justify-center transition-all duration-300">
                 Get Started Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button className="group px-6 py-3 text-sm font-semibold bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md border border-gray-200 hover:border-indigo-300 transition-all duration-300">
+              <Button className="cursor-pointer group px-6 py-3 text-sm font-semibold bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md border border-gray-200 flex items-center justify-center transition-all duration-300">
                 <Play className="mr-2 w-4 h-4" />
                 Watch Demo
               </Button>
@@ -109,7 +121,9 @@ export default function Hero() {
                   </div>
                   <div className="text-2xl font-bold text-gray-900">50K+</div>
                 </div>
-                <div className="text-xs text-gray-500 font-medium">Active Users</div>
+                <div className="text-xs text-gray-500 font-medium">
+                  Active Users
+                </div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -127,7 +141,9 @@ export default function Hero() {
                   </div>
                   <div className="text-2xl font-bold text-gray-900">4.9</div>
                 </div>
-                <div className="text-xs text-gray-500 font-medium">User Rating</div>
+                <div className="text-xs text-gray-500 font-medium">
+                  User Rating
+                </div>
               </div>
             </div>
           </div>
