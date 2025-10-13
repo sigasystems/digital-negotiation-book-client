@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
-// Dummy auth check, replace with real context/store
 const isAuthenticated = () => {
-  return localStorage.getItem("token") ? true : false;
+  const userCookie = Cookies.get("userInfo");
+  return !!userCookie;
 };
 
 export default function ProtectedRoute({ children }) {

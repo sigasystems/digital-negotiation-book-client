@@ -33,12 +33,14 @@ export default function Login() {
     try {
         const data = await login(values);
         const token = data.data.accessToken
-        if (token) {
-        sessionStorage.setItem("authToken", token);
+        if (data.statusCode === 200 && data.success === true && token) {
+          sessionStorage.setItem("authToken", token);
+          toast.success("Logged in successfully!");
+          navigate("/dashboard");
+        } else {
+          toast.error("Something went wrong! Please try again later.");
         }
 
-        toast.success("Logged in successfully!");
-        navigate("/");
     } catch (err) {
         setError(err);
         toast.error(err);
@@ -125,7 +127,7 @@ export default function Login() {
             </form>
           </Form>
 
-          <div className="flex flex-col sm:flex-row justify-center mt-6 text-base text-gray-700 font-medium gap-6">
+          <div className="flex justify-center mt-6 text-base text-gray-700 font-medium gap-6 flex-wrap">
             <Link
               to="/forgot-password"
               className="hover:text-blue-600 cursor-pointer transition-colors duration-200"
@@ -140,12 +142,12 @@ export default function Login() {
             </Link>
           </div>
 
-          <Button
+          <Link
             onClick={() => navigate("/")}
-            className="mt-8 w-full bg-blue-100 hover:bg-blue-300 text-blue-800 font-medium py-3 rounded-lg cursor-pointer transition"
+            className="mt-8 block w-full text-center bg-blue-100 hover:bg-blue-300 text-blue-800 font-medium py-2 rounded-lg cursor-pointer transition"
           >
             Back to Home
-          </Button>
+          </Link>
         </div>
       </div>
 
