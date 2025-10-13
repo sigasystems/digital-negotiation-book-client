@@ -32,9 +32,14 @@ export default function Login() {
     setError("");
     try {
         const data = await login(values);
+        const tokenPayload = data.data.tokenPayload;
         const token = data.data.accessToken
         if (data.statusCode === 200 && data.success === true && token) {
+            if (sessionStorage.getItem("user")) {
+          sessionStorage.removeItem("user");
+        }
           sessionStorage.setItem("authToken", token);
+          sessionStorage.setItem("user", JSON.stringify(tokenPayload));
           toast.success("Logged in successfully!");
           navigate("/dashboard");
         } else {
