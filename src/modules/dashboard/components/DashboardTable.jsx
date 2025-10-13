@@ -25,79 +25,93 @@ import { getAllBusinessOwners } from "../services/dashboardService";
 
 // Helper to create page numbers with ellipsis
 const getPageNumbers = (current, total) => {
+  if (total <= 1) return [0];
   const delta = 2;
   const range = [];
   const left = Math.max(0, current - delta);
   const right = Math.min(total - 1, current + delta);
 
-  for (let i = left; i <= right; i++) {
-    range.push(i);
-  }
+  for (let i = left; i <= right; i++) range.push(i);
 
   if (left > 1) range.unshift("...");
-  if (left > 0) range.unshift(0); // first page
-
+  if (left > 0) range.unshift(0);
   if (right < total - 2) range.push("...");
-  if (right < total - 1) range.push(total - 1); // last page
+  if (right < total - 1) range.push(total - 1);
 
-  return range;
+  return range.filter(
+    (p, idx, arr) => idx === 0 || p !== "..." || arr[idx - 1] !== "..."
+  );
 };
 
-// Custom Pagination component
-const Pagination = ({ pageIndex, totalPages, onPageChange, pageSize, onPageSizeChange }) => {
-  // Ensure totalPages >= 1
-  const pages = [];
-  for (let i = 0; i < totalPages; i++) {
-    // show first, last, current ±1
-    if (i === 0 || i === totalPages - 1 || (i >= pageIndex - 1 && i <= pageIndex + 1)) {
-      pages.push(i);
-    } else if (i === pageIndex - 2 || i === pageIndex + 2) {
-      pages.push("...");
-    }
-  }
-
-  // Remove consecutive "..."
-  const uniquePages = pages.filter((p, idx) => idx === 0 || p !== "..." || pages[idx - 1] !== "...");
+// Pagination component
+const Pagination = ({
+  pageIndex,
+  totalPages,
+  onPageChange,
+  pageSize,
+  onPageSizeChange,
+}) => {
+  const pages = getPageNumbers(pageIndex, totalPages || 1);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-      <div className="flex items-center gap-2">
-        <span>Rows per page:</span>
+    <div className="flex flex-col items-center gap-4 mt-6 py-4 border-t border-gray-200">
+      {/* Rows per page selector */}
+      <div className="flex items-center gap-2 text-sm">
+        <span className="text-gray-600">Rows per page:</span>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="border rounded px-2 py-1"
+          className="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {[10, 20, 50].map(size => <option key={size} value={size}>{size}</option>)}
+          {[10, 20, 50].map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="flex gap-1 flex-wrap justify-center sm:justify-end">
+      <div className="flex items-center justify-center flex-wrap gap-1">
         <button
-          disabled={pageIndex <= 0}
+          disabled={pageIndex <= 0 || totalPages <= 1}
           onClick={() => onPageChange(pageIndex - 1)}
-          className={`px-3 py-1 rounded border ${pageIndex <= 0 ? "bg-gray-200 cursor-not-allowed" : "bg-white hover:bg-gray-100"}`}
+          className={`px-3 py-1 rounded border text-sm ${
+            pageIndex <= 0 || totalPages <= 1
+              ? "bg-gray-200 cursor-not-allowed text-gray-500"
+              : "bg-white hover:bg-gray-100"
+          }`}
         >
           Previous
         </button>
 
-       {uniquePages.map((p, idx) => (
-  p === "..." ? (
-    <span key={idx} className="px-2 py-1">...</span>
-  ) : (
-    <Button
-      key={idx}
-      onClick={() => onPageChange(Number(p))}
-      className={p === pageIndex ? "bg-blue-500 text-white" : ""}
-    >
-      {p + 1}
-    </Button>
-  )
-))}
+        {pages.map((p, idx) =>
+          p === "..." ? (
+            <span key={idx} className="px-2 py-1 text-gray-500">
+              ...
+            </span>
+          ) : (
+            <button
+              key={idx}
+              onClick={() => onPageChange(p)}
+              className={`px-3 py-1 rounded border text-sm ${
+                p === pageIndex
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white hover:bg-gray-100"
+              }`}
+            >
+              {p + 1}
+            </button>
+          )
+        )}
+
         <button
-          disabled={pageIndex >= totalPages - 1}
+          disabled={pageIndex >= totalPages - 1 || totalPages <= 1}
           onClick={() => onPageChange(pageIndex + 1)}
-          className={`px-3 py-1 rounded border ${pageIndex >= totalPages - 1 ? "bg-gray-200 cursor-not-allowed" : "bg-white hover:bg-gray-100"}`}
+          className={`px-3 py-1 rounded border text-sm ${
+            pageIndex >= totalPages - 1 || totalPages <= 1
+              ? "bg-gray-200 cursor-not-allowed text-gray-500"
+              : "bg-white hover:bg-gray-100"
+          }`}
         >
           Next
         </button>
@@ -119,7 +133,7 @@ export default function DashboardTable() {
     pageSize: 10,
   });
 
-  // Fetch paginated data
+  // Fetch business owners
   const fetchOwners = async () => {
     setLoading(true);
     try {
@@ -127,9 +141,11 @@ export default function DashboardTable() {
         pageIndex: Number(pagination.pageIndex) || 0,
         pageSize: Number(pagination.pageSize) || 10,
       });
-      setData(response.data.data);
-      setTotalItems(response.totalItems);
-      setTotalPages(response.totalPages);
+
+      const { data: rows, totalItems } = response.data;
+      setData(rows);
+      setTotalItems(totalItems);
+      setTotalPages(Math.ceil(totalItems / pagination.pageSize));
     } catch (err) {
       console.error("Failed to fetch business owners:", err);
     } finally {
@@ -137,9 +153,9 @@ export default function DashboardTable() {
     }
   };
 
-useEffect(() => {
-  fetchOwners();
-}, [pagination.pageIndex, pagination.pageSize]);
+  useEffect(() => {
+    fetchOwners();
+  }, [pagination.pageIndex, pagination.pageSize]);
 
   const columns = [
     {
@@ -215,8 +231,8 @@ useEffect(() => {
   onSortingChange: setSorting,
   onColumnFiltersChange: setColumnFilters,
   onRowSelectionChange: setRowSelection,
-  manualPagination: true, // <--- important
-  pageCount: totalPages,  // <--- important
+  manualPagination: true,
+  pageCount: totalPages,
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
@@ -226,7 +242,7 @@ useEffect(() => {
   if (loading) return <div className="p-6 text-center">Loading business owners...</div>;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen overflow-x-hidden">
       {/* Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center mb-4 gap-4">
         <Input
@@ -237,15 +253,20 @@ useEffect(() => {
         />
       </div>
 
-      {/* Table */}
-      <div className="overflow-auto">
-        <Table className="min-w-[1200px] md:min-w-full">
+  <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-x-auto max-w-full">
+      <div className="inline-block min-w-full align-middle">
+        <Table className="min-w-[1000px]">
           <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}
+                    className="whitespace-nowrap bg-gray-50 sticky top-0 z-10">
+                    {header.isPlaceholder ? null : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -253,10 +274,10 @@ useEffect(() => {
           </TableHeader>
           <TableBody>
             {data.length > 0 ? (
-              table.getRowModel().rows.map(row => (
+              table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -264,7 +285,7 @@ useEffect(() => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500">
                   No results.
                 </TableCell>
               </TableRow>
@@ -272,17 +293,16 @@ useEffect(() => {
           </TableBody>
         </Table>
       </div>
+    </div>
+      </div>
 
-      {/* Custom Pagination */}
       <Pagination
   pageIndex={pagination.pageIndex}
   totalPages={totalPages}
   pageSize={pagination.pageSize}
-  onPageChange={(page) => {
-    console.log("Changing page to", page);
-    setPagination(prev => ({ ...prev, pageIndex: page }));
-  }}
-  onPageSizeChange={(size) => setPagination(prev => ({ ...prev, pageSize: size, pageIndex: 0 }))}
+  onPageChange={(page) =>
+    setPagination((prev) => ({ ...prev, pageIndex: page }))
+  }  onPageSizeChange={(size) => setPagination((prev) => ({ ...prev, pageSize: size, pageIndex: 0, }))}
 />
 
     </div>
