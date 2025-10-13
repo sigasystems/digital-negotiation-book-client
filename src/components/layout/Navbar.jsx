@@ -44,7 +44,7 @@ export default function Navbar() {
             </a>
           ))}
 
-          <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-3 rounded-lg">
+          <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg">
             Login
           </Link>
 

@@ -16,13 +16,11 @@ export const createPayment = async (payload) => {
 export const becomeBusinessOwner = async (payload) => {
   try {
 
-    console.log("user payloadq", payload);
     const response = await apiClient.post(
       "/business-owner/become-business-owner",
       payload,
       { withCredentials: true }
     );
-    console.log("becomeBusinessOwner axios response:", response);
     return response.data; // ✅ should contain { success, message, data }
   } catch (err) {
     console.error("Error in becomeBusinessOwner service:", err);

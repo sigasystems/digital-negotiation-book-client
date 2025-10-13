@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
 import { resetPasswordWithOtp } from "../services.js";
 import { Eye, EyeOff } from "lucide-react";
+import { dismissToast, showSuccess } from "@/components/common/toastService.js";
 
 export default function OtpAndPasswordForm({ email, navigate }) {
   const [loading, setLoading] = useState(false);
@@ -28,18 +29,18 @@ export default function OtpAndPasswordForm({ email, navigate }) {
     setError("");
     try {
       if (!showPasswordFields) {
-        toast.error("Please enter a valid 6-digit OTP first.");
+        dismissToast("Please enter a valid 6-digit OTP first.");
         return;
       }
 
       if (values.password !== values.confirmPassword) {
-        toast.error("Passwords do not match!");
+        dismissToast("Passwords do not match!");
         return;
       }
 
       const passwordError = validateField.password(values.password);
       if (!passwordError) {
-        toast.error(passwordError);
+        dismissToast(passwordError);
         return;
       }
 
@@ -49,11 +50,11 @@ export default function OtpAndPasswordForm({ email, navigate }) {
         password: values.password,
       });
 
-      toast.success("Password reset successful! You can now log in.");
+       showSuccess("Password reset successful! You can now log in.");
       navigate("/login");
     } catch (err) {
       setError(err);
-      toast.error(err);
+      dismissToast(err);
     } finally {
       setLoading(false);
     }

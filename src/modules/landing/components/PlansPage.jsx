@@ -8,16 +8,19 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { formateCurrency } from "@/lib/utils";
-import { Link } from "react-router-dom";
 import { getAllPlans } from "../services/planService";
+import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
+
 
 export default function PlansPage() {
   const [plans, setPlans] = useState([]);
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ isLoggedIn , setisLoggedIn ] = useState(false);
+const navigate = useNavigate();
 
-console.log("plans", plans);
 useEffect(() => {
   async function fetchPlans() {
     try {
@@ -188,7 +191,7 @@ useEffect(() => {
               </ul>
             </CardContent>
 
-            <CardFooter className="flex justify-center mt-6">
+            {/* <CardFooter className="flex justify-center mt-6">
               <Link
                 to="/checkout"
                 state={{ selectedPlan: plan, billingCycle }}
@@ -200,7 +203,29 @@ useEffect(() => {
               >
                 Choose {plan.name}
               </Link>
-            </CardFooter>
+            </CardFooter> */}
+
+            <CardFooter className="flex justify-center mt-6">
+  <button
+    onClick={() => {
+      if (!isLoggedIn) {
+        toast.error("Please log in to choose a plan");
+        return;
+      }
+      // If logged in, navigate to checkout
+      navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
+    }}
+    className={`inline-flex items-center justify-center w-full py-2 font-semibold rounded-lg ${
+      plan.isDefault
+        ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+        : "bg-gray-800 hover:bg-gray-900 text-white"
+    }`}
+  >
+    Choose {plan.name}
+  </button>
+</CardFooter>
+
+
           </Card>
         ))}
       </div>
