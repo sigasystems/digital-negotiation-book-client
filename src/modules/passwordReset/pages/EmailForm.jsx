@@ -5,7 +5,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
 import { forgotPassword } from "../services.js";
-
+import { showSuccess , dismissToast } from "@/components/common/toastService.js";
 export default function EmailForm({ setIsOtpSent, setEmail }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,12 +16,12 @@ export default function EmailForm({ setIsOtpSent, setEmail }) {
     setError("");
     try {
       const data = await forgotPassword({ email: values.email });
-      toast.success("OTP sent to your email!");
+       showSuccess("OTP sent to your email!");
       setIsOtpSent(true);
       setEmail(values.email);
     } catch (err) {
       setError(err);
-      toast.error(err);
+      dismissToast(err);
     } finally {
       setLoading(false);
     }

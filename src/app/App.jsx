@@ -9,11 +9,14 @@ import CheckoutPage from "@/modules/checkout/pages/Checkout";
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
 import Layout from "@/components/layout/Layout";
-import SuccessPage from "@/modules/checkout/components/SuccessPage";
+import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
+import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 
 export default function App() {
   return (
     <>
+    {/* <Toaster position="top-right" reverseOrder={false} /> */}
+
     <Router>
 <Layout>
         <Routes>
@@ -22,6 +25,7 @@ export default function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/success" element={<SuccessPage />} />
            <Route path="/login" element={<Login />} />
+           <Route path="/paymentsuccess" element={<PaymentSuccess />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
 
           {/* Protected routes */}
