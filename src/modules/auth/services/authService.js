@@ -2,7 +2,7 @@ import { apiClient } from "@/utils/apiClient";
 
 export const login = async (data) => {
   try {
-    const response = await apiClient.post("/auth/login", data);
+    const response = await apiClient.post("/auth/login", data, { withCredentials: true });
     return response.data;
   } catch (error) {
     throw error.response?.data?.message || "Something went wrong";

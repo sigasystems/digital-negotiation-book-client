@@ -5,14 +5,27 @@ import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
 // Pages
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
+import DashboardHome from "@/modules/dashboard/pages/DashboardHome";
 
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
 import Layout from "@/components/layout/Layout";
 import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
 import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
+import { useDispatch } from "react-redux";
+import { getUserFromCookie } from "@/utils/auth";
+import { useEffect } from "react";
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const user = getUserFromCookie();
+    if (user) {
+      dispatch({ type: "auth/loginUser/fulfilled", payload: user });
+    }
+  }, [dispatch]);
+
   return (
     <>
     {/* <Toaster position="top-right" reverseOrder={false} /> */}
@@ -33,8 +46,7 @@ export default function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                {/* <DashboardHome /> */}
-                <div>Dashboard</div>
+                <DashboardHome />
               </ProtectedRoute>
             }
           />

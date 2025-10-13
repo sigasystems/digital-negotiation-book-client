@@ -29,7 +29,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile toggle */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b bg-white shadow-sm">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4 border-b bg-white shadow-sm">
         <h1 className="text-lg font-semibold">MyApp</h1>
         <Button variant="ghost" size="icon" onClick={toggleMobile}>
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

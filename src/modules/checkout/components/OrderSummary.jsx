@@ -77,9 +77,7 @@ export default function OrderSummary({
       userId,
       planId: selectedPlan.id,
     };
-
     const paymentRes = await createPayment(paymentPayload);
-
     if (paymentRes?.checkoutUrl) {
        toast("Redirecting to Stripe checkout...");
 

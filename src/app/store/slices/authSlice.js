@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 const initialState = {
-  user: null,
+  user: Cookies.get("userInfo") ? JSON.parse(Cookies.get("userInfo")) : null,
   loading: false,
   error: null,
 };
@@ -13,7 +14,11 @@ export const loginUser = createAsyncThunk(
       // simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       if (credentials.email === "admin@test.com" && credentials.password === "123456") {
-        return { email: credentials.email };
+        const user = { email: credentials.email, name: "Admin User", userRole: "super_admin" };
+        
+        Cookies.set("userInfo", JSON.stringify(user), { expires: 7 });
+        
+        return user;
       } else {
         throw new Error("Invalid credentials");
       }
@@ -29,6 +34,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      Cookies.remove("userInfo"); 
     },
   },
   extraReducers: (builder) => {
