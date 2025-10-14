@@ -191,27 +191,14 @@ useEffect(() => {
               </ul>
             </CardContent>
 
-            {/* <CardFooter className="flex justify-center mt-6">
-              <Link
-                to="/checkout"
-                state={{ selectedPlan: plan, billingCycle }}
-                className={`inline-flex items-center justify-center w-full py-2 font-semibold rounded-lg ${
-                  plan.isDefault
-                    ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-                    : "bg-gray-800 hover:bg-gray-900 text-white"
-                }`}
-              >
-                Choose {plan.name}
-              </Link>
-            </CardFooter> */}
 
             <CardFooter className="flex justify-center mt-6">
   <button
     onClick={() => {
-      if (!isLoggedIn) {
-        toast.error("Please log in to choose a plan");
-        return;
-      }
+      // if (!isLoggedIn) {
+      //   toast.error("Please log in to choose a plan");
+      //   return;
+      // }
       // If logged in, navigate to checkout
       navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
     }}

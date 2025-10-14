@@ -27,3 +27,8 @@ export const becomeBusinessOwner = async (payload) => {
     throw err.response?.data?.message || "Failed to create business owner";
   }
 };
+
+export const checkRegistrationNumber = async (registrationNumber) => {
+  const res = await apiClient.get(`/business-owner/check-registration/${registrationNumber}`);
+  return res.data;
+};

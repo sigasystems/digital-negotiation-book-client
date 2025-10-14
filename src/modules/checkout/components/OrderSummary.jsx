@@ -4,7 +4,7 @@ import { Check, CreditCard, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {  createPayment } from "../services/paymentService";
+import {  becomeBusinessOwner, createPayment } from "../services/paymentService";
 import { toast } from "react-hot-toast";
 
 
@@ -13,7 +13,7 @@ export default function OrderSummary({
   billingCycle = "monthly",
   calculateTotal,
   formData = {}, // ✅ default to empty object
-  userId = "c3cd498b-b986-42f5-9f88-e10b28cdd437",
+  userId : userId,
   loading = false,
 }) {
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +62,7 @@ export default function OrderSummary({
 };
 
 
- const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!validateForm()) {
     toast("Please fill in all required fields.");
     return;
@@ -71,7 +71,7 @@ export default function OrderSummary({
   setSubmitting(true);
 
   try {
-    // Step 1️⃣ Create Stripe payment
+    // 1️⃣ Create Stripe payment session
     const paymentPayload = {
       isStripe: true,
       userId,
@@ -79,9 +79,9 @@ export default function OrderSummary({
     };
     const paymentRes = await createPayment(paymentPayload);
     if (paymentRes?.checkoutUrl) {
-       toast("Redirecting to Stripe checkout...");
+      toast("Redirecting to Stripe checkout...");
 
-      // Step 2️⃣ Save business data temporarily before redirect
+      // 2️⃣ Store pending data for after checkout
       sessionStorage.setItem(
         "pendingBusinessData",
         JSON.stringify({
@@ -92,14 +92,14 @@ export default function OrderSummary({
         })
       );
 
-      // Step 3️⃣ Redirect to Stripe checkout page
+      // 3️⃣ Redirect to Stripe checkout page
       window.location.href = paymentRes.checkoutUrl;
     } else {
-      toast("Checkout URL not received from server.");
+      toast.error("Checkout URL not received from server.");
     }
   } catch (err) {
     console.error("Error during payment creation:", err);
-    toast(err.response?.data?.message || err.message || "Something went wrong");
+    toast.error(err.response?.data?.message || err.message || "Something went wrong");
   } finally {
     setSubmitting(false);
   }
