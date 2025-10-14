@@ -1,9 +1,19 @@
 import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const isAuthenticated = () => {
-  const userCookie = Cookies.get("userInfo");
-  return !!userCookie;
+  const userCookie = sessionStorage.getItem("user");
+  if (!userCookie) return false;
+
+  try {
+    const userInfo = JSON.parse(userCookie);
+    return (
+      userInfo.userRole === "super_admin" ||
+      userInfo.userRole === "business_owner"
+    );
+  } catch (error) {
+    console.error("Invalid cookie format:", error);
+    return false;
+  }
 };
 
 export default function ProtectedRoute({ children }) {
