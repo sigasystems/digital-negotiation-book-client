@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,99 +7,102 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
-
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "../../../components/ui/table";
 import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
 import { Checkbox } from "../../../components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "../../../components/ui/dropdown-menu";
-import { Circle, MoreHorizontal } from "lucide-react";
+import { ActionsCell } from "@/utils/ActionsCell";
+import { Circle } from "lucide-react";
 import { getAllBusinessOwners } from "../services/dashboardService";
-
-import {
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { usePagination } from "@/app/hooks/usePagination";
+import { Pagination } from "@/utils/Pagination";
 
 export default function DashboardTable() {
   const [data, setData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [pageSize, setPageSize] = useState(10); // default page size
+
+  const { pageIndex, pageSize, totalPages, setPageIndex, setPageSize } =
+    usePagination({ totalItems, initialPageSize: 10 });
+
+  const fetchOwners = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllBusinessOwners({ pageIndex, pageSize });
+      const { data: rows, totalItems } = response.data;
+
+      setData(rows);
+      setTotalItems(totalItems);
+    } catch (err) {
+      console.error("Failed to fetch business owners:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOwners = async () => {
-      try {
-        const response = await getAllBusinessOwners();
-        const owners = response.data.owners.map(owner => ({
-          id: owner.id,
-          name: `${owner.first_name} ${owner.last_name}`,
-          email: owner.email,
-          status: owner.status?.toUpperCase() || "INACTIVE",
-          businessName: owner.businessName,
-          phoneNumber: owner.phoneNumber,
-          city: owner.city,
-          state: owner.state,
-          country: owner.country,
-          registrationNumber: owner.registrationNumber,
-          postalCode: owner.postalCode,
-          address: owner.address,
-          createdAt: owner.createdAt,
-          updatedAt: owner.updatedAt,
-        }));
-        setData(owners);
-      } catch (err) {
-        console.error("Failed to fetch business owners:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOwners();
-  }, []);
+  }, [pageIndex, pageSize]);
 
-  const columns = [
+const columns = useMemo(() => {
+  const SelectColumn = {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onChange={(e) => row.toggleSelected(e.target.checked)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+  };
+
+  const StatusCell = ({ row }) => {
+    const status = row.getValue("status");
+    return (
+      <span
+        className={`flex items-center gap-2 font-medium ${
+          status === "active" ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        <Circle
+          className={`w-3 h-3 ${
+            status === "active" ? "fill-green-500" : "fill-red-500"
+          }`}
+        />
+        {status}
+      </span>
+    );
+  };
+
+  return [
+    SelectColumn,
     {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-          onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onChange={(e) => row.toggleSelected(e.target.checked)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
+      id: "name",
+      header: "Name",
+      cell: ({ row }) => `${row.original.first_name} ${row.original.last_name}`,
     },
-    { accessorKey: "name", header: "Name" },
     { accessorKey: "email", header: "Email" },
-    { accessorKey: "status", header: "Status", cell: ({ row }) => {
-      const status = row.getValue("status");
-      return (
-        <span className={`flex items-center gap-2 font-medium ${status === "ACTIVE" ? "text-green-600" : "text-red-600"}`}>
-          <Circle className={`w-3 h-3 ${status === "ACTIVE" ? "fill-green-500" : "fill-red-500"}`} />
-          {status}
-        </span>
-      );
-    }},
+    { accessorKey: "status", header: "Status", cell: StatusCell },
     { accessorKey: "businessName", header: "Business Name" },
     { accessorKey: "phoneNumber", header: "Phone Number" },
     { accessorKey: "city", header: "City" },
@@ -110,140 +113,110 @@ export default function DashboardTable() {
     { accessorKey: "address", header: "Address" },
     { accessorKey: "createdAt", header: "Created At" },
     { accessorKey: "updatedAt", header: "Updated At" },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(row.original.email)}>
-              Copy Email
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View Owner</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
+    { id: "actions", cell: ({ row }) => <ActionsCell row={row} refreshData={fetchOwners}/> },
   ];
+}, []);
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, rowSelection, pagination: { pageSize } },
+    state: { sorting, columnFilters, rowSelection, pagination: { pageIndex, pageSize } },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    pageCount: totalPages,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: (updater) => {
-      const newState = typeof updater === "function" ? updater(table.getState().pagination) : updater;
-      setPageSize(newState.pageSize);
-      table.setPageIndex(newState.pageIndex);
-    },
-    debugTable: true,
   });
 
-  console.log("table.getRowModel().rows.length",table.getRowModel().rows.length)
+  if (loading)
+    return <div className="p-6 text-center">Loading business owners...</div>;
 
-  if (loading) return <div className="p-6 text-center">Loading business owners...</div>;
-
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex flex-col sm:flex-row sm:items-center mb-4 gap-4">
+return (
+  <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+    <div className="max-w-full mx-auto space-y-4">
+      {/* Search Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <Input
           placeholder="Filter emails..."
           value={table.getColumn("email")?.getFilterValue() || ""}
           onChange={(e) => table.getColumn("email")?.setFilterValue(e.target.value)}
-          className="max-w-sm"
+          className="max-w-md"
         />
       </div>
 
-      <div className="overflow-auto">
-        <Table className="min-w-[1200px] md:min-w-full">
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+      {/* Table Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[1000px]">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className="whitespace-nowrap bg-gray-50 font-semibold text-gray-700 border-b-2 border-gray-200"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                    className={`
+                      transition-colors
+                      ${row.getIsSelected() ? "bg-blue-50" : ""}
+                      ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
+                      hover:bg-gray-100
+                    `}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="whitespace-nowrap text-gray-700">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell 
+                    colSpan={columns.length} 
+                    className="h-32 text-center text-gray-500"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <p className="font-medium">No results found</p>
+                      <p className="text-sm text-gray-400">Try adjusting your filters</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between py-4 gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Rows per page:</span>
-          <select
-            className="border rounded p-1"
-            value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
-          >
-            {[10, 20, 50].map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-
-        <Pagination>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            />
-          </PaginationItem>
-
-          {Array.from({ length: table.getPageCount() }).map((_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                isActive={table.getState().pagination.pageIndex === index}
-                onClick={() => table.setPageIndex(index)}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            />
-          </PaginationItem>
-        </Pagination>
+      {/* Pagination Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <Pagination
+          pageIndex={pageIndex}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={setPageIndex}
+          onPageSizeChange={setPageSize}
+        />
       </div>
     </div>
-  );
+  </div>
+);
 }
