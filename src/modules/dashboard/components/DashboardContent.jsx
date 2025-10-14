@@ -1,16 +1,45 @@
-import React from "react";
-import { Search, Filter, Circle } from "lucide-react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table"; // adjust the path if needed
+import React, { useState, useEffect, useMemo } from "react";
+import { getAllBusinessOwners } from "../services/dashboardService";
+import { MobileCard, Pagination } from "@/utils/Pagination";
 import DashboardTable from "./DashboardTable";
+import { ActionsCell } from "@/utils/ActionsCell";
 
-const DashboardContent = () => {
+export default function ResponsiveDashboard() {
+  const [data, setData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [rowSelection, setRowSelection] = useState({});
+  const [emailFilter, setEmailFilter] = useState("");
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  const fetchOwners = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllBusinessOwners({ pageIndex, pageSize });
+      const { data: rows, totalItems } = response.data;
+      setData(rows);
+      setTotalItems(totalItems);
+    } catch (err) {
+      console.error("Failed to fetch business owners:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOwners();
+  }, [pageIndex, pageSize]);
+
+  const filteredData = useMemo(() => {
+    if (!emailFilter) return data;
+    return data.filter((item) =>
+      item.email.toLowerCase().includes(emailFilter.toLowerCase())
+    );
+  }, [data, emailFilter]);
+
   const stats = [
     { label: "Total Users", value: 33, color: "text-indigo-600" },
     { label: "Active Users", value: 12, color: "text-green-600" },
@@ -18,32 +47,36 @@ const DashboardContent = () => {
     { label: "Deleted Users", value: 17, color: "text-red-600" },
   ];
 
-  const users = [
-    { name: "qwer3", email: "qwer3@gmail.com", status: "DELETED" },
-    { name: "cha", email: "cha@gmail.com", status: "DELETED" },
-    { name: "kranti", email: "kranti@sigasystems.com", status: "ACTIVE" },
-    { name: "UserPune", email: "UserPune@gmail.com", status: "DELETED" },
-  ];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen p-6 md:p-10">
+    <div className="w-full space-y-8">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-500 mt-2">
-          Welcome back! Here’s a complete overview of your tenant.
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-500 mt-2">
+          Welcome back! Here's an overview of your tenant.
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      {/* Stats Section */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white shadow rounded-xl p-6 flex flex-col items-center justify-center text-center"
+            className="bg-white shadow-sm rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center"
           >
-            <p className="text-gray-500 text-sm">{stat.label}</p>
-            <h2 className={`text-3xl font-bold mt-2 ${stat.color}`}>
+            <p className="text-gray-500 text-xs sm:text-sm">{stat.label}</p>
+            <h2 className={`text-xl sm:text-2xl lg:text-3xl font-bold mt-1 sm:mt-2 ${stat.color}`}>
               {stat.value}
             </h2>
           </div>
@@ -51,32 +84,49 @@ const DashboardContent = () => {
       </div>
 
       {/* User Management Section */}
-      <div className="bg-white shadow rounded-xl p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">
-          User Management
-        </h2>
-
-        {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-          <div className="flex items-center w-full sm:w-1/2 border border-gray-300 rounded-lg px-3 py-2">
-            <Search className="w-4 h-4 text-gray-400 mr-2" />
-            <input
-              type="text"
-              placeholder="Search by name or email"
-              className="w-full outline-none text-sm"
-            />
-          </div>
-          <button className="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <Filter className="w-4 h-4" />
-            All
-          </button>
+      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div className="lg:hidden p-4 space-y-4">
+          {data.length > 0 ? (
+            data.map((item) => (
+              <MobileCard
+                key={item.id}
+                item={item}
+                isSelected={rowSelection[item.id]}
+                onSelect={(checked) =>
+                  setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
+                }
+                actions={<ActionsCell row={{ original: item }} refreshData={fetchOwners} />}
+              />
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-sm font-medium">No results found</p>
+              <p className="text-gray-400 text-xs mt-1">Try adjusting your filters</p>
+            </div>
+          )}
         </div>
 
-        {/* Table */}
-        <DashboardTable />
+        <div className="hidden lg:block">
+          <DashboardTable
+            data={filteredData}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
+          />
+        </div>
+
+        {/* Pagination */}
+        <div className="border-t border-gray-200 px-4 sm:px-6">
+          <Pagination
+            pageIndex={pageIndex}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+          />
+        </div>
       </div>
     </div>
   );
-};
-
-export default DashboardContent;
+}

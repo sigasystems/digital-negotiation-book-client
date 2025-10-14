@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,12 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const toggleCollapse = () => setCollapsed(!collapsed);
-  const toggleMobile = () => setMobileOpen(!mobileOpen);
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
+  const toggleCollapse = () => setSidebarOpen(!sidebarOpen);
 
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -28,11 +24,11 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4 border-b bg-white shadow-sm">
         <h1 className="text-lg font-semibold">MyApp</h1>
-        <Button variant="ghost" size="icon" onClick={toggleMobile}>
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        <Button variant="ghost" size="icon" onClick={toggleCollapse}>
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </Button>
       </div>
 
@@ -40,13 +36,14 @@ export default function Sidebar() {
       <aside
         className={cn(
           "fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex flex-col transition-all duration-300 z-50",
-          collapsed ? "w-16" : "w-64",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          sidebarOpen ? "w-64" : "w-16",
+          "transform lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 h-16 border-b">
-          {!collapsed && <h2 className="text-xl font-bold text-indigo-600">MyApp</h2>}
+          {sidebarOpen && <h2 className="text-xl font-bold text-indigo-600">MyApp</h2>}
           <Button
             variant="ghost"
             size="icon"
@@ -56,13 +53,13 @@ export default function Sidebar() {
             <ChevronRight
               className={cn(
                 "w-5 h-5 transition-transform",
-                collapsed ? "-rotate-180" : "rotate-0"
+                sidebarOpen ? "rotate-0" : "-rotate-180"
               )}
             />
           </Button>
         </div>
 
-        {/* Nav */}
+        {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-2">
           {navItems.map((item) => (
             <NavLink
@@ -78,7 +75,7 @@ export default function Sidebar() {
               }
             >
               <item.icon className="w-5 h-5 shrink-0" />
-              {!collapsed && <span>{item.name}</span>}
+              {sidebarOpen && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
@@ -92,16 +89,16 @@ export default function Sidebar() {
             className="w-full justify-start text-red-600 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5 mr-2" />
-            {!collapsed && "Logout"}
+            {sidebarOpen && "Logout"}
           </Button>
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
-      {mobileOpen && (
+      {/* Mobile overlay */}
+      {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-          onClick={toggleMobile}
+          onClick={toggleCollapse}
         />
       )}
     </>
