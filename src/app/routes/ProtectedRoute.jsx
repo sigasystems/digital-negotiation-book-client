@@ -1,24 +1,29 @@
 import { Navigate } from "react-router-dom";
 
-const isAuthenticated = () => {
+const getUserInfo = () => {
   const userCookie = sessionStorage.getItem("user");
-  if (!userCookie) return false;
+  if (!userCookie) return null;
 
   try {
-    const userInfo = JSON.parse(userCookie);
-    return (
-      userInfo.userRole === "super_admin" ||
-      userInfo.userRole === "business_owner"
-    );
+    return JSON.parse(userCookie);
   } catch (error) {
     console.error("Invalid cookie format:", error);
-    return false;
+    return null;
   }
 };
 
 export default function ProtectedRoute({ children }) {
-  if (!isAuthenticated()) {
+  const userInfo = getUserInfo();
+
+  if (!userInfo) {
     return <Navigate to="/login" replace />;
   }
-  return children;
+
+  const { userRole } = userInfo;
+
+  if (userRole === "super_admin" || userRole === "business_owner") {
+    return children;
+  }
+
+  return <Navigate to="/" replace />;
 }

@@ -48,8 +48,8 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
       title: "Timestamps",
       icon: <Calendar className="w-4 h-4" />,
       fields: [
-        { label: "Created", value: new Date(owner.createdAt).toLocaleString() },
-        { label: "Updated", value: new Date(owner.updatedAt).toLocaleString() },
+        { label: "Created", value: owner.createdAt},
+        { label: "Updated", value: owner.updatedAt},
       ]
     }
   ];
