@@ -48,12 +48,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             variant="ghost"
             size="icon"
             onClick={toggleCollapse}
-            className="hidden lg:flex"
+            className="hidden lg:flex cursor-pointer"
           >
             <ChevronRight
               className={cn(
                 "w-5 h-5 transition-transform",
-                sidebarOpen ? "rotate-0" : "-rotate-180"
+                !sidebarOpen ? "rotate-0" : "-rotate-180"
               )}
             />
           </Button>

@@ -1,70 +1,40 @@
 import { apiClient } from "@/utils/apiClient";
 
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+// 🔒 Helper to attach auth headers to every request
+const authConfig = (extra = {}) => ({
+  headers: {
+    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+    ...extra.headers,
+  },
+  withCredentials: true,
+  ...extra,
 });
 
-export const createBusinessOwner = async (payload) => {
-  const response = await apiClient.post("/superadmin/create-business-owner", payload, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
+// 🧩 Generic API methods for reusability
+const api = {
+  get: (url, params) => apiClient.get(url, authConfig({ params })),
+  post: (url, data) => apiClient.post(url, data, authConfig()),
+  put: (url, data) => apiClient.put(url, data, authConfig()),
+  patch: (url, data = {}) => apiClient.patch(url, data, authConfig()),
+  delete: (url) => apiClient.delete(url, authConfig()),
 };
 
-export const getAllBusinessOwners = async ({ pageIndex = 0, pageSize = 10, withBuyers = false } = {}) => {
-  const response = await apiClient.get("/superadmin/business-owners", {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-    params: { pageIndex, pageSize, withBuyers },
-  });
-  return response.data;
-};
+// 🧠 Business Owner API services
+export const dashboardService = {
+  createBusinessOwner: (payload) => api.post("/superadmin/create-business-owner", payload),
 
-export const getBusinessOwnerById = async (id) => {
-  const response = await apiClient.get(`/superadmin/business-owner/${id}`, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
-};
+  getAllBusinessOwners: ({ pageIndex = 0, pageSize = 10, withBuyers = false } = {}) =>
+    api.get("/superadmin/business-owners", { pageIndex, pageSize, withBuyers }),
 
-export const updateBusinessOwner = async (id, payload) => {
-  const response = await apiClient.put(`/superadmin/business-owner/${id}`, payload, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
-};
+  getBusinessOwnerById: (id) => api.get(`/superadmin/business-owner/${id}`),
 
-export const deactivateBusinessOwner = async (id) => {
-  const response = await apiClient.patch(`/superadmin/business-owner/${id}/deactivate`, {}, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
-};
+  updateBusinessOwner: (id, payload) => api.put(`/superadmin/business-owner/${id}`, payload),
 
-export const activateBusinessOwner = async (id) => {
-  const response = await apiClient.patch(`/superadmin/business-owner/${id}/activate`, {}, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
-};
+  activateBusinessOwner: (id) => api.patch(`/superadmin/business-owner/${id}/activate`),
 
-export const softDeleteBusinessOwner = async (id) => {
-  const response = await apiClient.delete(`/superadmin/business-owner/${id}`, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
-};
+  deactivateBusinessOwner: (id) => api.patch(`/superadmin/business-owner/${id}/deactivate`),
 
-export const reviewBusinessOwner = async (id, payload) => {
-  const response = await apiClient.patch(`/superadmin/business-owner/${id}/review`, payload, {
-    headers: getAuthHeaders(),
-    withCredentials: true,
-  });
-  return response.data;
+  softDeleteBusinessOwner: (id) => api.delete(`/superadmin/business-owner/${id}`),
+
+  reviewBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}/review`, payload),
 };

@@ -1,5 +1,5 @@
 import { Circle } from "lucide-react"
-export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPageSizeChange }) => {
+export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPageSizeChange}) => {
   const getPageNumbers = (current, total) => {
     if (total <= 1) return [0];
     const delta = 1;

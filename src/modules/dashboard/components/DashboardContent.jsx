@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { getAllBusinessOwners } from "../services/dashboardService";
+import { dashboardService } from "../services/dashboardService";
 import { MobileCard, Pagination } from "@/utils/Pagination";
 import DashboardTable from "./DashboardTable";
 import { ActionsCell } from "@/utils/ActionsCell";
@@ -14,11 +14,12 @@ export default function ResponsiveDashboard() {
   const [emailFilter, setEmailFilter] = useState("");
 
   const totalPages = Math.ceil(totalItems / pageSize);
+  const userActions = ["view"]
 
   const fetchOwners = async () => {
     setLoading(true);
     try {
-      const response = await getAllBusinessOwners({ pageIndex, pageSize });
+      const response = await dashboardService.getAllBusinessOwners({ pageIndex, pageSize });
       const { data: rows, totalItems } = response.data;
       setData(rows);
       setTotalItems(totalItems);
@@ -95,7 +96,7 @@ export default function ResponsiveDashboard() {
                 onSelect={(checked) =>
                   setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
                 }
-                actions={<ActionsCell row={{ original: item }} refreshData={fetchOwners} />}
+                actions={<ActionsCell row={{ original: item }} refreshData={fetchOwners} userActions={userActions} />}
               />
             ))
           ) : (
@@ -113,6 +114,8 @@ export default function ResponsiveDashboard() {
             pageSize={pageSize}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
+            fetchOwners={fetchOwners}
+            userActions={userActions}
           />
         </div>
 

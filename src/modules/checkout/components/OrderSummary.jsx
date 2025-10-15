@@ -18,7 +18,6 @@ export default function OrderSummary({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-console.log("user id from ordersummary page", userId)
   if (!selectedPlan) {
     return (
       <div className="text-center text-slate-500 p-6 border border-dashed rounded-lg">
