@@ -30,8 +30,6 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  console.log("data,data",data)
-
   // Keys to hide from table
   const HIDDEN_KEYS = ["id", "userId"];
 
