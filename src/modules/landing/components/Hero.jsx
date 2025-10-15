@@ -184,10 +184,10 @@ export default function Hero() {
               transition: 'all 1s ease-out 0.4s'
             }}
           >
-            <div className="relative">
+            <div className="relative" >
               {/* Floating card elements */}
               <div 
-                className="absolute -top-8 -left-8 w-32 h-32 bg-white rounded-2xl shadow-2xl flex items-center justify-center transform hover:rotate-6 transition-all duration-300"
+                className="absolute  z-1 -top-8 -left-8 w-22 h-22 bg-white rounded-2xl shadow-2xl flex items-center justify-center transform hover:rotate-6 transition-all duration-300"
                 style={{
                   transform: `translateY(${floatingCards[0].y}px) rotate(6deg)`
                 }}
@@ -199,7 +199,7 @@ export default function Hero() {
               </div>
               
               <div 
-                className="absolute -bottom-8 -right-8 w-36 h-36 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-2xl flex items-center justify-center transform hover:-rotate-6 transition-all duration-300"
+                className="absolute z-1 -bottom-8 -right-8 w-22 h-22 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-2xl flex items-center justify-center transform hover:-rotate-6 transition-all duration-300"
                 style={{
                   transform: `translateY(${floatingCards[1].y}px) rotate(-6deg)`
                 }}

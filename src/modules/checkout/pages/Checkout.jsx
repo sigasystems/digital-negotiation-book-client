@@ -36,6 +36,9 @@ export default function CheckoutPage() {
   const selectedPlan = state?.selectedPlan;
   const billingCycle = state?.billingCycle || "monthly";
 
+  const userData = sessionStorage.getItem("user");
+  const userId = userData ? JSON.parse(userData).id : null;
+  console.log("user id", userId)
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -488,7 +491,7 @@ export default function CheckoutPage() {
             handleSubmit={handleSubmit}
             formData={formData} // ✅ pass formData
             // userId={userId}           // optional
-            userId="5f56e21d-9d3d-4b03-b742-329782fd3c42" // optional
+            userId={userId} // optional
             loading={loading}
           />
         </div>
