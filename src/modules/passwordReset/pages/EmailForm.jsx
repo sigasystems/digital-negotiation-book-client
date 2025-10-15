@@ -5,7 +5,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
 import { forgotPassword } from "../services.js";
-import { showSuccess , dismissToast } from "@/components/common/toastService.js";
+import { showSuccess , dismissToast } from "@/utils/toastService.js";
 export default function EmailForm({ setIsOtpSent, setEmail }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

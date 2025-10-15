@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
 import { resetPasswordWithOtp } from "../services.js";
 import { Eye, EyeOff } from "lucide-react";
-import { dismissToast, showSuccess } from "@/components/common/toastService.js";
+import { dismissToast, showSuccess } from "@/utils/toastService.js";
 
 export default function OtpAndPasswordForm({ email, navigate }) {
   const [loading, setLoading] = useState(false);
