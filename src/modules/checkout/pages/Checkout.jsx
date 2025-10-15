@@ -38,7 +38,6 @@ export default function CheckoutPage() {
 
   const userData = sessionStorage.getItem("user");
   const userId = userData ? JSON.parse(userData).id : null;
-  console.log("user id", userId)
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -54,6 +53,8 @@ export default function CheckoutPage() {
     taxId: "",
     website: "",
   });
+
+  console.log("user id from checkout ",userId)
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});

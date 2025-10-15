@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {  becomeBusinessOwner, createPayment } from "../services/paymentService";
-import { toast } from "react-hot-toast";
+import { showError, showSuccess } from "@/utils/toastService";
 
 
 export default function OrderSummary({
@@ -18,7 +18,7 @@ export default function OrderSummary({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-
+console.log("user id from ordersummary page", userId)
   if (!selectedPlan) {
     return (
       <div className="text-center text-slate-500 p-6 border border-dashed rounded-lg">
@@ -64,7 +64,7 @@ export default function OrderSummary({
 
 const handleSubmit = async () => {
   if (!validateForm()) {
-    toast("Please fill in all required fields.");
+    showSuccess("Please fill in all required fields.");
     return;
   }
 
@@ -79,7 +79,7 @@ const handleSubmit = async () => {
     };
     const paymentRes = await createPayment(paymentPayload);
     if (paymentRes?.checkoutUrl) {
-      toast("Redirecting to Stripe checkout...");
+      showSuccess("Redirecting to Stripe checkout...");
 
       // 2️⃣ Store pending data for after checkout
       sessionStorage.setItem(
@@ -95,11 +95,11 @@ const handleSubmit = async () => {
       // 3️⃣ Redirect to Stripe checkout page
       window.location.href = paymentRes.checkoutUrl;
     } else {
-      toast.error("Checkout URL not received from server.");
+      showError("Checkout URL not received from server.");
     }
   } catch (err) {
     console.error("Error during payment creation:", err);
-    toast.error(err.response?.data?.message || err.message || "Something went wrong");
+    showError(err.response?.data?.message || err.message || "Something went wrong");
   } finally {
     setSubmitting(false);
   }

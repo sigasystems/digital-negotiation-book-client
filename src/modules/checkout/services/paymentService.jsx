@@ -21,7 +21,8 @@ export const becomeBusinessOwner = async (payload) => {
       payload,
       { withCredentials: true }
     );
-    return response.data; // ✅ should contain { success, message, data }
+    console.log("buesinness owner create...formpaymetnservice")
+    return response.data; 
   } catch (err) {
     console.error("Error in becomeBusinessOwner service:", err);
     throw err.response?.data?.message || "Failed to create business owner";

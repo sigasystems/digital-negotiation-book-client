@@ -39,7 +39,7 @@ export default function PaymentSuccess() {
       if (response?.success) {
         sessionStorage.removeItem("pendingBusinessData");
         sessionStorage.setItem("businessProcessed", "true");
-        toast.success("Business registration completed successfully!");
+        toast.success("Business registration complete d successfully!");
         console.log("Business registration completed successfully!!")
         setStatus("success");
       } else {
@@ -272,6 +272,36 @@ export default function PaymentSuccess() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // import { useEffect, useState } from "react";
