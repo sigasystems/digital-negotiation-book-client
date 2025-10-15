@@ -1,25 +1,25 @@
+// ActionsCell.jsx
 import { Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@headlessui/react";
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  getBusinessOwnerById,
-  updateBusinessOwner,
-  activateBusinessOwner,
-  deactivateBusinessOwner,
-  softDeleteBusinessOwner,
+  dashboardService
 } from "@/modules/dashboard/services/dashboardService";
 import ViewContent from "@/components/common/ViewContent";
 
-export const ActionsCell = ({ row, refreshData }) => {
+export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ownerDetails, setOwnerDetails] = useState(null);
+  const navigate = useNavigate();
+
   const isActive = row.original.status === "active";
 
   const handleView = async () => {
     setLoading(true);
     try {
-      const owner = await getBusinessOwnerById(row.original.id);
+      const owner = await dashboardService.getBusinessOwnerById(row.original.id);
       setOwnerDetails(owner.data);
       setIsModalOpen(true);
     } catch (err) {
@@ -29,23 +29,14 @@ export const ActionsCell = ({ row, refreshData }) => {
     }
   };
 
-  const handleEdit = async () => {
-    setLoading(true);
-    try {
-      const payload = { ...row.original, name: row.original.name + " Updated" };
-      await updateBusinessOwner(row.original.id, payload);
-      refreshData();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const handleEdit = () => {
+    navigate(`/user/${row.original.id}`, { state: row.original });
   };
 
   const handleActivate = async () => {
     setLoading(true);
     try {
-      await activateBusinessOwner(row.original.id);
+      await dashboardService.activateBusinessOwner(row.original.id);
       refreshData();
     } catch (err) {
       console.error(err);
@@ -57,7 +48,7 @@ export const ActionsCell = ({ row, refreshData }) => {
   const handleDeactivate = async () => {
     setLoading(true);
     try {
-      await deactivateBusinessOwner(row.original.id);
+      await dashboardService.deactivateBusinessOwner(row.original.id);
       refreshData();
     } catch (err) {
       console.error(err);
@@ -67,10 +58,10 @@ export const ActionsCell = ({ row, refreshData }) => {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this owner?")) return;
+    if (!window.confirm("Are you sure you want to delete this owner?")) return;
     setLoading(true);
     try {
-      await softDeleteBusinessOwner(row.original.id);
+      await dashboardService.softDeleteBusinessOwner(row.original.id);
       refreshData();
     } catch (err) {
       console.error(err);
@@ -79,25 +70,29 @@ export const ActionsCell = ({ row, refreshData }) => {
     }
   };
 
-  const actions = useMemo(() => [
-    { icon: Eye, color: "", label: "View", handler: handleView },
-    { icon: Edit, color: "", label: "Edit", handler: handleEdit },
-    isActive
-      ? { icon: XCircle, color: "text-yellow-600 hover:bg-yellow-50", label: "Deactivate", handler: handleDeactivate }
-      : { icon: CheckCircle, color: "text-green-600 hover:bg-green-50", label: "Activate", handler: handleActivate },
-    { icon: Trash2, color: "text-red-600 hover:bg-red-50", label: "Delete", handler: handleDelete },
-  ], [row, isActive]);
+  const allActions = useMemo(
+    () => [
+      { key: "view", icon: Eye, label: "View", handler: handleView },
+      { key: "edit", icon: Edit, label: "Edit", handler: handleEdit },
+      { key: "activate", icon: CheckCircle, label: "Activate", handler: handleActivate, show: !isActive },
+      { key: "deactivate", icon: XCircle, label: "Deactivate", handler: handleDeactivate, show: isActive },
+      { key: "delete", icon: Trash2, label: "Delete", handler: handleDelete, color: "text-red-600 hover:bg-red-50" },
+    ],
+    [row, isActive]
+  );
+
+  const filteredActions = allActions.filter(action => userActions.includes(action.key) && (action.show !== false));
 
   return (
     <>
       <div className="flex items-center gap-2">
-        {actions.map(({ icon: Icon, color, handler, label }) => (
+        {filteredActions.map(({ icon: Icon, color, handler, label }) => (
           <Button
             key={label}
             variant="ghost"
             size="icon"
             onClick={handler}
-            className={`p-1 ${color} cursor-pointer`}
+            className={`p-1 ${color || ""} cursor-pointer`}
             disabled={loading}
           >
             <Icon className="w-4 h-4" />

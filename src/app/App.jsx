@@ -5,7 +5,9 @@ import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
 // Pages
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
-import DashboardHome from "@/modules/dashboard/pages/DashboardHome";
+import Users from "@/modules/dashboard/pages/Users";
+import ResponsiveDashboard from "@/modules/dashboard/components/DashboardContent";
+import UserPage from "@/modules/dashboard/pages/UserPage";
 
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
@@ -46,7 +48,23 @@ export default function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardHome />
+                <ResponsiveDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/:id"
+            element={
+              <ProtectedRoute>
+                <UserPage />
               </ProtectedRoute>
             }
           />
