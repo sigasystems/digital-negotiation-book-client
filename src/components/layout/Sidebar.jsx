@@ -5,45 +5,33 @@ import {
   Users,
   Settings,
   LogOut,
-  Menu,
-  X,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
-  const toggleCollapse = () => setSidebarOpen(!sidebarOpen);
-
+export default function Sidebar({ collapsed, setCollapsed }) {
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Users", icon: Users, path: "/users" },
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
+  const toggleCollapse = () => setCollapsed(!collapsed);
+
   return (
     <>
-      {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4 border-b bg-white shadow-sm">
-        <h1 className="text-lg font-semibold">MyApp</h1>
-        <Button variant="ghost" size="icon" onClick={toggleCollapse}>
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
-      </div>
-
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex flex-col transition-all duration-300 z-50",
-          sidebarOpen ? "w-64" : "w-16",
-          "transform lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "hidden lg:flex fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex-col transition-all duration-300 z-40",
+          collapsed ? "w-16" : "w-64"
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 h-16 border-b">
-          {sidebarOpen && <h2 className="text-xl font-bold text-indigo-600">MyApp</h2>}
+          {!collapsed && (<h2 className="text-xl font-bold text-indigo-600">MyApp</h2>)}
           <Button
             variant="ghost"
             size="icon"
@@ -53,7 +41,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             <ChevronRight
               className={cn(
                 "w-5 h-5 transition-transform",
-                !sidebarOpen ? "rotate-0" : "-rotate-180"
+                collapsed ? "rotate-180" : "rotate-0"
               )}
             />
           </Button>
@@ -75,7 +63,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
               }
             >
               <item.icon className="w-5 h-5 shrink-0" />
-              {sidebarOpen && <span>{item.name}</span>}
+              {!collapsed && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
@@ -89,18 +77,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             className="w-full justify-start text-red-600 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5 mr-2" />
-            {sidebarOpen && "Logout"}
+            {!collapsed && "Logout"}
           </Button>
         </div>
       </aside>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-          onClick={toggleCollapse}
-        />
-      )}
     </>
   );
 }

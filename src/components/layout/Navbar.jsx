@@ -22,7 +22,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed w-full z-1 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+    <header className="fixed w-full z-10 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
         <a

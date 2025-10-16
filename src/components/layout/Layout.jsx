@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Routes where sidebar is hidden
   const noSidebarRoutes = [
@@ -20,26 +20,31 @@ export default function Layout({ children }) {
   ];
 
   const shouldShowSidebar = !noSidebarRoutes.includes(location.pathname);
+  const contentPadding = sidebarCollapsed ? "lg:pl-16" : "lg:pl-64";
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar (only for dashboard routes) */}
       {shouldShowSidebar && (
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <div className="hidden lg:block">
+          <Sidebar sidebarOpen={true} setSidebarOpen={() => {}}
+            collapsed={sidebarCollapsed}
+            setCollapsed={setSidebarCollapsed}
+          />
+        </div>
       )}
 
       {/* Main Content Area */}
       <div
         className={cn(
           "flex flex-col flex-1 w-full transition-all duration-300",
-          "pt-16 lg:pt-0", // top padding for mobile header
-          shouldShowSidebar && sidebarOpen ? "lg:pl-64" : "pl-16"
+          shouldShowSidebar && contentPadding
         )}
       >
         <Navbar />
 
         {/* Page content */}
-        <main className="flex-1 w-full px-4 py-4 md:px-6 md:py-26">
+        <main className="flex-1 w-full px-4 py-4 pt-20 md:px-6 md:py-20">
           {children}
         </main>
 

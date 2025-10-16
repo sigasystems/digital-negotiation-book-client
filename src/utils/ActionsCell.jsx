@@ -20,7 +20,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
     setLoading(true);
     try {
       const owner = await dashboardService.getBusinessOwnerById(row.original.id);
-      setOwnerDetails(owner.data);
+      setOwnerDetails(owner.data.data);
       setIsModalOpen(true);
     } catch (err) {
       console.error(err);

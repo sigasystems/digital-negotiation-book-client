@@ -20,11 +20,11 @@ export default function ResponsiveDashboard() {
     setLoading(true);
     try {
       const response = await dashboardService.getAllBusinessOwners({ pageIndex, pageSize });
-      const { data: rows, totalItems } = response.data;
-      setData(rows);
-      setTotalItems(totalItems);
+      setData(response.data.data.data || []);
+      setTotalItems(response.totalItems || 0);
     } catch (err) {
       console.error("Failed to fetch business owners:", err);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -40,6 +40,14 @@ export default function ResponsiveDashboard() {
       item.email.toLowerCase().includes(emailFilter.toLowerCase())
     );
   }, [data, emailFilter]);
+
+  const tableData = filteredData.map((item) => ({
+    id: item.id,
+    name: item.first_name + " " + item.last_name,
+    email: item.email,
+    status: item.status,
+    businessName: item.businessName,
+  }));
 
   const stats = [
     { label: "Total Users", value: 33, color: "text-indigo-600" },
@@ -109,24 +117,16 @@ export default function ResponsiveDashboard() {
 
         <div className="hidden lg:block">
           <DashboardTable
-            data={filteredData}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
+            data={tableData}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
             fetchOwners={fetchOwners}
             userActions={userActions}
-          />
-        </div>
-
-        {/* Pagination */}
-        <div className="border-t border-gray-200 px-4 sm:px-6">
-          <Pagination
             pageIndex={pageIndex}
-            totalPages={totalPages}
             pageSize={pageSize}
-            onPageChange={setPageIndex}
-            onPageSizeChange={setPageSize}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            totalItems={totalItems}
           />
         </div>
       </div>
