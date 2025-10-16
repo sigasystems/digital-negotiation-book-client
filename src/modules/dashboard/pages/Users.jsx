@@ -92,19 +92,7 @@ export default function Users() {
             pageSize={pageSize}
             setPageIndex={setPageIndex}
             setPageSize={setPageSize}
-            emailFilter={emailFilter}
-            setEmailFilter={setEmailFilter}
             totalItems={totalItems}
-          />
-        </div>
-
-        <div className="border-t border-gray-200 px-4 sm:px-6">
-          <Pagination
-            pageIndex={pageIndex}
-            totalPages={Math.ceil(totalItems / pageSize)}
-            pageSize={pageSize}
-            onPageChange={setPageIndex}
-            onPageSizeChange={setPageSize}
           />
         </div>
       </div>

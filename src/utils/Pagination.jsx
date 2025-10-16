@@ -62,7 +62,7 @@ export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPa
               key={idx}
               onClick={() => onPageChange(p)}
               className={`
-                min-w-[36px] sm:min-w-[40px] h-9 sm:h-10 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                min-w-[36px] sm:min-w-[40px] h-9 sm:h-10 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                 p === pageIndex 
                   ? "bg-blue-600 text-white shadow-md" 
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
@@ -82,7 +82,7 @@ export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPa
       <button
         disabled={pageIndex >= totalPages - 1 || totalPages <= 1}
         onClick={() => onPageChange(pageIndex + 1)}
-        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
           pageIndex >= totalPages - 1 || totalPages <= 1
             ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
             : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"

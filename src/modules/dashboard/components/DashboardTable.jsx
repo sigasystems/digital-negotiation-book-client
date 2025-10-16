@@ -18,6 +18,7 @@ import { Input } from "../../../components/ui/input";
 import { Checkbox } from "../../../components/ui/checkbox";
 import { ActionsCell } from "@/utils/ActionsCell";
 import { Circle } from "lucide-react";
+import { Pagination } from "@/utils/Pagination";
 
 export default function DashboardTable({
   data = [],
@@ -26,6 +27,11 @@ export default function DashboardTable({
   fetchOwners,
   userActions = [],
   filterKey = "email", // optional: key to filter by default
+  pageIndex,
+  pageSize,
+  setPageIndex,
+  setPageSize,
+  totalItems,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -153,6 +159,8 @@ export default function DashboardTable({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const totalPages = Math.ceil(totalItems / pageSize);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
       {/* Optional filter */}
@@ -214,6 +222,14 @@ export default function DashboardTable({
           )}
         </TableBody>
       </Table>
+
+      <Pagination
+        pageIndex={pageIndex}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPageIndex}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }
