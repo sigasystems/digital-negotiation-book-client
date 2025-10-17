@@ -27,20 +27,18 @@ export default function PaymentSuccess() {
         return;
       }
 
-      const alreadyProcessed = sessionStorage.getItem("businessProcessed");
-      if (alreadyProcessed) {
-        toast("Business registration already completed.");
-        console.log("Buesiness registration already completed.....")
-        setStatus("success");
-        return;
-      }
+      // const alreadyProcessed = sessionStorage.getItem("businessProcessed");
+      // if (alreadyProcessed) {
+      //   toast("Business registration already completed.");
+      //   setStatus("success");
+      //   return;
+      // }
       await simulateProgress();
       const response = await becomeBusinessOwner(pendingData);
       if (response?.success) {
         sessionStorage.removeItem("pendingBusinessData");
         sessionStorage.setItem("businessProcessed", "true");
-        toast.success("Business registration complete d successfully!");
-        console.log("Business registration completed successfully!!")
+        toast.success("Business registration completed successfully!");
         setStatus("success");
       } else {
         toast.error(response?.message || "Failed to register business.");
@@ -307,29 +305,8 @@ export default function PaymentSuccess() {
 // import { useEffect, useState } from "react";
 // import { CheckCircle, Mail, FileText, Building2, ArrowRight, XCircle, Shield, Download, Calendar, CreditCard, Loader2 } from "lucide-react";
 // import { Navigate, useNavigate } from "react-router-dom";
-// const formatDate = (date) => {
-//   return date.toLocaleDateString('en-US', { 
-//     month: 'long', 
-//     day: 'numeric', 
-//     year: 'numeric' 
-//   });
-// };
-// const formatTime = (date) => {
-//   return date.toLocaleTimeString('en-US', { 
-//     hour: '2-digit', 
-//     minute: '2-digit',
-//     hour12: true
-//   });
-// };
-// const becomeBusinessOwner = async (payload) => {
-//   // Simulate API call delay
-//   await new Promise(resolve => setTimeout(resolve, 2000));
-  
-//   // To test the success state, ensure the line below is commented out:
-//   // return { success: false, message: "Server timeout during profile creation." };
-  
-//   return { success: true };
-// };
+// import { becomeBusinessOwner } from "../services/paymentService";
+// import { formatDate, formatTime } from "@/utils/formateDate";
 // const getInitialOrderData = () => {
 //   try {
 //     const rawData = sessionStorage.getItem("pendingBusinessData");
@@ -405,20 +382,17 @@ export default function PaymentSuccess() {
 //   const handleGoToDashboard = () => {
 //     // In a real application, this would use a router or window.location.assign
 //     navigate("/dashboard");
-//     console.log("Navigating to dashboard...");
 //     // Clear session storage upon successful completion
 //     sessionStorage.removeItem("pendingBusinessData");
 //   };
 
 //   const handleReturnToPricing = () => {
 //     navigate("/")
-//     console.log("Navigating to home/pricing page...");
 //     // Optionally clear session storage
 //     sessionStorage.removeItem("pendingBusinessData");
 //   };
 
 //   const handleDownloadReceipt = () => {
-//     console.log(`Downloading receipt for business: ${orderData.businessName}`);
 //   };
 
 //   // --- Utility Component for Reusable Data Row ---
