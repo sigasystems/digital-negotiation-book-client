@@ -76,7 +76,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             >
               <item.icon className="w-5 h-5 shrink-0" />
               {!collapsed && <span>{item.name}</span>}
-              {!collapsed && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
@@ -90,7 +89,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             className="w-full justify-start text-red-600 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5 mr-2" />
-            {!collapsed && "Logout"}
             {!collapsed && "Logout"}
           </Button>
         </div>
