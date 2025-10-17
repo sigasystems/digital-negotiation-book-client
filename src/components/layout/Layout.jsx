@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "./Footer";
+import Footer from "./Footer"
 import Sidebar from "@/components/layout/Sidebar";
 import { cn } from "@/lib/utils";
 

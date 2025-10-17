@@ -1,8 +1,12 @@
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from '@/modules/auth/pages/Login';
-import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { getUserFromCookie } from "@/utils/auth";
+
 // Pages
+import Login from "@/modules/auth/pages/Login";
+import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
 import Users from "@/modules/dashboard/pages/Users";
@@ -13,26 +17,45 @@ import UserPage from "@/modules/dashboard/pages/UserPage";
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
 import Layout from "@/components/layout/Layout";
 import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
+import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
-import { useDispatch } from "react-redux";
-import { getUserFromCookie } from "@/utils/auth";
-import { useEffect } from "react";
 
-export default function App() {
+function AppContent() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user = getUserFromCookie();
-    if (user) {
-      dispatch({ type: "auth/loginUser/fulfilled", payload: user });
+    const initUser = async () => {
+      try {
+        let sessionUser = sessionStorage.getItem("user");
+        sessionUser = sessionUser ? JSON.parse(sessionUser) : null;
+
+        if (!sessionUser) {
+          // No session user → redirect to login
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        dispatch({ type: "auth/loginUser/fulfilled", payload: sessionUser });
+        setUser(sessionUser);
+      } catch (err) {
+        console.error("Error loading user:", err);
+        navigate("/login", { replace: true });
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [dispatch]);
+
+    initUser();
+  }, [dispatch, navigate]);
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
 
   return (
-    <>
-    {/* <Toaster position="top-right" reverseOrder={false} /> */}
-
-    <Router>
 <Layout>
         <Routes>
           {/* Public routes */}
@@ -56,7 +79,7 @@ export default function App() {
             path="/users"
             element={
               <ProtectedRoute>
-                <Users />
+                <Users userRole={user?.userRole} />
               </ProtectedRoute>
             }
           />
@@ -68,10 +91,26 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/add-buyer"
+            element={
+              <ProtectedRoute>
+                <AddBuyerForm />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Layout>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <Router>
+        <AppContent />
     </Router>
     <Toaster position="top-center" reverseOrder={false} />
     </>
-  )
+  );
 }

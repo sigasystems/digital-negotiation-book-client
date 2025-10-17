@@ -3,9 +3,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
-import {
-  dashboardService
-} from "@/modules/dashboard/services/dashboardService";
+import { roleBasedDataService } from "@/services/roleBasedDataService";
 import {
   ArrowLeft,
   Save,
@@ -88,7 +86,7 @@ const UserPage = () => {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const res = await dashboardService.getBusinessOwnerById(id);
+      const res = await roleBasedDataService.getDashboardData(userRole.userRole, id);
       setUser(res.data);
       setOriginalUser(res.data);
     } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { dashboardService } from "../services/dashboardService";
-import { MobileCard, Pagination } from "@/utils/Pagination";
+import { roleBasedDataService } from "@/services/roleBasedDataService";
+import { MobileCard } from "@/utils/Pagination";
 import DashboardTable from "./DashboardTable";
 import { ActionsCell } from "@/utils/ActionsCell";
 
@@ -13,47 +13,50 @@ export default function ResponsiveDashboard() {
   const [rowSelection, setRowSelection] = useState({});
   const [emailFilter, setEmailFilter] = useState("");
 
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const userActions = ["view"]
+  const user = sessionStorage.getItem("user");
+  const userRole = JSON.parse(user).userRole || "guest" 
+  const userActions = ["view"];
 
-  const fetchOwners = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await dashboardService.getAllBusinessOwners({ pageIndex, pageSize });
-      setData(response.data.data.data || []);
-      setTotalItems(response.totalItems || 0);
+      const { data: fetchedData, total } = await roleBasedDataService.getDashboardData(userRole, { pageIndex, pageSize });
+      setData(fetchedData || []);
+      setTotalItems(total || 0);
     } catch (err) {
-      console.error("Failed to fetch business owners:", err);
+      console.error("Failed to fetch dashboard data:", err);
       setData([]);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOwners();
-  }, [pageIndex, pageSize]);
+    fetchData();
+  }, [pageIndex, pageSize, userRole]);
 
+  // Filter by email
   const filteredData = useMemo(() => {
     if (!emailFilter) return data;
     return data.filter((item) =>
-      item.email.toLowerCase().includes(emailFilter.toLowerCase())
+      item.email?.toLowerCase().includes(emailFilter.toLowerCase())
     );
   }, [data, emailFilter]);
 
-  const tableData = filteredData.map((item) => ({
+  const tableData = filteredData?.map((item) => ({
     id: item.id,
-    name: item.first_name + " " + item.last_name,
-    email: item.email,
+    name: `${item.first_name || ""} ${item.last_name || ""}`.trim() || item.contactName,
+    email: item.email || item.contactEmail,
     status: item.status,
-    businessName: item.businessName,
+    businessName: item.businessName || item.companyName || item.buyersCompanyName || "-",
   }));
 
   const stats = [
-    { label: "Total Users", value: 33, color: "text-indigo-600" },
-    { label: "Active Users", value: 12, color: "text-green-600" },
-    { label: "Inactive Users", value: 4, color: "text-gray-600" },
-    { label: "Deleted Users", value: 17, color: "text-red-600" },
+    { label: "Total Users", value: totalItems, color: "text-indigo-600" },
+    { label: "Active Users", value: 0, color: "text-green-600" },
+    { label: "Inactive Users", value: 0, color: "text-gray-600" },
+    { label: "Deleted Users", value: 0, color: "text-red-600" },
   ];
 
   if (loading) {
@@ -94,6 +97,7 @@ export default function ResponsiveDashboard() {
 
       {/* User Management Section */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Mobile cards */}
         <div className="lg:hidden p-4 space-y-4">
           {data.length > 0 ? (
             data.map((item) => (
@@ -104,7 +108,7 @@ export default function ResponsiveDashboard() {
                 onSelect={(checked) =>
                   setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
                 }
-                actions={<ActionsCell row={{ original: item }} refreshData={fetchOwners} userActions={userActions} />}
+                actions={<ActionsCell row={{ original: item }} refreshData={fetchData} userActions={userActions} />}
               />
             ))
           ) : (
@@ -115,12 +119,13 @@ export default function ResponsiveDashboard() {
           )}
         </div>
 
+        {/* Desktop table */}
         <div className="hidden lg:block">
           <DashboardTable
             data={tableData}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
-            fetchOwners={fetchOwners}
+            fetchOwners={fetchData}
             userActions={userActions}
             pageIndex={pageIndex}
             pageSize={pageSize}

@@ -1,11 +1,11 @@
 // Users.jsx
 import React, { useState, useEffect } from "react";
-import { dashboardService } from "../services/dashboardService";
+import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { MobileCard, Pagination } from "@/utils/Pagination";
 import DashboardTable from "../components/DashboardTable";
 import { ActionsCell } from "@/utils/ActionsCell";
 
-export default function Users() {
+export default function Users({ userRole }) {
   const [data, setData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -16,23 +16,32 @@ export default function Users() {
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
 
-  const fetchOwners = async () => {
+  const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await dashboardService.getAllBusinessOwners({ pageIndex, pageSize });
-      const { data: rows, totalItems } = response.data.data;
+      const role =
+        typeof userRole === "object" && userRole?.userRole
+          ? userRole.userRole
+          : userRole;
+
+      const { data: rows, total } = await roleBasedDataService.getDashboardData(role, {
+        pageIndex,
+        pageSize,
+        filter: emailFilter,
+      });
+
       setData(rows);
-      setTotalItems(totalItems);
+      setTotalItems(total);
     } catch (err) {
-      console.error("Failed to fetch business owners:", err);
+      console.error("❌ Failed to fetch users:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOwners();
-  }, [pageIndex, pageSize]);
+    fetchUsers();
+  }, [pageIndex, pageSize, emailFilter]);
 
   if (loading) {
     return (
@@ -48,7 +57,11 @@ export default function Users() {
   return (
     <div className="w-full space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">All Business Owners</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          {userRole === "super_admin"
+            ? "All Business Owners"
+            : "All Buyers"}
+        </h1>
       </div>
 
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
@@ -66,7 +79,7 @@ export default function Users() {
                 actions={
                   <ActionsCell
                     row={{ original: item }}
-                    refreshData={fetchOwners}
+                    refreshData={fetchUsers}
                     userActions={userActions}
                   />
                 }
@@ -86,7 +99,7 @@ export default function Users() {
             data={data}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
-            fetchOwners={fetchOwners}
+            fetchOwners={fetchUsers}
             userActions={userActions}
             pageIndex={pageIndex}
             pageSize={pageSize}

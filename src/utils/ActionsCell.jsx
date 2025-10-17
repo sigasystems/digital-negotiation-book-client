@@ -1,29 +1,29 @@
-// ActionsCell.jsx
 import { Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@headlessui/react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  dashboardService
-} from "@/modules/dashboard/services/dashboardService";
 import ViewContent from "@/components/common/ViewContent";
+import { roleBasedDataService } from "@/services/roleBasedDataService";
 
 export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [ownerDetails, setOwnerDetails] = useState(null);
+  const [details, setDetails] = useState(null);
   const navigate = useNavigate();
+
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const role = userInfo?.userRole || "super_admin"; // fallback just in case
 
   const isActive = row.original.status === "active";
 
   const handleView = async () => {
     setLoading(true);
     try {
-      const owner = await dashboardService.getBusinessOwnerById(row.original.id);
-      setOwnerDetails(owner.data.data);
+      const data = await roleBasedDataService.getById(role, row.original.id);
+      setDetails(data);
       setIsModalOpen(true);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching details:", err);
     } finally {
       setLoading(false);
     }
@@ -36,10 +36,10 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const handleActivate = async () => {
     setLoading(true);
     try {
-      await dashboardService.activateBusinessOwner(row.original.id);
+      await roleBasedDataService.activate(role, row.original.id);
       refreshData();
     } catch (err) {
-      console.error(err);
+      console.error("Activation failed:", err);
     } finally {
       setLoading(false);
     }
@@ -48,23 +48,23 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const handleDeactivate = async () => {
     setLoading(true);
     try {
-      await dashboardService.deactivateBusinessOwner(row.original.id);
+      await roleBasedDataService.deactivate(role, row.original.id);
       refreshData();
     } catch (err) {
-      console.error(err);
+      console.error("Deactivation failed:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this owner?")) return;
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
     setLoading(true);
     try {
-      await dashboardService.softDeleteBusinessOwner(row.original.id);
+      await roleBasedDataService.softDelete(role, row.original.id);
       refreshData();
     } catch (err) {
-      console.error(err);
+      console.error("Delete failed:", err);
     } finally {
       setLoading(false);
     }
@@ -81,7 +81,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
     [row, isActive]
   );
 
-  const filteredActions = allActions.filter(action => userActions.includes(action.key) && (action.show !== false));
+  const filteredActions = allActions.filter((action) => userActions.includes(action.key) && (action.show !== false));
 
   return (
     <>
@@ -103,7 +103,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
       <ViewContent
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        owner={ownerDetails}
+        owner={details}
       />
     </>
   );
