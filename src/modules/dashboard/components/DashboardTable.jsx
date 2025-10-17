@@ -26,7 +26,7 @@ export default function DashboardTable({
   setRowSelection,
   fetchOwners,
   userActions = [],
-  filterKey = "email", // optional: key to filter by default
+  filterKey = "contactEmail", // optional: key to filter by default
   pageIndex,
   pageSize,
   setPageIndex,
@@ -36,26 +36,23 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  // Keys to hide from table
-  const HIDDEN_KEYS = ["id", "userId"];
+   const HIDDEN_KEYS = ["id", "ownerId", "isDeleted"];
 
-  // Map keys to human-readable labels (extendable)
   const COLUMN_LABELS = {
-    first_name: "First Name",
-    last_name: "Last Name",
-    email: "Email",
-    phoneNumber: "Phone Number",
-    businessName: "Business Name",
+    buyersCompanyName: "Company Name",
     registrationNumber: "Registration Number",
+    taxId: "Tax ID",
+    contactName: "Contact Name",
+    contactEmail: "Contact Email",
+    countryCode: "Country Code",
+    contactPhone: "Contact Phone",
     country: "Country",
     state: "State",
     city: "City",
     address: "Address",
     postalCode: "Postal Code",
     status: "Status",
-    is_deleted: "Deleted",
-    is_verified: "Verified",
-    is_approved: "Approved",
+    isVerified: "Verified",
     createdAt: "Created At",
     updatedAt: "Updated At",
   };
@@ -68,10 +65,8 @@ export default function DashboardTable({
       id: "select",
       header: ({ table }) => (
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomePageRowsSelected()}
           onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
         />
       ),
@@ -84,27 +79,11 @@ export default function DashboardTable({
       enableSorting: false,
     };
 
-    // Name column if first_name/last_name exist
-    const nameColumn =
-      data[0].first_name && data[0].last_name
-        ? {
-            id: "name",
-            header: "Name",
-            cell: ({ row }) =>
-              `${row.original.first_name || ""} ${row.original.last_name || ""}`.trim(),
-          }
-        : null;
-
-    // Dynamic columns
+    // Dynamic columns for buyers
     const dynamicColumns = Object.keys(data[0])
-      .filter(
-        (key) =>
-          !HIDDEN_KEYS.includes(key) &&
-          key !== "first_name" &&
-          key !== "last_name"
-      )
+      .filter((key) => !HIDDEN_KEYS.includes(key))
       .map((key) => {
-        // Special rendering for status
+        // Custom render for status
         if (key === "status") {
           return {
             accessorKey: key,
@@ -129,6 +108,18 @@ export default function DashboardTable({
           };
         }
 
+        if (key === "isVerified") {
+          return {
+            accessorKey: key,
+            header: COLUMN_LABELS[key] || key,
+            cell: ({ row }) => (
+              <span className={`font-medium ${row.getValue(key) ? "text-green-600" : "text-red-600"}`}>
+                {row.getValue(key) ? "Yes" : "No"}
+              </span>
+            ),
+          };
+        }
+
         return {
           accessorKey: key,
           header: COLUMN_LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1),
@@ -144,7 +135,7 @@ export default function DashboardTable({
       ),
     };
 
-    return [selectColumn, ...(nameColumn ? [nameColumn] : []), ...dynamicColumns, actionsColumn];
+    return [selectColumn, ...dynamicColumns, actionsColumn];
   }, [data, userActions]);
 
   const table = useReactTable({
@@ -175,7 +166,7 @@ export default function DashboardTable({
         </div>
       )}
 
-      <Table className="min-w-[800px]">
+      <Table className="min-w-[1000px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>

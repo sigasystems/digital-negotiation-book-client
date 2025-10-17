@@ -6,23 +6,35 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
+  const user = sessionStorage.getItem("user");
+  const userRole = JSON.parse(user).userRole || "guest"
+
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-    { name: "Users", icon: Users, path: "/users" },
+
+  // Show Users for both super_admin and business_owner
+  ...(["super_admin", "business_owner"].includes(userRole)
+    ? [{ name: "Users", icon: Users, path: "/users" }]
+    : []),
+
+  // Show Add Buyer only for business_owner
+  ...(userRole === "business_owner"
+    ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" }]
+    : []),
+
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
   return (
-    <>
-      {/* Sidebar */}
       <aside
         className={cn(
           "hidden lg:flex fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex-col transition-all duration-300 z-40",
@@ -31,7 +43,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 h-16 border-b">
-          {!collapsed && (<h2 className="text-xl font-bold text-indigo-600">MyApp</h2>)}
+          {!collapsed && <h2 className="text-xl font-bold text-indigo-600">MyApp</h2>}
           <Button
             variant="ghost"
             size="icon"
@@ -81,6 +93,5 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           </Button>
         </div>
       </aside>
-    </>
   );
 }
