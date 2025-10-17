@@ -54,7 +54,6 @@ export default function CheckoutPage() {
     website: "",
   });
 
-  console.log("user id from checkout ",userId)
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});

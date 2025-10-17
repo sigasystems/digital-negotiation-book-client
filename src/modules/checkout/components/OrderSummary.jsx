@@ -72,12 +72,12 @@ const handleSubmit = async () => {
   try {
     // 1️⃣ Create Stripe payment session
     const paymentPayload = {
-      isStripe: true,
       userId,
       planId: selectedPlan.id,
+      billingCycle: billingCycle,
     };
     const paymentRes = await createPayment(paymentPayload);
-    if (paymentRes?.checkoutUrl) {
+    if (paymentRes) {
       showSuccess("Redirecting to Stripe checkout...");
 
       // 2️⃣ Store pending data for after checkout
@@ -92,7 +92,10 @@ const handleSubmit = async () => {
       );
 
       // 3️⃣ Redirect to Stripe checkout page
-      window.location.href = paymentRes.checkoutUrl;
+      window.location.href = paymentRes.url;
+      // window.open(paymentRes.url, "_blank");
+window.open(paymentRes.url, "_blank", "noopener,noreferrer");
+
     } else {
       showError("Checkout URL not received from server.");
     }

@@ -151,11 +151,11 @@ useEffect(() => {
                   plan.currency
                 )}
                 <span className="text-sm font-medium text-gray-500 ml-1">
-                  /{billingCycle === "monthly" ? "mo" : "yr"}
+                  /{billingCycle === "monthly" ? "monthly" : "yearly"}
                 </span>
               </p>
               <p className="text-gray-500 mb-6">
-                per {billingCycle === "monthly" ? "month" : "year"}
+                per {billingCycle === "monthly" ? "monthly" : "yearly"}
               </p>
 
               {/* Plan Details */}

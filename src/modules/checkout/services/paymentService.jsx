@@ -2,10 +2,10 @@ import { apiClient } from "@/utils/apiClient";
 
 export const createPayment = async (payload) => {
   try {
-    const response = await apiClient.post("/payments/create-payment", payload, {
+    const response = await apiClient.post("/subscription/create-checkout-session", payload, {
       withCredentials: true,
     });
-    return response.data.data; // <-- returns { checkoutUrl, payment }
+    return response.data; // <-- returns { checkoutUrl, payment }
   } catch (err) {
     console.error("Payment Error:", err);
     throw err.response?.data?.message || "Failed to create payment";
@@ -21,7 +21,6 @@ export const becomeBusinessOwner = async (payload) => {
       payload,
       { withCredentials: true }
     );
-    console.log("buesinness owner create...formpaymetnservice")
     return response.data; 
   } catch (err) {
     console.error("Error in becomeBusinessOwner service:", err);
