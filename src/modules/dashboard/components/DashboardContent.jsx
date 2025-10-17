@@ -36,6 +36,7 @@ export default function ResponsiveDashboard() {
     fetchData();
   }, [pageIndex, pageSize, userRole]);
 
+  // Filter by email
   const filteredData = useMemo(() => {
     if (!emailFilter) return data;
     return data.filter((item) =>
@@ -96,6 +97,7 @@ export default function ResponsiveDashboard() {
 
       {/* User Management Section */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Mobile cards */}
         <div className="lg:hidden p-4 space-y-4">
           {data.length > 0 ? (
             data.map((item) => (
@@ -117,6 +119,7 @@ export default function ResponsiveDashboard() {
           )}
         </div>
 
+        {/* Desktop table */}
         <div className="hidden lg:block">
           <DashboardTable
             data={tableData}

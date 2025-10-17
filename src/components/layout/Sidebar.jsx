@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -76,19 +76,21 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             >
               <item.icon className="w-5 h-5 shrink-0" />
               {!collapsed && <span>{item.name}</span>}
+              {!collapsed && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
 
         <Separator className="my-2" />
 
-        {/* Footer */}
+        {/* Footer / Logout */}
         <div className="px-2 py-4">
           <Button
             variant="ghost"
             className="w-full justify-start text-red-600 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5 mr-2" />
+            {!collapsed && "Logout"}
             {!collapsed && "Logout"}
           </Button>
         </div>
