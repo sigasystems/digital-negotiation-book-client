@@ -26,7 +26,7 @@ export default function DashboardTable({
   setRowSelection,
   fetchOwners,
   userActions = [],
-  filterKey = "contactEmail", // optional: key to filter by default
+  filterKey = "email",
   pageIndex,
   pageSize,
   setPageIndex,
@@ -36,26 +36,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-   const HIDDEN_KEYS = ["id", "ownerId", "isDeleted"];
-
-  const COLUMN_LABELS = {
-    buyersCompanyName: "Company Name",
-    registrationNumber: "Registration Number",
-    taxId: "Tax ID",
-    contactName: "Contact Name",
-    contactEmail: "Contact Email",
-    countryCode: "Country Code",
-    contactPhone: "Contact Phone",
-    country: "Country",
-    state: "State",
-    city: "City",
-    address: "Address",
-    postalCode: "Postal Code",
-    status: "Status",
-    isVerified: "Verified",
-    createdAt: "Created At",
-    updatedAt: "Updated At",
-  };
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -79,15 +60,15 @@ export default function DashboardTable({
       enableSorting: false,
     };
 
-    // Dynamic columns for buyers
+    // Dynamic columns
     const dynamicColumns = Object.keys(data[0])
       .filter((key) => !HIDDEN_KEYS.includes(key))
       .map((key) => {
-        // Custom render for status
         if (key === "status") {
           return {
+            id: key,
             accessorKey: key,
-            header: COLUMN_LABELS[key] || key,
+            header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
               return (
@@ -110,23 +91,25 @@ export default function DashboardTable({
 
         if (key === "isVerified") {
           return {
+            id: key,
             accessorKey: key,
-            header: COLUMN_LABELS[key] || key,
-            cell: ({ row }) => (
-              <span className={`font-medium ${row.getValue(key) ? "text-green-600" : "text-red-600"}`}>
-                {row.getValue(key) ? "Yes" : "No"}
-              </span>
-            ),
+            header: "Verified",
+            cell: ({ row }) =>
+              row.getValue(key) ? (
+                <span className="text-green-600 font-medium">Yes</span>
+              ) : (
+                <span className="text-red-600 font-medium">No</span>
+              ),
           };
         }
 
         return {
+          id: key,
           accessorKey: key,
-          header: COLUMN_LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1),
+          header: key.charAt(0).toUpperCase() + key.slice(1),
         };
       });
 
-    // Actions column
     const actionsColumn = {
       id: "actions",
       header: "Actions",
@@ -154,17 +137,21 @@ export default function DashboardTable({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
-      {/* Optional filter */}
-      {table.getColumn(filterKey) && (
-        <div className="mb-4">
-          <Input
-            placeholder={`Filter by ${filterKey}...`}
-            value={table.getColumn(filterKey)?.getFilterValue() || ""}
-            onChange={(e) => table.getColumn(filterKey)?.setFilterValue(e.target.value)}
-            className="max-w-md"
-          />
-        </div>
-      )}
+      {/* Filter input */}
+      {/* Filter input */}
+{table.getAllColumns().some(col => col.id === filterKey) && (
+  <div className="mb-4">
+    <Input
+      placeholder={`Filter by ${filterKey}...`}
+      value={table.getColumn(filterKey)?.getFilterValue() || ""}
+      onChange={(e) =>
+        table.getColumn(filterKey)?.setFilterValue(e.target.value)
+      }
+      className="max-w-md"
+    />
+  </div>
+)}
+
 
       <Table className="min-w-[1000px]">
         <TableHeader>
