@@ -77,25 +77,25 @@ function AppContent() {
         <Route
           path="/users"
           element={
-            // <ProtectedRoute>
-            <Users userRole={user?.userRole} />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <Users userRole={user?.userRole} />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/user/:id"
           element={
-            // <ProtectedRoute>
-            <UserPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/add-buyer"
           element={
-            // <ProtectedRoute>
-            <AddBuyerForm />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <AddBuyerForm />
+            </ProtectedRoute>
           }
         />
       </Routes>
