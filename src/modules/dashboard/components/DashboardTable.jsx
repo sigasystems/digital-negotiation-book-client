@@ -110,15 +110,20 @@ export default function DashboardTable({
         };
       });
 
-    const actionsColumn = {
+    const actionsColumn = Array.isArray(userActions) && userActions.length > 0
+    ? {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
         <ActionsCell row={row} refreshData={fetchOwners} userActions={userActions} />
       ),
-    };
+    }
+    : null;
 
-    return [selectColumn, ...dynamicColumns, actionsColumn];
+return actionsColumn
+  ? [selectColumn, ...dynamicColumns, actionsColumn]
+  : [selectColumn, ...dynamicColumns];
+
   }, [data, userActions]);
 
   const table = useReactTable({

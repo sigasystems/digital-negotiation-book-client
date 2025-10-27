@@ -17,6 +17,23 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const record = row?.original || {};
   const isActive = record.status === "active";
 
+  const getErrorMessage = (err, fallback = "Something went wrong") =>
+    err?.response?.data?.message || err?.message || fallback;
+
+  const runAction = async (key, fn, successMsg, fallbackError) => {
+    setLoadingAction(key);
+    try {
+      await fn();
+      if (successMsg) toast.success(successMsg);
+      refreshData?.();
+    } catch (err) {
+      console.error(`${key} failed:`, err);
+      toast.error(getErrorMessage(err, fallbackError));
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
   const actionHandlers = {
     view: async () => {
       setLoadingAction("view");
@@ -26,7 +43,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
         setIsModalOpen(true);
       } catch (err) {
         console.error("Error fetching details:", err);
-        toast.error(err.error);
+        toast.error(getErrorMessage(err, "Failed to fetch details"));
       } finally {
         setLoadingAction(null);
       }
@@ -36,64 +53,42 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
       navigate(`/user/${record.id}`, { state: record });
     },
 
-    activate: async () => {
-      setLoadingAction("activate");
-      try {
-        await roleBasedDataService.activate(role, record.id);
-        toast.success("Activated successfully");
-        refreshData?.();
-      } catch (err) {
-        console.error("Activation failed:", err);
-        toast.error("Failed to activate record");
-      } finally {
-        setLoadingAction(null);
-      }
-    },
+    activate: () =>
+      runAction(
+        "activate",
+        () => roleBasedDataService.activate(role, record.id),
+        "Activated successfully",
+        "Failed to activate record"
+      ),
 
-    deactivate: async () => {
-      setLoadingAction("deactivate");
-      try {
-        await roleBasedDataService.deactivate(role, record.id);
-        toast.success("Deactivated successfully");
-        refreshData?.();
-      } catch (err) {
-        console.error("Deactivation failed:", err);
-        toast.error("Failed to deactivate record");
-      } finally {
-        setLoadingAction(null);
-      }
-    },
+    deactivate: () =>
+      runAction(
+        "deactivate",
+        () => roleBasedDataService.deactivate(role, record.id),
+        "Deactivated successfully",
+        "Failed to deactivate record"
+      ),
 
-    delete: async () => {
+    delete: () => {
       if (!window.confirm("Are you sure you want to delete this record?")) return;
-      setLoadingAction("delete");
-      try {
-        await roleBasedDataService.softDelete(role, record.id);
-        toast.success("Deleted successfully");
-        refreshData?.();
-      } catch (err) {
-        console.error("Delete failed:", err);
-        toast.error("Failed to delete record");
-      } finally {
-        setLoadingAction(null);
-      }
+      runAction(
+        "delete",
+        () => roleBasedDataService.softDelete(role, record.id),
+        "Deleted successfully",
+        "Failed to delete record"
+      );
     },
 
-    update: async () => {
-      setLoadingAction("update");
-      try {
-        await roleBasedDataService.update(role, record.id, record);
-        toast.success("Updated successfully");
-        refreshData?.();
-      } catch (err) {
-        console.error("Update failed:", err);
-        toast.error("Failed to update record");
-      } finally {
-        setLoadingAction(null);
-      }
-    },
+    update: () =>
+      runAction(
+        "update",
+        () => roleBasedDataService.update(role, record.id, record),
+        "Updated successfully",
+        "Failed to update record"
+      ),
   };
 
+  /** ✅ Icon + color mapping */
   const actionIcons = {
     view: { icon: Eye, color: "text-blue-600 hover:bg-blue-50" },
     edit: { icon: Edit, color: "text-indigo-600 hover:bg-indigo-50" },
@@ -133,9 +128,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
             onClick={handler}
             disabled={!!loadingAction}
             className={`p-1 rounded-md transition-colors duration-150 ${color} ${
-              loadingAction === key
-                ? "opacity-50 cursor-wait"
-                : "cursor-pointer"
+              loadingAction === key ? "opacity-50 cursor-wait" : "cursor-pointer"
             }`}
           >
             <Icon className="w-4 h-4" />

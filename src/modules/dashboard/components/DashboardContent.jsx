@@ -15,7 +15,7 @@ export default function ResponsiveDashboard() {
 
   const user = sessionStorage.getItem("user");
   const userRole = JSON.parse(user)?.userRole || "guest";
-  const userActions = ["view", "edit", "activate", "deactivate", "delete"];
+  const userActions = [];
 
   const fetchData = async () => {
     setLoading(true);
@@ -107,9 +107,6 @@ export default function ResponsiveDashboard() {
                 isSelected={rowSelection[item.id]}
                 onSelect={(checked) =>
                   setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
-                }
-                actions={
-                  <ActionsCell row={{ original: item }} refreshData={fetchData} userActions={userActions} />
                 }
               />
             ))
