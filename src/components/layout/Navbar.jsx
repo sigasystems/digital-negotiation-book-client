@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link } from "react-router-dom";
@@ -8,6 +7,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  let sessionUser = sessionStorage.getItem("user");
+  sessionUser = sessionUser ? JSON.parse(sessionUser) : null;
 
   const links = [
     { name: "Features", href: "#features" },
@@ -44,9 +46,9 @@ export default function Navbar() {
             </a>
           ))}
 
-          <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg">
+          {!sessionUser && <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg">
             Login
-          </Link>
+          </Link>}
 
           {/* User Menu */}
           <div className="relative">
@@ -57,9 +59,8 @@ export default function Navbar() {
               <User className="w-5 h-5 text-gray-700" />
               <span className="text-gray-700 font-medium">John Doe</span>
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  userMenuOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -72,7 +73,7 @@ export default function Navbar() {
                   }}
                   className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer text-sm"
                 >
-                  <LogOut className= "w-4 h-4" /> Logout
+                  <LogOut className="w-4 h-4" /> Logout
                 </button>
               </div>
             )}
@@ -103,12 +104,9 @@ export default function Navbar() {
               </a>
             ))}
 
-            <Link
-              to="/login" className="cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg text-center"
-              onClick={() => setMobileOpen(false)}
-            >
+            {!sessionUser && <Link to="/login" className="bg-indigo-600 text-white hover:bg-indigo-700 transition p-2 rounded-lg">
               Login
-            </Link>
+            </Link>}
 
             <button
               className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md cursor-pointer"

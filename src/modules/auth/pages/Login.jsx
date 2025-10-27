@@ -31,42 +31,43 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-        const data = await login(values);
-        const tokenPayload = data.data.tokenPayload;
-        const token = data.data.accessToken
-        if (data.statusCode === 200 && data.success === true && token) {
-            if (sessionStorage.getItem("user")) {
+      const data = await login(values);
+      const tokenPayload = data.data.tokenPayload;
+      const token = data.data.accessToken
+      if (data.statusCode === 200 && data.success === true && token) {
+        if (sessionStorage.getItem("user")) {
           sessionStorage.removeItem("user");
         }
-          sessionStorage.setItem("authToken", token);
-          sessionStorage.setItem("user", JSON.stringify(tokenPayload));
-          toast.success("Logged in successfully!");
-          navigate("/dashboard");
-        } else {
-          toast.error("Something went wrong! Please try again later.");
-        }
-
+        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem("user", JSON.stringify(tokenPayload));
+        toast.success("Logged in successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.error("Something went wrong! Please try again later.");
+      }
     } catch (err) {
-        setError(err);
-        toast.error(err);
+      setError(err?.message || "Login failed. Please try again.");
+      toast.error(err?.message || "Login failed.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="flex w-full md:w-1/2 justify-center items-center bg-gray-100 px-8 md:px-16 py-12">
-        <div className="w-full max-w-md">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800 text-center">
+    <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
+      {/* Left side - form */}
+      <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-16 py-10 sm:py-16 bg-gray-100">
+        <div className="w-full max-w-md sm:max-w-lg">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-800 text-center">
             Welcome 👋
           </h1>
-          <p className="text-gray-600 mb-8 text-center text-lg">
+          <p className="text-gray-600 mb-8 text-center text-base sm:text-lg">
             Please login to your account
           </p>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+              {/* Email */}
               <FormField
                 control={form.control}
                 name="email"
@@ -79,7 +80,7 @@ export default function Login() {
                         type="email"
                         placeholder="you@example.com"
                         {...field}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
                       />
                     </FormControl>
                     {fieldState.error && (
@@ -89,6 +90,7 @@ export default function Login() {
                 )}
               />
 
+              {/* Password */}
               <FormField
                 control={form.control}
                 name="password"
@@ -102,7 +104,7 @@ export default function Login() {
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
                           {...field}
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
                         />
                         <button
                           type="button"
@@ -122,45 +124,49 @@ export default function Login() {
 
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
+              {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg cursor-pointer transition"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition text-sm sm:text-base cursor-pointer"
                 disabled={loading}
               >
-                {loading ? "Login in..." : "Login"}
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </Form>
 
-          <div className="flex justify-center mt-6 text-base text-gray-700 font-medium gap-6 flex-wrap">
+          {/* Links */}
+          <div className="flex justify-center mt-6 text-sm sm:text-base text-gray-700 font-medium gap-4 sm:gap-6 flex-wrap">
             <Link
               to="/forgot-password"
-              className="hover:text-blue-600 cursor-pointer transition-colors duration-200"
+              className="hover:text-blue-600 transition-colors duration-200"
             >
               Forgot password?
             </Link>
             <Link
               to="/become-tenant"
-              className="hover:text-blue-600 cursor-pointer transition-colors duration-200"
+              className="hover:text-blue-600 transition-colors duration-200"
             >
               Become a tenant
             </Link>
           </div>
 
+          {/* Back to Home */}
           <Link
             onClick={() => navigate("/")}
-            className="mt-8 block w-full text-center bg-blue-100 hover:bg-blue-300 text-blue-800 font-medium py-2 rounded-lg cursor-pointer transition"
+            className="mt-8 block w-full text-center bg-blue-100 hover:bg-blue-300 text-blue-800 font-medium py-2 rounded-lg transition text-sm sm:text-base"
           >
             Back to Home
           </Link>
         </div>
       </div>
 
-      <div className="w-full md:w-1/2 h-64 md:h-auto">
+      {/* Right side - image */}
+      <div className="w-full md:w-1/2 h-56 sm:h-72 md:h-auto">
         <img
           src="/src/assets/loginimage.webp"
           alt="Login illustration"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center"
         />
       </div>
     </div>

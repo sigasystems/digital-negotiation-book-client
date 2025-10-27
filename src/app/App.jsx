@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { getUserFromCookie } from "@/utils/auth";
 
 // Pages
 import Login from "@/modules/auth/pages/Login";
@@ -56,51 +55,51 @@ function AppContent() {
   }
 
   return (
-<Layout>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/success" element={<SuccessPage />} />
-           <Route path="/login" element={<Login />} />
-           <Route path="/paymentsuccess" element={<PaymentSuccess />} />
+    <Layout>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/success" element={<SuccessPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/paymentsuccess" element={<PaymentSuccess />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <ResponsiveDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/users"
-            element={
-              <ProtectedRoute>
-                <Users userRole={user?.userRole} />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/user/:id"
-            element={
-              <ProtectedRoute>
-                <UserPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/add-buyer"
-            element={
-              <ProtectedRoute>
-                <AddBuyerForm />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Layout>
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <ResponsiveDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <Users userRole={user?.userRole} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/:id"
+          element={
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-buyer"
+          element={
+            <ProtectedRoute>
+              <AddBuyerForm />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Layout>
   );
 }
 
@@ -109,8 +108,8 @@ export default function App() {
     <>
       <Router>
         <AppContent />
-    </Router>
-    <Toaster position="top-center" reverseOrder={false} />
+      </Router>
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   );
 }
