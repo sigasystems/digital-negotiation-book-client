@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch user from session storage
   const sessionUserData = sessionStorage.getItem("user");
@@ -21,6 +22,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("authToken");
     setLogoutOpen(false);
     window.location.href = "/login";
   };
@@ -49,15 +51,28 @@ export default function Navbar() {
           ))}
 
           {/* User Section */}
-          {sessionUser ? (
+          {!sessionUser ? (
+            <Link
+              to="/login"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+            >
+              Login
+            </Link>
+          ) : (
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition"
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
               >
-                <User className="w-4 h-4" />
-                <span>{sessionUser.email?.split("@")[0]}</span>
-                <ChevronDown className="w-4 h-4" />
+                <User className="w-5 h-5 text-gray-700" />
+                <span className="text-gray-700 font-medium">
+                  {sessionUser?.name || "User"}
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    userMenuOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {userMenuOpen && (
@@ -74,17 +89,10 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-          ) : (
-            <Link
-              to="/login"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
-            >
-              Login
-            </Link>
           )}
         </nav>
 
-        {/* Mobile Button */}
+        {/* Mobile Menu Button */}
         <button
           className="md:hidden text-gray-700 hover:text-indigo-600 transition"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -131,7 +139,7 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Logout Dialog */}
+      {/* Logout Modal */}
       <LogoutDialog
         isOpen={logoutOpen}
         onClose={() => setLogoutOpen(false)}

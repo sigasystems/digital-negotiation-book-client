@@ -1,19 +1,69 @@
 import React from "react";
-import { X, Building2, Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Shield } from "lucide-react";
-
+import { X, Building2, Mail, MapPin, Calendar, CheckCircle, Shield, XCircle } from "lucide-react";
 const ViewContent = ({ isOpen, onClose, owner }) => {
   if (!isOpen || !owner) return null;
 
-  const sections = [
+  const isBuyer = !!owner.buyersCompanyName || !!owner.contactEmail;
+
+  const sections = isBuyer
+    ? [
+        {
+          title: "Company Details",
+          icon: <Building2 className="w-4 h-4" />,
+          fields: [
+            { label: "Company Name", value: owner.buyersCompanyName },
+            { label: "Registration No", value: owner.registrationNumber },
+            { label: "Tax ID", value: owner.taxId },
+          ],
+        },
+        {
+          title: "Contact Information",
+          icon: <Mail className="w-4 h-4" />,
+          fields: [
+            { label: "Contact Name", value: owner.contactName },
+            { label: "Email", value: owner.contactEmail },
+            { label: "Phone", value: `${owner.countryCode || ""} ${owner.contactPhone || ""}`.trim() },
+          ],
+        },
+        {
+          title: "Address",
+          icon: <MapPin className="w-4 h-4" />,
+          fields: [
+            { label: "Address", value: owner.address },
+            { label: "City", value: owner.city },
+            { label: "State", value: owner.state },
+            { label: "Country", value: owner.country },
+            { label: "Postal Code", value: owner.postalCode },
+          ],
+        },
+        {
+          title: "Account Status",
+          icon: <CheckCircle className="w-4 h-4" />,
+          fields: [
+            { label: "Status", value: owner.status, type: "status" },
+            { label: "Verified", value: owner.isVerified, type: "boolean" },
+            { label: "Deleted", value: owner.isDeleted, type: "boolean-negative" },
+          ],
+        },
+        {
+          title: "Timestamps",
+          icon: <Calendar className="w-4 h-4" />,
+          fields: [
+            { label: "Created", value: owner.createdAt },
+            { label: "Updated", value: owner.updatedAt },
+          ],
+        },
+      ]
+    : [
     {
       title: "Personal Information",
       icon: <Shield className="w-4 h-4" />,
       fields: [
-        { label: "First Name", value: owner.first_name, icon: <Mail className="w-4 h-4" /> },
+        { label: "First Name", value: owner.first_name },
         { label: "Last Name", value: owner.last_name },
-        { label: "Email", value: owner.email, icon: <Mail className="w-4 h-4" /> },
-        { label: "Phone", value: owner.phoneNumber, icon: <Phone className="w-4 h-4" /> },
-      ]
+        { label: "Email", value: owner.email },
+        { label: "Phone", value: owner.phoneNumber },
+      ],
     },
     {
       title: "Business Details",
@@ -21,7 +71,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
       fields: [
         { label: "Business Name", value: owner.businessName },
         { label: "Registration No", value: owner.registrationNumber },
-      ]
+      ],
     },
     {
       title: "Address",
@@ -32,7 +82,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         { label: "State", value: owner.state },
         { label: "Country", value: owner.country },
         { label: "Postal Code", value: owner.postalCode },
-      ]
+      ],
     },
     {
       title: "Account Status",
@@ -42,14 +92,14 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         { label: "Verified", value: owner.is_verified, type: "boolean" },
         { label: "Approved", value: owner.is_approved, type: "boolean" },
         { label: "Deleted", value: owner.is_deleted, type: "boolean-negative" },
-      ]
+      ],
     },
     {
       title: "Timestamps",
       icon: <Calendar className="w-4 h-4" />,
       fields: [
-        { label: "Created", value: owner.createdAt},
-        { label: "Updated", value: owner.updatedAt},
+        { label: "Created", value: owner.createdAt },
+        { label: "Updated", value: owner.updatedAt },
       ]
     }
   ];
@@ -59,8 +109,8 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
       const isActive = field.value === "active";
       return (
         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-          isActive 
-            ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+          isActive
+            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
             : "bg-red-50 text-red-700 border border-red-200"
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-red-500"}`} />
@@ -68,13 +118,12 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         </span>
       );
     }
-    
     if (field.type === "boolean" || field.type === "boolean-negative") {
       const isPositive = field.type === "boolean" ? field.value : !field.value;
       return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
-          isPositive 
-            ? "bg-emerald-50 text-emerald-700" 
+          isPositive
+            ? "bg-emerald-50 text-emerald-700"
             : "bg-gray-100 text-gray-600"
         }`}>
           {isPositive ? (
@@ -86,29 +135,34 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         </span>
       );
     }
-    
     return <span className="text-gray-900 font-medium">{field.value || "—"}</span>;
   };
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Gradient */}
+        {/* Header */}
         <div className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 px-6 py-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Business Owner</h2>
-                <p className="text-sm text-gray-300 mt-0.5">Detailed information</p>
+                <h2 className="text-xl font-bold text-white">
+                  {isBuyer ? "Buyer Details" : "Business Owner Details"}
+                </h2>
+                <p className="text-sm text-gray-300 mt-0.5">
+                  {isBuyer
+                    ? "Detailed information about the buyer"
+                    : "Detailed information about the business owner"}
+                </p>
               </div>
             </div>
             <button

@@ -106,7 +106,16 @@ const UserPage = () => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      await roleBasedDataService.update(userRole, { id, ownerId: buyer.ownerId }, buyer);
+      const changedData = Object.keys(buyer).reduce((acc, key) => {
+        const newValue = buyer[key];
+        const oldValue = originalBuyer[key];
+        if (newValue !== oldValue && newValue !== undefined && newValue !== null) {
+          acc[key] = newValue;
+        }
+        return acc;
+      }, {});
+
+      await roleBasedDataService.update(userRole, { id, ownerId: buyer.ownerId }, changedData);
       toast.success("Buyer updated successfully");
       setHasChanges(false);
       setOriginalBuyer(buyer);

@@ -11,6 +11,7 @@ import CheckoutPage from "@/modules/checkout/pages/Checkout";
 import Users from "@/modules/dashboard/pages/Users";
 import ResponsiveDashboard from "@/modules/dashboard/components/DashboardContent";
 import UserPage from "@/modules/dashboard/pages/UserPage";
+import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
 
 // Optional: ProtectedRoute wrapper
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
@@ -95,6 +96,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AddBuyerForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-business-owner"
+          element={
+            <ProtectedRoute>
+              <AddBusinessOwner />
             </ProtectedRoute>
           }
         />

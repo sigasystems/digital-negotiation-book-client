@@ -32,22 +32,28 @@ export default function Login() {
     setError("");
     try {
       const data = await login(values);
-      const tokenPayload = data.data.tokenPayload;
-      const token = data.data.accessToken
-      if (data.statusCode === 200 && data.success === true && token) {
-        if (sessionStorage.getItem("user")) {
+      const tokenPayload = data?.data?.tokenPayload;
+      const token = data?.data?.accessToken
+
+      if (data?.statusCode === 200 && data?.success === true && token) {
           sessionStorage.removeItem("user");
-        }
         sessionStorage.setItem("authToken", token);
         sessionStorage.setItem("user", JSON.stringify(tokenPayload));
         toast.success("Logged in successfully!");
         navigate("/dashboard");
       } else {
-        toast.error("Something went wrong! Please try again later.");
+        const message =
+          data?.data?.message || "Something went wrong! Please try again later.";
+        toast.error(message);
       }
     } catch (err) {
-      setError(err?.message || "Login failed. Please try again.");
-      toast.error(err?.message || "Login failed.");
+      console.error("Login failed:", err);  
+      const errorMessage =
+        err ||
+        "Login failed. Please try again.";
+
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
