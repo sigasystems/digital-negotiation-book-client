@@ -4,13 +4,15 @@ import { Check, CreditCard, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {  becomeBusinessOwner, createPayment } from "../services/paymentService";
+import {   createPayment } from "../services/paymentService";
 import { showError, showSuccess } from "@/utils/toastService";
 
 
 export default function OrderSummary({
   selectedPlan,
-  billingCycle = "monthly",
+  // billingCycle = "monthly",
+    billingCycle, // <-- new field
+
   calculateTotal,
   formData = {}, // ✅ default to empty object
   userId : userId,
@@ -18,6 +20,7 @@ export default function OrderSummary({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  
   if (!selectedPlan) {
     return (
       <div className="text-center text-slate-500 p-6 border border-dashed rounded-lg">
@@ -74,6 +77,7 @@ const handleSubmit = async () => {
     const paymentPayload = {
       userId,
       planId: selectedPlan.id,
+      price: selectedPlan.priceMonthly || selectedPlan.priceYearly,
       billingCycle: billingCycle,
     };
     const paymentRes = await createPayment(paymentPayload);

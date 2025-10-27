@@ -1,736 +1,798 @@
-import { useEffect, useState } from "react";
-import { CheckCircle, Mail, FileText, Building2, ArrowRight, XCircle } from "lucide-react";
-import { toast } from "react-hot-toast";
-import { becomeBusinessOwner } from "../services/paymentService";
-
-export default function PaymentSuccess() {
-  const [status, setStatus] = useState("processing");
-  const [currentStep, setCurrentStep] = useState(0);
-  const [userEmail, setUserEmail] = useState("");
-  // ✅ Call once when component mounts
-  useEffect(() => {
-     // ✅ Step-by-step animation sequence
-  const simulateProgress = async () => {
-    const steps = [1, 2, 3];
-    for (const step of steps) {
-      setCurrentStep(step);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-    }
-  };
-  // ✅ Function moved outside of useEffect
-  const handleBusinessCreation = async () => {
-    try {
-      const pendingData = JSON.parse(sessionStorage.getItem("pendingBusinessData"));
-      if (!pendingData) {
-        toast.error("No pending business data found.");
-        setStatus("error");
-        return;
-      }
-
-      // const alreadyProcessed = sessionStorage.getItem("businessProcessed");
-      // if (alreadyProcessed) {
-      //   toast("Business registration already completed.");
-      //   setStatus("success");
-      //   return;
-      // }
-      await simulateProgress();
-      const response = await becomeBusinessOwner(pendingData);
-      if (response?.success) {
-        sessionStorage.removeItem("pendingBusinessData");
-        sessionStorage.setItem("businessProcessed", "true");
-        toast.success("Business registration completed successfully!");
-        setStatus("success");
-      } else {
-        toast.error(response?.message || "Failed to register business.");
-        setStatus("error");
-      }
-    } catch (err) {
-      console.error("Error during business creation:", err);
-      toast.error(err.message || "Something went wrong");
-      setStatus("error");
-    }
-  };
-    handleBusinessCreation();
-  }, []);
-
-  const handleGoToDashboard = () => {
-    window.location.href = "/";
-  };
-
-  const handleReturnToPricing = () => {
-    window.location.href = "/";
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-          {/* ===== Status Icon ===== */}
-          <div className="flex justify-center mb-6">
-            {status === "processing" && (
-              <div className="relative">
-                <div className="w-20 h-20 border-4 border-blue-200 rounded-full"></div>
-                <div className="w-20 h-20 border-4 border-blue-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
-              </div>
-            )}
-            {status === "success" && (
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center animate-scale-in">
-                <CheckCircle className="w-12 h-12 text-green-600" />
-              </div>
-            )}
-            {status === "error" && (
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                <XCircle className="w-12 h-12 text-red-600" />
-              </div>
-            )}
-          </div>
-
-          {/* ===== Processing State ===== */}
-          {status === "processing" && (
-            <>
-              <h1 className="text-3xl font-bold text-gray-900 text-center mb-4">
-                Processing Your Registration
-              </h1>
-              <p className="text-gray-600 text-center mb-8">
-                We're setting up your business account. This will only take a moment...
-              </p>
-
-              {/* Progress Steps */}
-              <div className="space-y-4 mb-8">
-                {/* Step 1 */}
-                <div className={`flex items-center gap-4 p-4 rounded-lg border transition-all duration-300 ${
-                  currentStep >= 1 ? "bg-blue-50 border-blue-200" : "bg-gray-50 border-gray-200"
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    currentStep >= 1 ? "bg-blue-600" : "bg-gray-300"
-                  }`}>
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  </div>
-                  <div>
-                    <p className={`font-semibold ${currentStep >= 1 ? "text-gray-900" : "text-gray-500"}`}>
-                      Verifying Payment
-                    </p>
-                    <p className="text-sm text-gray-600">Confirming transaction details</p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className={`flex items-center gap-4 p-4 rounded-lg border transition-all duration-300 ${
-                  currentStep >= 2 ? "bg-blue-50 border-blue-200" : "bg-gray-50 border-gray-200"
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    currentStep >= 2 ? "bg-blue-600" : "bg-gray-300"
-                  }`}>
-                    <Building2 className={`w-4 h-4 ${currentStep >= 2 ? "text-white" : "text-gray-500"}`} />
-                  </div>
-                  <div>
-                    <p className={`font-semibold ${currentStep >= 2 ? "text-gray-900" : "text-gray-500"}`}>
-                      Creating Business Profile
-                    </p>
-                    <p className="text-sm text-gray-600">Setting up your account</p>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className={`flex items-center gap-4 p-4 rounded-lg border transition-all duration-300 ${
-                  currentStep >= 3 ? "bg-blue-50 border-blue-200" : "bg-gray-50 border-gray-200"
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    currentStep >= 3 ? "bg-blue-600" : "bg-gray-300"
-                  }`}>
-                    <Mail className={`w-4 h-4 ${currentStep >= 3 ? "text-white" : "text-gray-500"}`} />
-                  </div>
-                  <div>
-                    <p className={`font-semibold ${currentStep >= 3 ? "text-gray-900" : "text-gray-500"}`}>
-                      Sending Confirmation
-                    </p>
-                    <p className="text-sm text-gray-600">Email with details on the way</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800 text-center">
-                  <strong>Please don't close this page</strong> — We're finalizing your registration
-                </p>
-              </div>
-            </>
-          )}
-
-          {/* ===== Success State ===== */}
-          {status === "success" && (
-            <>
-              <h1 className="text-3xl font-bold text-gray-900 text-center mb-4">
-                Registration Complete!
-              </h1>
-              <p className="text-gray-600 text-center mb-8">
-                Your business account has been successfully created
-              </p>
-
-              <div className="space-y-3 mb-8">
-                <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Payment Confirmed</p>
-                    <p className="text-sm text-gray-600">Your subscription is now active</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <Building2 className="w-5 h-5 text-green-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Business Profile Created</p>
-                    <p className="text-sm text-gray-600">You can now access all premium features</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <Mail className="w-5 h-5 text-green-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Confirmation Email Sent</p>
-                    <p className="text-sm text-gray-600">
-                      We've sent details to <strong className="text-gray-900">{userEmail}</strong>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <FileText className="w-5 h-5 text-green-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Documentation Ready</p>
-                    <p className="text-sm text-gray-600">Access guides in your dashboard</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-4 text-center mb-4">
-                <p className="font-semibold mb-1">Welcome aboard! 🎉</p>
-                <p className="text-sm text-blue-100">Get ready to explore your new features</p>
-              </div>
-
-              <button
-                onClick={handleGoToDashboard}
-                className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-              >
-                Go to Dashboard
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-
-          {/* ===== Error State ===== */}
-          {status === "error" && (
-            <>
-              <h1 className="text-3xl font-bold text-gray-900 text-center mb-4">
-                Something Went Wrong
-              </h1>
-              <p className="text-gray-600 text-center mb-8">
-                We encountered an issue processing your registration
-              </p>
-
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-                <p className="text-red-800 text-center mb-2 font-medium">
-                  Don't worry — your payment was successful
-                </p>
-                <p className="text-sm text-red-700 text-center">
-                  Our team will manually complete your registration and email you at{" "}
-                  <strong className="text-red-900">{userEmail || "your registered email"}</strong> within 24 hours.
-                </p>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-yellow-800 text-center">
-                  <strong>Reference ID:</strong>{" "}
-                  {Math.random().toString(36).substr(2, 9).toUpperCase()}
-                </p>
-                <p className="text-xs text-yellow-700 text-center mt-1">
-                  Please save this ID for your records
-                </p>
-              </div>
-
-              <button
-                onClick={handleReturnToPricing}
-                className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-              >
-                Return to Pricing
-              </button>
-            </>
-          )}
-        </div>
-
-        <div className="text-center mt-6 text-sm text-gray-600">
-          <p>
-            Need help? Contact{" "}
-            <a href="mailto:support@yourbusiness.com" className="text-blue-600 hover:underline font-medium">
-              support@yourbusiness.com
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useEffect, useState } from "react";
-// import { CheckCircle, Mail, FileText, Building2, ArrowRight, XCircle, Shield, Download, Calendar, CreditCard, Loader2 } from "lucide-react";
-// import { Navigate, useNavigate } from "react-router-dom";
+// import { useEffect, useState, useCallback, useRef } from "react";
+// import {
+//   CheckCircle,
+//   Mail,
+//   FileText,
+//   Building2,
+//   ArrowRight,
+//   XCircle,
+//   Shield,
+//   Download,
+//   Calendar,
+//   CreditCard,
+//   Loader2,
+// } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
 // import { becomeBusinessOwner } from "../services/paymentService";
 // import { formatDate, formatTime } from "@/utils/formateDate";
+
 // const getInitialOrderData = () => {
 //   try {
 //     const rawData = sessionStorage.getItem("pendingBusinessData");
-//     return rawData ? JSON.parse(rawData) : {};
+//     const parsedData = rawData ? JSON.parse(rawData) : {};
+
+//     return {
+//       businessName: parsedData.businessName || "Business Instance",
+//       email: parsedData.email || "user@example.com",
+//       planId: parsedData.planId || "d1d98dd8-779e-4777-9ca7-19a1413ac78d",
+//       billingCycle: parsedData.billingCycle || "monthly",
+//       cardLast4: "1234",
+//       cardType: "Visa",
+//       transactionId: "TXN-9876543210",
+//       planName: "Loading...",
+//       planPrice: "0.00",
+//       currencySymbol: "₹",
+//       currencyCode: "INR",
+//       ...parsedData,
+//     };
 //   } catch (error) {
 //     console.error("Failed to parse session storage data:", error);
 //     return {};
 //   }
 // };
+
 // const PaymentSuccess = () => {
-//   // status: "processing", "success", or "error"
-//   const [status, setStatus] = useState("processing"); 
-//     const [orderData, setOrderData] = useState(getInitialOrderData());
+//   const [status, setStatus] = useState("processing");
+//   const [orderData, setOrderData] = useState(getInitialOrderData());
+//   const [currentStep, setCurrentStep] = useState(0);
 //   const navigate = useNavigate();
-//   // currentStep: 0=init, 1=payment, 2=provisioning, 3=notification
-//   const [currentStep, setCurrentStep] = useState(0); 
+//   const hasRun = useRef(false); // 👈 Prevent double API call
+
+//   const handleGoToDashboard = useCallback(() => {
+//     sessionStorage.removeItem("pendingBusinessData");
+//     navigate("/dashboard");
+//   }, [navigate]);
+
+//   const handleReturnToPricing = useCallback(() => {
+//     sessionStorage.removeItem("pendingBusinessData");
+//     navigate("/");
+//   }, [navigate]);
+
+//   const handleDownloadReceipt = () => {
+//     alert("Receipt download functionality not implemented yet.");
+//   };
 
 //   useEffect(() => {
 //     const handleBusinessCreation = async () => {
-//       const rawData = sessionStorage.getItem("pendingBusinessData");
-
-//       if (!rawData) {
-//         console.error("CRITICAL: No pending business data found in session.");
-//         setStatus("error");
-//         return;
-//       }
+//       if (hasRun.current) return; // prevent multiple runs
+//       hasRun.current = true;
 
 //       const sessionData = getInitialOrderData();
-      
-//       // Calculate derived/time-sensitive fields
 //       const now = new Date();
-//       const nextMonth = new Date(now);
-//       nextMonth.setMonth(nextMonth.getMonth() + 1);
+//       const nextBillingDate = new Date(now);
+//       if (sessionData.billingCycle === "yearly") {
+//         nextBillingDate.setFullYear(nextBillingDate.getFullYear() + 1);
+//       } else {
+//         nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+//       }
 
-//       // Create the final, enriched data object
-//       const finalOrderData = {
+//       // Set initial placeholder data
+//       setOrderData({
 //         ...sessionData,
-//         nextBilling: formatDate(nextMonth),
-//         time: formatTime(now), // Use current time for order time
-//       };
+//         nextBilling: formatDate(nextBillingDate),
+//         time: formatTime(now),
+//         date: formatDate(now),
+//       });
 
 //       try {
-//         // Step 1: Update the state with the complete, enriched data payload
-//         setOrderData(finalOrderData); 
-
-//         // Animate through processing steps for better UX
-//         setCurrentStep(1); 
-//         await new Promise(resolve => setTimeout(resolve, 800));
+//         // smooth progress animation
+//         setCurrentStep(1);
+//         await new Promise((r) => setTimeout(r, 600));
 //         setCurrentStep(2);
-//         await new Promise(resolve => setTimeout(resolve, 800));
+//         await new Promise((r) => setTimeout(r, 600));
 //         setCurrentStep(3);
 
-//         // Step 2: Finalize account creation on the backend
-//         const res = await becomeBusinessOwner(finalOrderData);
-        
-//         if (res.success) {
+//         // API call
+//         const res = await becomeBusinessOwner(sessionData);
+//         if (res?.success && res.data) {
+//           const api = res.data;
+//           const plan = api.plan || {};
+
+//           setOrderData((prev) => ({
+//             ...prev,
+//             businessName: api.businessName || prev.businessName,
+//             email: api.email || prev.email,
+//             planName: plan.name || "Unknown Plan",
+//             planPrice: plan.price || "0.00",
+//             billingCycle: plan.billingCycle || prev.billingCycle,
+//             total: plan.price || "0.00",
+//             transactionId:
+//               api.transactionId ||
+//               `TXN-${Math.floor(Math.random() * 10000000000)}`,
+//           }));
+
 //           setStatus("success");
 //         } else {
-//           // If mock API returns failure
+//           console.error("Business creation failed:", res?.message);
 //           setStatus("error");
-//           console.error("Business registration failed:", res.message || "Unknown API Error");
 //         }
 //       } catch (err) {
-//         console.error("Critical Error during setup:", err);
+//         console.error("Error during setup:", err);
 //         setStatus("error");
 //       }
 //     };
 
 //     handleBusinessCreation();
-//   }, []); // Run once on component mount
+//   }, []);
 
-//   // Handler functions (kept concise, logging navigation actions)
-//   const handleGoToDashboard = () => {
-//     // In a real application, this would use a router or window.location.assign
-//     navigate("/dashboard");
-//     // Clear session storage upon successful completion
-//     sessionStorage.removeItem("pendingBusinessData");
-//   };
-
-//   const handleReturnToPricing = () => {
-//     navigate("/")
-//     // Optionally clear session storage
-//     sessionStorage.removeItem("pendingBusinessData");
-//   };
-
-//   const handleDownloadReceipt = () => {
-//   };
-
-//   // --- Utility Component for Reusable Data Row ---
-//   const DataRow = ({ icon: Icon, label, value, valueClass = 'text-gray-900', border = true }) => (
-//     <div className={`flex justify-between items-center ${border ? 'border-b pb-3 border-gray-100' : ''}`}>
+//   const DataRow = ({ icon: Icon, label, value, border = true }) => (
+//     <div
+//       className={`flex justify-between items-center ${
+//         border ? "border-b pb-3 border-gray-100" : ""
+//       }`}
+//     >
 //       <span className="flex items-center gap-2 text-gray-600 text-sm">
-//         <Icon className="w-4 h-4" /> 
-//         {label}
+//         <Icon className="w-4 h-4" /> {label}
 //       </span>
-//       <span className={`font-semibold ${valueClass} text-sm`}>{value}</span>
+//       <span className="font-semibold text-gray-900 text-sm">{value}</span>
 //     </div>
 //   );
 
+//   const formatPrice = (price) =>
+//     `${orderData.currencySymbol}${parseFloat(price).toFixed(2)}`;
 
-//   // --- MAIN RENDER LOGIC ---
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 font-sans antialiased">
-//       {/* Load Tailwind CSS */}
-//       <script src="https://cdn.tailwindcss.com"></script>
-//       <style>{`
-//         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-//         .font-sans {
-//           font-family: 'Inter', sans-serif;
-//         }
-//         .animate-spin-slow {
-//           animation: spin 3s linear infinite;
-//         }
-//         @keyframes spin {
-//           from { transform: rotate(0deg); }
-//           to { transform: rotate(360deg); }
-//         }
-//       `}</style>
-
-//       {/* Processing State */}
-//       {status === "processing" && (
-//         <div className="grid lg:grid-cols-2 min-h-screen">
-//           {/* Left Side - Status Tracker */}
-//           <div className="flex flex-col justify-center items-center p-8 sm:p-12 bg-white">
-//             <div className="w-full max-w-lg">
-//               <div className="relative w-24 h-24 mx-auto mb-8">
-//                 <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-//                 <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin-slow"></div>
-//               </div>
-              
-//               <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4">
-//                 Finalizing Your Profile
-//               </h1>
-//               <p className="text-gray-600 text-center text-md sm:text-lg mb-12">
-//                 We're setting up your **{orderData.businessName || 'Business Instance'}** with the details secured during checkout.
-//               </p>
-
-//               <div className="space-y-6">
-                
-//                 {/* Step 1: Payment Verification */}
-//                 <div className={`flex items-center gap-4 transition-opacity duration-500 ${
-//                   currentStep >= 1 ? 'opacity-100' : 'opacity-30'
-//                 } p-4 rounded-xl shadow-sm border border-gray-100`}>
-//                   <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-//                     currentStep === 1 ? 'bg-indigo-600' : currentStep > 1 ? 'bg-green-600' : 'bg-gray-200'
-//                   }`}>
-//                     {currentStep === 1 ? <Loader2 className="w-6 h-6 text-white animate-spin" /> : currentStep > 1 ? <CheckCircle className="w-6 h-6 text-white" /> : <Shield className="w-6 h-6 text-gray-400" />}
-//                   </div>
-//                   <div className="flex-1">
-//                     <p className="font-medium text-gray-900">Payment Verified</p>
-//                     <p className="text-sm text-gray-500">Securing **${orderData.total || '0.00'}** for **{orderData.plan || 'Standard'}** plan.</p>
-//                   </div>
-//                 </div>
-
-//                 {/* Step 2: Resource Provisioning */}
-//                 <div className={`flex items-center gap-4 transition-opacity duration-500 ${
-//                   currentStep >= 2 ? 'opacity-100' : 'opacity-30'
-//                 } p-4 rounded-xl shadow-sm border border-gray-100`}>
-//                   <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-//                     currentStep === 2 ? 'bg-indigo-600' : currentStep > 2 ? 'bg-green-600' : 'bg-gray-200'
-//                   }`}>
-//                     {currentStep === 2 ? <Loader2 className="w-6 h-6 text-white animate-spin" /> : currentStep > 2 ? <CheckCircle className="w-6 h-6 text-white" /> : <Building2 className="w-6 h-6 text-gray-400" />}
-//                   </div>
-//                   <div className="flex-1">
-//                     <p className="font-medium text-gray-900">Provisioning Resources</p>
-//                     <p className="text-sm text-gray-500">Creating your dedicated **{orderData.businessName || 'new'}** instance on the server.</p>
-//                   </div>
-//                 </div>
-
-//                 {/* Step 3: Confirmation and Notification */}
-//                 <div className={`flex items-center gap-4 transition-opacity duration-500 ${
-//                   currentStep >= 3 ? 'opacity-100' : 'opacity-30'
-//                 } p-4 rounded-xl shadow-sm border border-gray-100`}>
-//                   <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-//                     currentStep === 3 ? 'bg-indigo-600' : currentStep > 3 ? 'bg-green-600' : 'bg-gray-200'
-//                   }`}>
-//                     {currentStep === 3 ? <Loader2 className="w-6 h-6 text-white animate-spin" /> : currentStep > 3 ? <CheckCircle className="w-6 h-6 text-white" /> : <Mail className="w-6 h-6 text-gray-400" />}
-//                   </div>
-//                   <div className="flex-1">
-//                     <p className="font-medium text-gray-900">Finalizing and Notifying</p>
-//                     <p className="text-sm text-gray-500">Preparing confirmation email for **{orderData.email || 'your account'}**.</p>
-//                   </div>
-//                 </div>
-//               </div>
+//   // --- UI States ---
+//   if (status === "processing") {
+//     return (
+//       <div className="grid lg:grid-cols-2 min-h-screen bg-gray-50">
+//         <div className="flex flex-col justify-center items-center p-8 bg-white">
+//           <div className="max-w-lg w-full text-center">
+//             <div className="relative w-20 h-20 mx-auto mb-6">
+//               <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+//               <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin-slow"></div>
 //             </div>
-//           </div>
 
-//           {/* Right Side - Session Data Preview */}
-//           <div className="flex flex-col justify-center p-8 sm:p-12 border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50">
-//             <div className="w-full max-w-lg mx-auto">
-//               <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Details</h2>
-//               <p className="text-gray-600 mb-8">This data was secured post-payment and is being used to finalize your account.</p>
-              
-//               <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xl">
-                
-//                 {/* Session Data Fields */}
-//                 <div className="space-y-4">
-//                   <DataRow icon={Building2} label="Business Name" value={orderData.businessName || 'N/A'} />
-//                   <DataRow icon={Mail} label="Account Email" value={orderData.email || 'N/A'} valueClass="truncate max-w-[200px] sm:max-w-none" />
-//                   <DataRow icon={FileText} label="Selected Plan" value={orderData.plan || 'N/A'} valueClass="text-indigo-600" />
-//                   <DataRow icon={CreditCard} label="Card Used (Last 4)" value={`•••• ${orderData.cardLast4 || 'N/A'}`} border={false} />
-//                 </div>
+//             <h1 className="text-3xl font-bold mb-3">
+//               Finalizing Your Profile
+//             </h1>
+//             <p className="text-gray-600 mb-10">
+//               Setting up <b>{orderData.businessName}</b> and verifying payment.
+//             </p>
 
-//                 <div className="mt-6 pt-6 border-t border-gray-200">
-//                   <div className="flex justify-between font-bold text-lg">
-//                     <span className="text-gray-700">Total Charged</span>
-//                     <span className="text-green-600">${orderData.total || '0.00'}</span>
+//             <div className="space-y-4">
+//               {[
+//                 {
+//                   step: 1,
+//                   label: "Payment Verified",
+//                   desc: `Verifying ${orderData.planName} plan.`,
+//                   icon: Shield,
+//                 },
+//                 {
+//                   step: 2,
+//                   label: "Provisioning Resources",
+//                   desc: `Creating your ${orderData.businessName} workspace.`,
+//                   icon: Building2,
+//                 },
+//                 {
+//                   step: 3,
+//                   label: "Finalizing Setup",
+//                   desc: `Notifying ${orderData.email}.`,
+//                   icon: Mail,
+//                 },
+//               ].map(({ step, label, desc, icon: Icon }) => (
+//                 <div
+//                   key={step}
+//                   className={`flex items-center gap-3 p-4 rounded-xl shadow-sm border transition ${
+//                     currentStep >= step
+//                       ? "border-indigo-200 bg-indigo-50"
+//                       : "border-gray-100 opacity-50"
+//                   }`}
+//                 >
+//                   <div
+//                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
+//                       currentStep >= step
+//                         ? "bg-indigo-600 text-white"
+//                         : "bg-gray-200 text-gray-400"
+//                     }`}
+//                   >
+//                     {currentStep > step ? (
+//                       <CheckCircle className="w-5 h-5" />
+//                     ) : (
+//                       <Icon className="w-5 h-5" />
+//                     )}
+//                   </div>
+//                   <div className="text-left">
+//                     <p className="font-medium text-gray-900">{label}</p>
+//                     <p className="text-sm text-gray-500">{desc}</p>
 //                   </div>
 //                 </div>
-//               </div>
-//               <p className="mt-6 text-sm text-gray-500 text-center">
-//                 **Please do not close this window.** Automatic redirection upon completion.
-//               </p>
+//               ))}
 //             </div>
 //           </div>
 //         </div>
-//       )}
 
-//       {/* Success State */}
-//       {status === "success" && (
-//         <div className="grid lg:grid-cols-2 min-h-screen">
-//           {/* Left Side - Success Message */}
-//           <div className="flex flex-col justify-center items-center p-8 sm:p-12 bg-white">
-//             <div className="w-full max-w-lg">
-              
-              
-//               <CheckCircle className="w-16 h-16 text-green-500 mb-6 mx-auto" />
-//                             <h1 className="text-4xl font-extrabold text-gray-900 mb-2 text-center">
-//                                 Success!
-//                             </h1>
-                           
-//                             <p className="text-gray-600 text-center text-lg mb-12">
-//                 Welcome, **{orderData.businessName || 'New User'}**. Your **{orderData.plan || 'Standard'}** account is now fully active.
-//               </p>
-                            
-//                             {/* Transaction Details Card */}
-//                             <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-lg shadow-md mb-8">
-//                                 <div className="flex items-center">
-//                                     <div className="flex-shrink-0">
-//                                         <FileText className="h-5 w-5 text-indigo-500" />
-//                                     </div>
-//                                     <div className="ml-3">
-//                                         <p className="text-sm font-medium text-indigo-800">
-//                                             Transaction ID: <span className="font-mono text-xs bg-indigo-200 p-1 rounded">{orderData.transactionId}</span>
-//                                         </p>
-//                                         <p className="text-xs text-indigo-700 mt-1">
-//                                             Charged to your {orderData.cardType} ending in {orderData.cardLast4}
-//                                         </p>
-//                                     </div>
-//                                 </div>
-//                             </div>
-              
-
-//               <div className="space-y-4 mb-12">
-//                 <div className="border border-green-200 bg-white rounded-xl p-5 shadow-sm">
-//                   <div className="flex items-center gap-3 mb-3">
-//                     <CheckCircle className="w-5 h-5 text-green-600" />
-//                     <p className="font-medium text-gray-900">Confirmation Sent</p>
-//                   </div>
-//                   <p className="text-sm text-gray-600 pl-8">Invoice and initial login credentials have been delivered to **{orderData.email || 'your email'}**.</p>
-//                 </div>
-//               </div>
-
-//               <button
-//                 onClick={handleGoToDashboard}
-//                 className="w-full bg-indigo-600 text-white py-4 px-6 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.01] transition duration-200"
-//               >
-//                 Launch Dashboard
-//                 <ArrowRight className="w-5 h-5" />
-//               </button>
+//         <div className="flex flex-col justify-center p-10 bg-gray-50 border-l">
+//           <div className="max-w-lg w-full mx-auto bg-white rounded-xl p-6 shadow-md">
+//             <h2 className="text-xl font-bold mb-4">Order Details</h2>
+//             <div className="space-y-4">
+//               <DataRow
+//                 icon={Building2}
+//                 label="Business Name"
+//                 value={orderData.businessName}
+//               />
+//               <DataRow icon={Mail} label="Email" value={orderData.email} />
+//               <DataRow
+//                 icon={FileText}
+//                 label="Plan"
+//                 value={`${orderData.planName} (${orderData.billingCycle})`}
+//               />
+//               <DataRow
+//                 icon={CreditCard}
+//                 label="Card"
+//                 value={`•••• ${orderData.cardLast4}`}
+//                 border={false}
+//               />
 //             </div>
-//           </div>
 
-//           {/* Right Side - Order Summary */}
-//           <div className="flex flex-col justify-center p-8 sm:p-12 border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50">
-//             <div className="w-full max-w-lg mx-auto">
-//               <h2 className="text-2xl font-bold text-gray-900 mb-8">Detailed Order Summary</h2>
-              
-//               <div className="border border-gray-200 rounded-xl overflow-hidden mb-8 shadow-2xl">
-//                 <div className="bg-gray-900 px-6 py-4 border-b border-gray-700 text-white">
-//                   <p className="text-sm font-medium text-gray-300">Initial Charge ({orderData.time || 'N/A'})</p>
-//                   <p className="text-3xl font-extrabold mt-1">${orderData.total || '0.00'}</p>
-//                 </div>
-
-//                 <div className="p-6 space-y-4 bg-white">
-//                   <div className="flex justify-between text-base">
-//                     <span className="text-gray-600">Plan Subscription ({orderData.plan || 'N/A'})</span>
-//                     <span className="text-gray-900 font-medium">${orderData.subtotal || '0.00'}</span>
-//                   </div>
-//                   <div className="flex justify-between text-sm">
-//                     <span className="text-gray-600">Taxes & Fees</span>
-//                     <span className="text-gray-900 font-medium">${orderData.tax || '0.00'}</span>
-//                   </div>
-//                   <div className="border-t border-dashed border-gray-300 pt-4 flex justify-between">
-//                     <span className="font-bold text-gray-900 text-xl">Total Paid</span>
-//                     <span className="text-2xl font-extrabold text-green-600">${orderData.total || '0.00'}</span>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <div className="space-y-6">
-//                 <div className="flex items-start gap-3 text-sm">
-//                   <CreditCard className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" />
-//                   <div>
-//                     <p className="text-gray-900 font-medium">Payment Method</p>
-//                     <p className="text-gray-600">Card ending in •••• **{orderData.cardLast4 || 'N/A'}**</p>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex items-start gap-3 text-sm">
-//                   <Calendar className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" />
-//                   <div>
-//                     <p className="text-gray-900 font-medium">Next Billing Date</p>
-//                     <p className="text-gray-600">Scheduled for **{orderData.nextBilling || 'N/A'}**</p>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex items-start gap-3 text-sm">
-//                   <FileText className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" />
-//                   <div>
-//                     <p className="text-gray-900 font-medium">Download Documentation</p>
-//                     <button 
-//                       onClick={handleDownloadReceipt}
-//                       className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 mt-1 border border-indigo-300 bg-indigo-50 rounded-lg px-4 py-2 text-sm font-medium hover:bg-indigo-100 transition-colors shadow-sm"
-//                     >
-//                       Download Receipt PDF
-//                       <Download className="w-4 h-4" />
-//                     </button>
-//                   </div>
-//                 </div>
-//               </div>
+//             <div className="mt-6 flex justify-between font-semibold text-lg">
+//               <span>Total Charged</span>
+//               <span className="text-green-600">
+//                 {formatPrice(orderData.planPrice)}
+//               </span>
 //             </div>
 //           </div>
 //         </div>
-//       )}
+//       </div>
+//     );
+//   }
 
-//       {/* Error State */}
-//       {status === "error" && (
-//         <div className="grid lg:grid-cols-2 min-h-screen">
-//           {/* Left Side - Error Message */}
-//           <div className="flex flex-col justify-center items-center p-8 sm:p-12 bg-white">
-//             <div className="w-full max-w-lg">
-//               <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-in fade-in zoom-in duration-500">
-//                 <XCircle className="w-14 h-14 text-white" strokeWidth={2} />
-//               </div>
-              
-//               <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4">
-//                 Setup Interrupted
-//               </h1>
-//               <p className="text-gray-600 text-center text-lg mb-12">
-//                 We encountered an issue during the final automation of your **{orderData.businessName || 'new'}** registration.
-//               </p>
+//   if (status === "success") {
+//     return (
+//       <div className="grid lg:grid-cols-2 min-h-screen">
+//         <div className="flex flex-col justify-center items-center p-10 bg-white">
+//           <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+//           <h1 className="text-3xl font-bold mb-2">
+//             Success! Onboarding Complete 🚀
+//           </h1>
+//           <p className="text-gray-600 mb-8 text-center">
+//             Welcome <b>{orderData.businessName}</b>, your{" "}
+//             {orderData.planName} ({orderData.billingCycle}) plan is active.
+//           </p>
+//           <button
+//             onClick={handleGoToDashboard}
+//             className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-indigo-700 transition"
+//           >
+//             Launch Dashboard <ArrowRight className="w-5 h-5" />
+//           </button>
+//         </div>
 
-//               <div className="bg-white border border-red-300 rounded-xl p-6 mb-8 shadow-xl">
-//                 <div className="flex items-start gap-4 mb-4">
-//                   <Shield className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-//                   <div>
-//                     <p className="font-bold text-gray-900 mb-2">Your Payment is Secure: ${orderData.total || '0.00'}</p>
-//                     <p className="text-sm text-gray-700">
-//                       **Our support team has been notified** and is manually reviewing your session data to complete the setup. You will receive full account access via **{orderData.email || 'email'}** within 24 hours.
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <div className="bg-gray-100 rounded-xl p-6 mb-8 shadow-sm">
-//                 <p className="text-sm font-medium text-gray-700 mb-2 text-center">Reference Account Details</p>
-//                 <div className="space-y-2 text-center">
-//                     <p className="text-lg font-bold text-gray-900">{orderData.businessName || 'N/A'}</p>
-//                     <p className="text-sm text-gray-500 font-medium">{orderData.email || 'N/A'}</p>
-//                 </div>
-//                 <p className="text-xs text-gray-500 text-center mt-3">
-//                   Please mention these details if you contact support for faster resolution.
-//                 </p>
-//               </div>
-
-//               <button
-//                 onClick={handleReturnToPricing}
-//                 className="w-full bg-red-600 text-white py-4 px-6 rounded-xl font-medium hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
-//               >
-//                 Return to Home Page
-//               </button>
-//             </div>
-//           </div>
-
-//           {/* Right Side - Immediate Next Steps */}
-//           <div className="flex flex-col justify-center p-8 sm:p-12 border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50">
-//             <div className="w-full max-w-lg mx-auto">
-//               <h2 className="text-2xl font-bold text-gray-900 mb-8">Immediate Next Steps</h2>
-              
-//               <div className="space-y-6">
-//                 <div className="flex gap-4">
-//                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-sm font-bold text-white">1</div>
-//                   <div>
-//                     <p className="font-medium text-gray-900 mb-1">Check Email for Status Updates</p>
-//                     <p className="text-sm text-gray-600">We are actively working on your account, and updates will be sent to **{orderData.email || 'your email'}**.</p>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex gap-4">
-//                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-sm font-bold text-white">2</div>
-//                   <div>
-//                     <p className="font-medium text-gray-900 mb-1">Reach out to Priority Support</p>
-//                     <p className="text-sm text-gray-600">
-//                       Email us at <a href="mailto:support@business.com" className="text-indigo-600 hover:underline font-medium">support@business.com</a> with your business name if you have questions.
-//                     </p>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex gap-4">
-//                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-sm font-bold text-white">3</div>
-//                   <div>
-//                     <p className="font-medium text-gray-900 mb-1">Don't Attempt Re-purchase</p>
-//                     <p className="text-sm text-gray-600">Since your payment was successful, please wait for manual confirmation to avoid duplicate charges.</p>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
+//         <div className="flex flex-col justify-center p-10 bg-gray-50 border-l">
+//           <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md">
+//             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+//             <p className="text-gray-700 mb-2">
+//               Plan: {orderData.planName} ({orderData.billingCycle})
+//             </p>
+//             <p className="text-gray-700 mb-2">
+//               Charged: {formatPrice(orderData.planPrice)}
+//             </p>
+//             <p className="text-gray-700 mb-2">
+//               Transaction ID: {orderData.transactionId}
+//             </p>
+//             <p className="text-gray-700 mb-2">
+//               Next Billing: {orderData.nextBilling}
+//             </p>
+//             <button
+//               onClick={handleDownloadReceipt}
+//               className="mt-4 w-full border border-indigo-500 text-indigo-600 py-2 rounded-lg hover:bg-indigo-50"
+//             >
+//               Download Receipt
+//             </button>
 //           </div>
 //         </div>
-//       )}
-//     </div>
-//   );
+//       </div>
+//     );
+//   }
+
+//   if (status === "error") {
+//     return (
+//       <div className="flex flex-col justify-center items-center min-h-screen p-10">
+//         <XCircle className="w-16 h-16 text-red-600 mb-4" />
+//         <h1 className="text-3xl font-bold mb-2">Setup Interrupted</h1>
+//         <p className="text-gray-600 mb-6">
+//           Something went wrong while finalizing{" "}
+//           <b>{orderData.businessName}</b>. Don’t worry — payment is safe.
+//         </p>
+//         <button
+//           onClick={handleReturnToPricing}
+//           className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
+//         >
+//           Return to Home
+//         </button>
+//       </div>
+//     );
+//   }
+
+//   return null;
 // };
 
 // export default PaymentSuccess;
+
+
+
+
+
+
+
+import { useEffect, useState, useCallback, useRef } from "react";
+import {
+    CheckCircle,
+    Mail,
+    FileText,
+    Building2,
+    ArrowRight,
+    XCircle,
+    Shield,
+    Download,
+    Calendar,
+    CreditCard,
+    Loader2,
+    Receipt,
+    Printer,
+    CheckCheck,
+    Sparkles,
+    TrendingUp,
+    User,
+    Clock,
+    UserCheck,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+// Ensure this service is correctly implemented
+import { becomeBusinessOwner } from "../services/paymentService";
+// Assume formatDate and formatTime are available
+import { formatDate, formatTime } from "@/utils/formateDate";
+
+
+// ====================================================================
+// 1. CONSTANTS AND INITIAL DATA UTILITY
+// ====================================================================
+
+const CURRENCY_SYMBOL = {
+    "INR": "₹",
+    "USD": "$",
+    "EUR": "€"
+};
+
+// --- Mock Plan Data (More robust defaults for the processing/error state) ---
+const MOCK_PLAN_PRICES = {
+    // Pro Plan (Yearly: 2999, Monthly: 299)
+    "745c7918-8b87-4498-ba8a-27f2eb98bfc8": { name: "Pro", priceMonthly: "299.00", priceYearly: "2999.00", currency: "INR" },
+    // Basic Plan (Yearly: 1999, Monthly: 199) - Defaulted in current getInitialOrderData
+    "d1d98dd8-779e-4777-9ca7-19a1413ac78d": { name: "Basic", priceMonthly: "199.00", priceYearly: "1999.00", currency: "INR" },
+};
+
+// Utility to safely retrieve and enrich initial session data
+const getInitialOrderData = () => {
+    try {
+        const rawData = sessionStorage.getItem("pendingBusinessData");
+        const parsedData = rawData ? JSON.parse(rawData) : {};
+        
+        const planId = parsedData.planId || 'd1d98dd8-779e-4777-9ca7-19a1413ac78d';
+        const billingCycle = parsedData.billingCycle || 'monthly';
+        
+        const planDetails = MOCK_PLAN_PRICES[planId] || MOCK_PLAN_PRICES['d1d98dd8-779e-4777-9ca7-19a1413ac78d'];
+        const mockPriceKey = billingCycle === 'yearly' ? 'priceYearly' : 'priceMonthly';
+        
+        // This ensures the processing/error screen shows the expected charged amount
+        const initialPrice = planDetails[mockPriceKey] || '199.00'; 
+        const currencyCode = planDetails.currency || 'INR';
+
+        return {
+            businessName: parsedData.businessName || 'Your Business',
+            email: parsedData.email || 'user@example.com',
+            planId: planId,
+            billingCycle: billingCycle,
+            
+            // Initial price and plan set from mock data
+            planName: planDetails.name || 'Basic Plan',
+            planPrice: initialPrice, 
+            total: initialPrice,     
+            currencySymbol: CURRENCY_SYMBOL[currencyCode] || '₹', 
+            currencyCode: currencyCode,
+            
+            // Mocked/Placeholder payment details
+            cardLast4: '1234', 
+            cardType: 'Visa', 
+            transactionId: 'TXN-9876543210', 
+            
+            ...parsedData, // Merge all other form data
+        };
+    } catch (error) {
+        console.error("Failed to parse session storage data:", error);
+        return {};
+    }
+};
+
+
+// ====================================================================
+// 2. MAIN COMPONENT
+// ====================================================================
+
+const PaymentSuccess = () => {
+    const [status, setStatus] = useState("processing");
+    const [orderData, setOrderData] = useState(getInitialOrderData());
+    const [currentStep, setCurrentStep] = useState(0);
+    const navigate = useNavigate();
+    const hasRun = useRef(false);
+    const [setupError, setSetupError] = useState(null);
+
+    // --- HANDLERS ---
+
+    const handleGoToDashboard = useCallback(() => {
+        sessionStorage.removeItem("pendingBusinessData");
+        navigate("/dashboard");
+    }, [navigate]);
+
+    const handleReturnToPricing = useCallback(() => {
+        sessionStorage.removeItem("pendingBusinessData");
+        navigate("/");
+    }, [navigate]);
+
+    // Receipt HTML and Print/Download logic (kept from user's code, but slightly simplified)
+    const generateReceiptHTML = () => {
+        // Use the final state data for the receipt
+        const data = orderData;
+        const totalAmount = parseFloat(data.planPrice).toFixed(2);
+        
+        return `
+            <!DOCTYPE html><html><head>
+            <title>Payment Receipt - ${data.transactionId}</title>
+            <style>
+                /* ... (Your previous receipt CSS style here) ... */
+                body { font-family: sans-serif; line-height: 1.6; color: #333; padding: 40px; }
+                .receipt { max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 30px; }
+                .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+                .header h1 { color: #4F46E5; }
+                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+                .total-section { border-top: 2px solid #4F46E5; padding-top: 20px; font-size: 1.2em; }
+                .total-row { display: flex; justify-content: space-between; font-weight: bold; }
+            </style>
+            </head><body>
+            <div class="receipt">
+                <div class="header"><h1>Payment Receipt</h1><p>Transaction ID: ${data.transactionId}</p></div>
+                <div class="info-grid">
+                    <div><strong>Business:</strong> ${data.businessName}</div>
+                    <div><strong>Email:</strong> ${data.email}</div>
+                    <div><strong>Plan:</strong> ${data.planName} (${data.billingCycle})</div>
+                    <div><strong>Date:</strong> ${data.date}</div>
+                </div>
+                <div class="total-section">
+                    <div class="total-row"><span>Total Paid:</span><span>${data.currencySymbol}${totalAmount}</span></div>
+                </div>
+                <p style="text-align: center; margin-top: 30px;">Thank you for your purchase!</p>
+            </div>
+            </body></html>
+        `;
+    };
+
+    const handleDownloadReceipt = () => {
+        const receiptHTML = generateReceiptHTML();
+        const blob = new Blob([receiptHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${orderData.transactionId}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const handlePrintReceipt = () => {
+        const receiptHTML = generateReceiptHTML();
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(receiptHTML);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
+    };
+    
+    // Placeholder function for price formatting
+    const formatPrice = (price) =>
+        `${orderData.currencySymbol}${parseFloat(price || '0').toFixed(2)}`;
+
+    // --- EFFECT FOR BUSINESS CREATION & DATA ENRICHMENT ---
+    useEffect(() => {
+        const handleBusinessCreation = async () => {
+            if (hasRun.current) return;
+            hasRun.current = true;
+
+            const sessionData = getInitialOrderData();
+            const now = new Date();
+            const nextBillingDate = new Date(now);
+            
+            if (sessionData.billingCycle === "yearly") {
+                nextBillingDate.setFullYear(nextBillingDate.getFullYear() + 1);
+            } else {
+                nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+            }
+
+            // 1. Initial State Update (with expected price)
+            setOrderData({
+                ...sessionData,
+                nextBilling: formatDate(nextBillingDate),
+                time: formatTime(now),
+                date: formatDate(now),
+            });
+
+            try {
+                // Animate through steps
+                setCurrentStep(1);
+                await new Promise((r) => setTimeout(r, 700));
+                setCurrentStep(2);
+                await new Promise((r) => setTimeout(r, 700));
+                setCurrentStep(3);
+                await new Promise((r) => setTimeout(r, 700));
+                setCurrentStep(4);
+
+                // 2. API Call to finalize
+                const res = await becomeBusinessOwner(sessionData);
+                
+                if (res?.success && res.data) {
+                    const api = res.data;
+                    // API should return the final, confirmed plan and price
+                    const plan = api.plan || {}; 
+
+                    // 3. Final Success State Update (with confirmed API data)
+                    setOrderData((prev) => ({
+                        ...prev,
+                        planName: plan.name || prev.planName,
+                        // CRITICAL: Update the price with the CONFIRMED amount from the API
+                        planPrice: plan.price || prev.planPrice, 
+                        total: plan.price || prev.total,
+                        transactionId: api.transactionId || prev.transactionId,
+                    }));
+
+                    setStatus("success");
+                } else {
+                    // 4. Error State Update
+                    // We keep the initial charged price (from sessionData) for reassurance
+                    setSetupError(res?.message || "Final account creation failed. We are reviewing your payment.");
+                    setStatus("error");
+                }
+            } catch (err) {
+                console.error("Error during setup:", err);
+                // 4. Error State Update (for network/exception errors)
+                setSetupError("A network error occurred. Your payment is secure, but manual setup is needed.");
+                setStatus("error");
+            }
+        };
+
+        handleBusinessCreation();
+    }, []);
+
+
+    // ====================================================================
+    // 3. RENDER LOGIC
+    // ====================================================================
+
+    // --- Utility Component for Reusable Data Row ---
+    const DataRow = ({ icon: Icon, label, value, valueClass = 'text-gray-900' }) => (
+        <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+            <span className="flex items-center gap-2 text-gray-600 text-sm font-medium">
+                <Icon className="w-4 h-4 text-indigo-400" /> 
+                {label}
+            </span>
+            <span className={`font-semibold ${valueClass} text-sm`}>{value}</span>
+        </div>
+    );
+
+    const commonClasses = "min-h-screen flex items-center justify-center p-4 bg-gray-50";
+
+    // --- PROCESSING STATE UI (Cleaned up and centered) ---
+    if (status === "processing") {
+        return (
+            <div className={`${commonClasses} bg-gradient-to-br from-indigo-50 via-white to-purple-50`}>
+                <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-8 sm:p-12 text-center border border-gray-100">
+                    
+                    {/* Animated Spinner */}
+                    <div className="relative w-20 h-20 mx-auto mb-8">
+                        <div className="absolute inset-0 border-8 border-gray-200 rounded-full"></div>
+                        <div className="absolute inset-0 border-8 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 text-indigo-600 animate-pulse" />
+                        </div>
+                    </div>
+
+                    <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
+                        Finalizing Your Account Setup
+                    </h1>
+                    <p className="text-gray-500 mb-10 text-lg">
+                        We're securely provisioning your **{orderData.businessName}** workspace.
+                    </p>
+
+                    {/* Progress Steps List */}
+                    <div className="space-y-4 text-left">
+                        {[
+                            { step: 1, label: "Payment Verification", desc: "Securing transaction details.", icon: Shield },
+                            { step: 2, label: "Workspace Creation", desc: `Building your instance on our servers.`, icon: Building2 },
+                            { step: 3, label: "Feature Activation", desc: `Enabling all ${orderData.planName} plan tools.`, icon: Sparkles },
+                            { step: 4, label: "Final Confirmation", desc: `Preparing to send your access email.`, icon: Mail },
+                        ].map(({ step, label, desc, icon: Icon }) => {
+                            const isComplete = currentStep > step;
+                            const isActive = currentStep === step;
+                            
+                            return (
+                                <div key={step} className="flex items-center gap-4">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-500 ${
+                                        isComplete ? 'bg-green-500 text-white' : isActive ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+                                    }`}>
+                                        {isComplete ? <CheckCheck className="w-5 h-5" /> : isActive ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className={`font-semibold ${isComplete || isActive ? 'text-gray-900' : 'text-gray-500'}`}>{label}</p>
+                                        <p className={`text-sm ${isComplete || isActive ? 'text-gray-600' : 'text-gray-400'}`}>{desc}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    {/* Total Charged Preview */}
+                    <div className="mt-10 pt-6 border-t border-dashed border-gray-200">
+                        <div className="flex justify-between items-center bg-indigo-50 p-4 rounded-xl">
+                            <span className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <Clock className="w-5 h-5 text-indigo-600" />
+                                Charged Amount
+                            </span>
+                            <span className="text-2xl font-extrabold text-indigo-600">
+                                {formatPrice(orderData.planPrice)}
+                            </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-3">
+                            Please do not close this window. You will be redirected automatically.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        );
+    }
+
+    // --- SUCCESS STATE UI (Focus on actions) ---
+    if (status === "success") {
+        return (
+            <div className={`${commonClasses} bg-gradient-to-br from-green-50 via-white to-indigo-50`}>
+                <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl p-8 sm:p-12 text-center border border-gray-100">
+                    
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-6 shadow-xl">
+                        <CheckCircle className="w-12 h-12 text-white" />
+                    </div>
+                    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+                        Setup Complete! Welcome 🎉
+                    </h1>
+                    <p className="text-gray-600 text-xl mb-8 max-w-lg mx-auto">
+                        Your **{orderData.businessName}** account is now fully active. You're all set to go.
+                    </p>
+
+                    {/* Action Button */}
+                    <button
+                        onClick={handleGoToDashboard}
+                        className="w-full max-w-sm mx-auto bg-indigo-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-indigo-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-[1.01]"
+                    >
+                        Launch My Dashboard
+                        <ArrowRight className="w-5 h-5" />
+                    </button>
+
+                    <div className="grid sm:grid-cols-2 gap-8 mt-10 text-left">
+                        {/* Summary Card */}
+                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <h3 className="font-bold text-lg text-gray-900 mb-4 flex items-center gap-2">
+                                <Receipt className="w-5 h-5 text-indigo-600" />
+                                Payment Summary
+                            </h3>
+                            <div className="space-y-2">
+                                <DataRow icon={Sparkles} label="Plan" value={orderData.planName} />
+                                <DataRow icon={TrendingUp} label="Billing Cycle" value={orderData.billingCycle.charAt(0).toUpperCase() + orderData.billingCycle.slice(1)} />
+                                <DataRow icon={CreditCard} label="Card" value={`${orderData.cardType} •••• ${orderData.cardLast4}`} />
+                                <DataRow icon={Calendar} label="Next Bill" value={orderData.nextBilling} />
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+                                <span className="text-xl font-bold text-gray-800">Total Paid:</span>
+                                <span className="text-3xl font-extrabold text-green-600">{formatPrice(orderData.planPrice)}</span>
+                            </div>
+                        </div>
+
+                        {/* Receipt Actions */}
+                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col justify-between">
+                            <div>
+                                <h3 className="font-bold text-lg text-gray-900 mb-4 flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-indigo-600" />
+                                    Get Your Receipt
+                                </h3>
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={handleDownloadReceipt}
+                                        className="w-full flex items-center justify-center gap-2 text-indigo-600 bg-indigo-100 py-3 rounded-lg font-semibold hover:bg-indigo-200 transition-colors text-sm"
+                                    >
+                                        <Download className="w-4 h-4" /> Download HTML Receipt
+                                    </button>
+                                    <button
+                                        onClick={handlePrintReceipt}
+                                        className="w-full flex items-center justify-center gap-2 text-indigo-600 bg-indigo-100 py-3 rounded-lg font-semibold hover:bg-indigo-200 transition-colors text-sm"
+                                    >
+                                        <Printer className="w-4 h-4" /> Print Receipt
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`mailto:${orderData.email}?subject=Payment%20Receipt%20for%20${orderData.transactionId}`, '_self')}
+                                        className="w-full flex items-center justify-center gap-2 text-indigo-600 bg-indigo-100 py-3 rounded-lg font-semibold hover:bg-indigo-200 transition-colors text-sm"
+                                    >
+                                        <Mail className="w-4 h-4" /> Email Receipt Now
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="mt-4 text-xs text-gray-500 text-center">
+                                A full invoice has also been sent to **{orderData.email}**.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // --- ERROR STATE UI (CRITICAL: Showing correct charged price) ---
+    if (status === "error") {
+        return (
+            <div className={`${commonClasses} bg-gradient-to-br from-red-50 via-white to-red-100`}>
+                <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-8 sm:p-12 text-center border border-red-200">
+                    
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-red-600 rounded-full mb-6 shadow-xl animate-in fade-in zoom-in duration-500">
+                        <XCircle className="w-12 h-12 text-white" />
+                    </div>
+                    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+                        Setup Interrupted
+                    </h1>
+                    <p className="text-lg text-red-600 mb-6 max-w-lg mx-auto font-medium">
+                        {setupError || "An unexpected error occurred during the finalization step."}
+                    </p>
+
+                    {/* Reassurance Block (FIXED: Shows correct price) */}
+                    <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-xl mb-8 text-left">
+                        <div className="flex items-center gap-3 mb-3">
+                            <Shield className="w-6 h-6 text-red-700 flex-shrink-0" />
+                            <p className="text-xl font-bold text-gray-900">
+                                Your Payment Is Secure: {formatPrice(orderData.planPrice)}
+                            </p>
+                        </div>
+                        <p className="text-sm text-gray-700">
+                            **Your funds have been successfully collected.** The final account setup failed, but our **Priority Support Team** has been notified of Transaction ID: `{orderData.transactionId}`. We will complete your setup manually and email access to **{orderData.email}** within 4 hours.
+                        </p>
+                    </div>
+
+                    {/* Next Steps */}
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => window.open('mailto:support@yourcompany.com?subject=Priority%20Setup%20Issue', '_self')}
+                            className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-md"
+                        >
+                            <UserCheck className="w-5 h-5" /> Contact Priority Support Now
+                        </button>
+                        <button
+                            onClick={handleReturnToPricing}
+                            className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+                        >
+                            Return to Home Page
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        );
+    }
+    
+    return null; // Fallback to avoid empty screen
+};
+
+export default PaymentSuccess;
