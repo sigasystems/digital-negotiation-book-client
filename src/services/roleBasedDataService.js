@@ -88,7 +88,6 @@ export const roleBasedDataService = {
 
       case "business_owner": {
         // For business_owner, need both ownerId and buyerId
-        console.log("Owner id", record.ownerId)
         if (!record.ownerId) throw new Error("ownerId is required for business_owner");
         const response = await businessOwnerService.getBuyerById(record.ownerId, record.id);
         return response?.buyer || response;
