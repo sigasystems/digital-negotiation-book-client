@@ -1,99 +1,135 @@
-import { Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Eye, Edit, Trash2, CheckCircle, XCircle, Save } from "lucide-react";
 import { Button } from "@headlessui/react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ViewContent from "@/components/common/ViewContent";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
+import { toast } from "react-hot-toast";
 
 export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [details, setDetails] = useState(null);
   const navigate = useNavigate();
 
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const role = userInfo?.userRole || "super_admin"; // fallback just in case
+  const userInfo = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const role = userInfo?.userRole || "super_admin";
+  const record = row?.original || {};
+  const isActive = record.status === "active";
 
-  const isActive = row.original.status === "active";
+  const getErrorMessage = (err, fallback = "Something went wrong") =>
+    err?.response?.data?.message || err?.message || fallback;
 
-  const handleView = async () => {
-    setLoading(true);
+  const runAction = async (key, fn, successMsg, fallbackError) => {
+    setLoadingAction(key);
     try {
-      const data = await roleBasedDataService.getById(role, row.original.id);
-      setDetails(data);
-      setIsModalOpen(true);
+      await fn();
+      if (successMsg) toast.success(successMsg);
+      refreshData?.();
     } catch (err) {
-      console.error("Error fetching details:", err);
+      console.error(`${key} failed:`, err);
+      toast.error(getErrorMessage(err, fallbackError));
     } finally {
-      setLoading(false);
+      setLoadingAction(null);
     }
   };
 
-  const handleEdit = () => {
-    navigate(`/user/${row.original.id}`, { state: row.original });
+  const actionHandlers = {
+    view: async () => {
+      setLoadingAction("view");
+      try {
+        const data = await roleBasedDataService.getById(role, record);
+        setDetails(data);
+        setIsModalOpen(true);
+      } catch (err) {
+        console.error("Error fetching details:", err);
+        toast.error(getErrorMessage(err, "Failed to fetch details"));
+      } finally {
+        setLoadingAction(null);
+      }
+    },
+
+    edit: () => {
+      navigate(`/user/${record.id}`, { state: record });
+    },
+
+    activate: () =>
+      runAction(
+        "activate",
+        () => roleBasedDataService.activate(role, record.id),
+        "Activated successfully",
+        "Failed to activate record"
+      ),
+
+    deactivate: () =>
+      runAction(
+        "deactivate",
+        () => roleBasedDataService.deactivate(role, record.id),
+        "Deactivated successfully",
+        "Failed to deactivate record"
+      ),
+
+    delete: () => {
+      if (!window.confirm("Are you sure you want to delete this record?")) return;
+      runAction(
+        "delete",
+        () => roleBasedDataService.softDelete(role, record.id),
+        "Deleted successfully",
+        "Failed to delete record"
+      );
+    },
+
+    update: () =>
+      runAction(
+        "update",
+        () => roleBasedDataService.update(role, record.id, record),
+        "Updated successfully",
+        "Failed to update record"
+      ),
   };
 
-  const handleActivate = async () => {
-    setLoading(true);
-    try {
-      await roleBasedDataService.activate(role, row.original.id);
-      refreshData();
-    } catch (err) {
-      console.error("Activation failed:", err);
-    } finally {
-      setLoading(false);
-    }
+  /** ✅ Icon + color mapping */
+  const actionIcons = {
+    view: { icon: Eye, color: "text-blue-600 hover:bg-blue-50" },
+    edit: { icon: Edit, color: "text-indigo-600 hover:bg-indigo-50" },
+    activate: { icon: CheckCircle, color: "text-green-600 hover:bg-green-50" },
+    deactivate: { icon: XCircle, color: "text-yellow-600 hover:bg-yellow-50" },
+    delete: { icon: Trash2, color: "text-red-600 hover:bg-red-50" },
+    update: { icon: Save, color: "text-emerald-600 hover:bg-emerald-50" },
   };
 
-  const handleDeactivate = async () => {
-    setLoading(true);
-    try {
-      await roleBasedDataService.deactivate(role, row.original.id);
-      refreshData();
-    } catch (err) {
-      console.error("Deactivation failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredActions = useMemo(() => {
+    return userActions
+      .map((key) => {
+        const config = actionIcons[key];
+        const handler = actionHandlers[key];
+        if (!config || !handler) return null;
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this record?")) return;
-    setLoading(true);
-    try {
-      await roleBasedDataService.softDelete(role, row.original.id);
-      refreshData();
-    } catch (err) {
-      console.error("Delete failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (key === "activate" && isActive) return null;
+        if (key === "deactivate" && !isActive) return null;
 
-  const allActions = useMemo(
-    () => [
-      { key: "view", icon: Eye, label: "View", handler: handleView },
-      { key: "edit", icon: Edit, label: "Edit", handler: handleEdit },
-      { key: "activate", icon: CheckCircle, label: "Activate", handler: handleActivate, show: !isActive },
-      { key: "deactivate", icon: XCircle, label: "Deactivate", handler: handleDeactivate, show: isActive },
-      { key: "delete", icon: Trash2, label: "Delete", handler: handleDelete, color: "text-red-600 hover:bg-red-50" },
-    ],
-    [row, isActive]
-  );
-
-  const filteredActions = allActions.filter((action) => userActions.includes(action.key) && (action.show !== false));
+        return {
+          key,
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          icon: config.icon,
+          color: config.color,
+          handler,
+        };
+      })
+      .filter(Boolean);
+  }, [userActions, isActive, record]);
 
   return (
     <>
       <div className="flex items-center gap-2">
-        {filteredActions.map(({ icon: Icon, color, handler, label }) => (
+        {filteredActions.map(({ key, icon: Icon, color, handler }) => (
           <Button
-            key={label}
-            variant="ghost"
-            size="icon"
+            key={key}
             onClick={handler}
-            className={`p-1 ${color || ""} cursor-pointer`}
-            disabled={loading}
+            disabled={!!loadingAction}
+            className={`p-1 rounded-md transition-colors duration-150 ${color} ${
+              loadingAction === key ? "opacity-50 cursor-wait" : "cursor-pointer"
+            }`}
           >
             <Icon className="w-4 h-4" />
           </Button>

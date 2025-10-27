@@ -73,21 +73,24 @@ export const roleBasedDataService = {
     }
   },
 
-  async getById(role, id) {
-    if (!id) throw new Error("ID is required");
+ getById: async (role, record) => {
+    if (!record?.id) throw new Error("ID is required");
 
     const normalizedRole =
       typeof role === "object" && role?.userRole ? role.userRole : role;
 
     switch (normalizedRole) {
       case "super_admin": {
-        const response = await dashboardService.getBusinessOwnerById(id);
+        // For super admin, just pass the id
+        const response = await dashboardService.getBusinessOwnerById(record.id);
         return response?.data?.data || response?.data || response;
       }
 
       case "business_owner": {
-        const response = await businessOwnerService.getBuyerById(id);
-        return response?.data?.data || response?.data || response;
+        // For business_owner, need both ownerId and buyerId
+        if (!record.ownerId) throw new Error("ownerId is required for business_owner");
+        const response = await businessOwnerService.getBuyerById(record.ownerId, record.id);
+        return response?.buyer || response;
       }
 
       default:

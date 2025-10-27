@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
-import { MobileCard } from "@/utils/Pagination";
+import { MobileCard, Pagination } from "@/utils/Pagination";
 import DashboardTable from "./DashboardTable";
 import { ActionsCell } from "@/utils/ActionsCell";
 
@@ -14,8 +14,8 @@ export default function ResponsiveDashboard() {
   const [emailFilter, setEmailFilter] = useState("");
 
   const user = sessionStorage.getItem("user");
-  const userRole = JSON.parse(user).userRole || "guest" 
-  const userActions = ["view"];
+  const userRole = JSON.parse(user)?.userRole || "guest";
+  const userActions = [];
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,7 +40,7 @@ export default function ResponsiveDashboard() {
   const filteredData = useMemo(() => {
     if (!emailFilter) return data;
     return data.filter((item) =>
-      item.email?.toLowerCase().includes(emailFilter.toLowerCase())
+      (item.email || item.contactEmail)?.toLowerCase().includes(emailFilter.toLowerCase())
     );
   }, [data, emailFilter]);
 
@@ -99,8 +99,8 @@ export default function ResponsiveDashboard() {
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
         {/* Mobile cards */}
         <div className="lg:hidden p-4 space-y-4">
-          {data.length > 0 ? (
-            data.map((item) => (
+          {tableData.length > 0 ? (
+            tableData.map((item) => (
               <MobileCard
                 key={item.id}
                 item={item}
@@ -108,7 +108,6 @@ export default function ResponsiveDashboard() {
                 onSelect={(checked) =>
                   setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
                 }
-                actions={<ActionsCell row={{ original: item }} refreshData={fetchData} userActions={userActions} />}
               />
             ))
           ) : (
@@ -127,6 +126,7 @@ export default function ResponsiveDashboard() {
             setRowSelection={setRowSelection}
             fetchOwners={fetchData}
             userActions={userActions}
+            filterKey="email"
             pageIndex={pageIndex}
             pageSize={pageSize}
             setPageIndex={setPageIndex}
