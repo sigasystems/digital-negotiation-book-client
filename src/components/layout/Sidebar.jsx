@@ -29,6 +29,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" }]
     : []),
 
+      ...(userRole === "super_admin"
+    ? [{ name: "Add Business Owner", icon: UserPlus, path: "/add-business-owner" }]
+    : []),
+
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 

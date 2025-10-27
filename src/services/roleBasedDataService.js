@@ -89,8 +89,8 @@ export const roleBasedDataService = {
       case "business_owner": {
         // For business_owner, need both ownerId and buyerId
         if (!record.ownerId) throw new Error("ownerId is required for business_owner");
-        const response = await businessOwnerService.getBuyerById(record.ownerId, record.id);
-        return response?.buyer || response;
+        const response = await businessOwnerService.getBuyerById(record.id);
+        return response?.data?.data?.buyer || response;
       }
 
       default:
@@ -129,7 +129,7 @@ async update(role, id, payload) {
     }
 
     case "business_owner": {
-      const res = await businessOwnerService.updateBuyer(id, payload);
+      const res = await businessOwnerService.updateBuyer(id.id, payload);
       return res?.data || res;
     }
 

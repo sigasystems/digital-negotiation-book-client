@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-
+import { businessOwnerService } from "../services/businessOwner";
 export default function AddBuyerForm() {
-  const ownerId = "owner-id";
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const ownerId = user?.businessOwnerId || "";
 
   const initialFormData = {
     ownerId,
@@ -36,17 +37,55 @@ export default function AddBuyerForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    if (!formData.buyersCompanyName.trim()) return "Company name is required";
+    if (!formData.contactName.trim()) return "Contact name is required";
+    if (!formData.contactEmail.trim()) return "Contact email is required";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactEmail)) return "Enter a valid email";
+
+    if (!formData.country.trim()) return "Country is required";
+    if (!formData.countryCode.trim()) return "Country code is required";
+
+    return null; // valid
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+  const validationError = validateForm();
+  if (validationError) {
+    showToast(`✕ ${validationError}`, "error");
+    return;
+  }
+
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      showToast("✓ Buyer added successfully!", "success");
+  try {
+    const response = await businessOwnerService.addBuyer(formData);
+
+    if (response?.status === 201) {
+      showToast("Buyer added successfully!", "success");
       setFormData(initialFormData);
+    } else {
+      const message =
+        response?.data?.message ||
+        response?.message ||
+        "Failed to add buyer.";
+      showToast(`${message}`, "error");
+    }
+  } catch (error) {
+    console.error("Add Buyer Error:", error);
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to add buyer. Please try again.";
+    showToast(`${message}`, "error");
+  } finally {
       setLoading(false);
-    }, 1200);
-  };
+    }
+};
 
   const handleBack = () => {
     window.location.href = "/dashboard";
@@ -80,7 +119,7 @@ export default function AddBuyerForm() {
         <div className="flex flex-col gap-4 mb-8">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-200 w-fit hover:translate-x-1"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-200 w-fit hover:translate-x-1 cursor-pointer"
           >
             <span className="text-lg">←</span>
             <span className="font-medium hidden sm:inline">Back to Dashboard</span>
@@ -280,14 +319,14 @@ export default function AddBuyerForm() {
             <button
               type="button"
               onClick={handleBack}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200"
+              className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>

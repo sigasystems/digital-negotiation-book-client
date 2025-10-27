@@ -53,5 +53,32 @@ export const businessOwnerService = {
     if (!buyerData) throw new Error("Buyer data is required");
     return api.post("/business-owner/add-buyer", buyerData);
   },
+
+  updateBuyer: (buyerId, buyerData) => {
+    if (!buyerId) throw new Error("Buyer ID is required");
+    if (!buyerData || typeof buyerData !== "object")
+      throw new Error("Valid buyer data is required");
+
+    const sanitizedData = { ...buyerData };
+    delete sanitizedData.createdAt;
+    delete sanitizedData.updatedAt;
+    delete sanitizedData.id;
+    return api.patch(`/business-owner/edit-buyer/${buyerId}/edit`, sanitizedData);
+  },
+  activateBuyer: (buyerId) => {
+    if (!buyerId) throw new Error("Buyer ID is required");
+
+    return api.patch(`/business-owner/activate-buyer/${buyerId}/activate`);
+  },
+
+  deactivateBuyer: (buyerId) => {
+    if (!buyerId) throw new Error("Buyer ID is required");
+    return api.patch(`/business-owner/deactivate-buyer/${buyerId}/deactivate`);
+  },
+
+  deleteBuyer: (buyerId) => {
+    if (!buyerId) throw new Error("Buyer ID is required");
+    return api.delete(`/business-owner/delete-buyer/${buyerId}`);
+  },
 };
 
