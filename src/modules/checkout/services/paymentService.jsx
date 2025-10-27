@@ -17,10 +17,11 @@ export const becomeBusinessOwner = async (payload) => {
   try {
 
     const response = await apiClient.post(
-      "/business-owner/become-business-owner",
+      "/business-owner/become-business-owner", 
       payload,
       { withCredentials: true }
     );
+    console.log("Become business owner succcesfully done !!!...Onboard succesfully......",payload)
     return response.data; 
   } catch (err) {
     console.error("Error in becomeBusinessOwner service:", err);

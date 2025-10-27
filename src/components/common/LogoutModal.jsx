@@ -7,8 +7,17 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 export default function LogoutDialog({ isOpen, onClose, onLogout }) {
+
+  const handleLogout = () => {
+  const remove = sessionStorage.removeItem("user");
+  const removeToken = sessionStorage.removeItem("authToken");
+  toast.success("Logged out successfully!");
+  onClose();
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md text-center">
@@ -30,7 +39,7 @@ export default function LogoutDialog({ isOpen, onClose, onLogout }) {
             Cancel
           </Button>
           <Button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white cursor-pointer"
           >
             Logout
