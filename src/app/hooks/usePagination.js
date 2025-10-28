@@ -8,7 +8,7 @@ export function usePagination({ totalItems = 0, initialPageSize = 10 }) {
 
   // Update total pages whenever totalItems or pageSize changes
   useEffect(() => {
-    setTotalPages(Math.ceil(totalItems / pageSize) || 1);
+    setTotalPages(totalPages || Math.ceil((totalItems || 0) / pageSize) || 1);
   }, [totalItems, pageSize]);
 
   const handlePageChange = (page) => {

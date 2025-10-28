@@ -62,7 +62,6 @@ const apiData = response?.data?.data || {};
   };
 }
 
-
       default:
         throw new Error(`Unsupported role: ${normalizedRole}`);
     }

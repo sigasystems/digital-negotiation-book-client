@@ -43,7 +43,7 @@ export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPa
       <button
         disabled={pageIndex <= 0 || totalPages <= 1}
         onClick={() => onPageChange(pageIndex - 1)}
-        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
           pageIndex <= 0 || totalPages <= 1 
             ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
             : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
