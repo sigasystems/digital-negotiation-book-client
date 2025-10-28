@@ -28,7 +28,7 @@ export const dashboardService = {
 
   getBusinessOwnerById: (id) => api.get(`/superadmin/business-owner/${id}`),
 
-  updateBusinessOwner: (id, payload) => api.put(`/superadmin/business-owner/${id}`, payload),
+  updateBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}`, payload),
 
   activateBusinessOwner: (id) => api.patch(`/superadmin/business-owner/${id}/activate`),
 
