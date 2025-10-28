@@ -8,13 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function LogoutDialog({ isOpen, onClose, onLogout }) {
 
+  const navigate = useNavigate();
   const handleLogout = () => {
-  const remove = sessionStorage.removeItem("user");
-  const removeToken = sessionStorage.removeItem("authToken");
+  sessionStorage.removeItem("user");
+  sessionStorage.removeItem("authToken");
   toast.success("Logged out successfully!");
+  navigate("/");
   onClose();
   }
 
