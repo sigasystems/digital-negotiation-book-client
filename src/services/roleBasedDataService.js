@@ -9,17 +9,15 @@ export const roleBasedDataService = {
     switch (normalizedRole) {
       case "super_admin": {
         const response = await dashboardService.getAllBusinessOwners(params);
-        const data =
-          response?.data?.data?.data ||
-          response?.data?.data ||
-          response?.businessOwners ||
-          [];
-        const total =
-          response?.data?.totalItems ||
-          response?.totalItems ||
-          response?.total ||
-          data.length;
-        return { data, total };
+
+        const apiData = response?.data?.data || {};
+        const data = apiData?.data || [];
+        const totalItems = apiData?.totalItems || 0;
+        const totalPages = apiData?.totalPages || Math.ceil(totalItems / (params.pageSize || 10));
+        const pageIndex = apiData?.pageIndex ?? params.pageIndex ?? 0;
+        const pageSize = apiData?.pageSize ?? params.pageSize ?? 10;
+
+        return { data, totalItems, totalPages, pageIndex, pageSize };
       }
 
       case "business_owner": {

@@ -13,6 +13,7 @@ export default function Users({ userRole }) {
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [emailFilter, setEmailFilter] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
 
@@ -24,16 +25,22 @@ export default function Users({ userRole }) {
           ? userRole.userRole
           : userRole;
 
-      const { data: rows, total } = await roleBasedDataService.getDashboardData(role, {
+      const response = await roleBasedDataService.getDashboardData(role, {
         pageIndex,
         pageSize,
         filter: emailFilter,
       });
 
-      setData(rows);
-      setTotalItems(total);
+    const { data: rows, totalItems, totalPages } = response || {};
+
+    setData(rows || []);
+      setTotalItems(totalItems || 0);
+      setTotalPages(totalPages || 1);
     } catch (err) {
-      console.error("❌ Failed to fetch users:", err);
+      console.error("Failed to fetch users:", err);
+      setData([]);
+      setTotalItems(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
