@@ -33,14 +33,14 @@ export const HIDDEN_FIELDS = [
   "userId",
   "ownerId",
   "planId",
-  "createdAt",
-  "updatedAt",
-  "is_deleted",
-  "is_verified",
-  "is_approved",
-  "isDeleted",
-  "isVerified",
-  "isApproved",
+  // "createdAt",
+  // "updatedAt",
+  // "is_deleted",
+  // "is_verified",
+  // "is_approved",
+  // "isDeleted",
+  // "isVerified",
+  // "isApproved",
 ];
 
 export const ROLE_CONFIG = {
@@ -63,7 +63,7 @@ export const ROLE_CONFIG = {
       is_approved: "isApproved",
     },
     UI_TO_API: {
-      firstName: "first_name",
+      first_name: "first_name",
       lastName: "last_name",
       email: "email",
       phoneNumber: "phoneNumber",
@@ -86,7 +86,7 @@ export const ROLE_CONFIG = {
         fields: [
           "businessName",
           "registrationNumber",
-          "firstName",
+          "first_name",
           "lastName",
           "email",
           "phoneNumber",

@@ -8,32 +8,59 @@ export const roleBasedDataService = {
 
     switch (normalizedRole) {
       case "super_admin": {
-        const response = await dashboardService.getAllBusinessOwners(params);
+  const response = await dashboardService.getAllBusinessOwners(params);
 
-        const apiData = response?.data?.data || {};
-        const data = apiData?.data || [];
-        const totalItems = apiData?.totalItems || 0;
-        const totalPages = apiData?.totalPages || Math.ceil(totalItems / (params.pageSize || 10));
-        const pageIndex = apiData?.pageIndex ?? params.pageIndex ?? 0;
-        const pageSize = apiData?.pageSize ?? params.pageSize ?? 10;
+const apiData = response?.data?.data || {};
+  const data = apiData?.data || [];
+  const totalItems = apiData?.totalItems || 0;
+  const totalPages = apiData?.totalPages || Math.ceil(totalItems / (params.pageSize || 10));
+  const pageIndex = apiData?.pageIndex ?? params.pageIndex ?? 0;
+  const pageSize = apiData?.pageSize ?? params.pageSize ?? 10;
 
-        return { data, totalItems, totalPages, pageIndex, pageSize };
-      }
+  const totalActive = apiData?.totalActive ?? 0;
+  const totalInactive = apiData?.totalInactive ?? 0;
+  const totalDeleted = apiData?.totalDeleted ?? 0;
 
-      case "business_owner": {
-        const response = await businessOwnerService.getAllBuyers(params);
-        const buyers =
-          response?.data?.data?.data ||
-          response?.buyers ||
-          response?.data?.data ||
-          [];
-        const total =
-          response?.data?.total ||
-          response?.total ||
-          response?.data?.buyers?.length ||
-          buyers.length;
-        return { data: buyers, total };
-      }
+  return {
+    data,
+    totalItems,
+    totalPages,
+    pageIndex,
+    pageSize,
+    totalActive,
+    totalInactive,
+    totalDeleted,
+  };
+}
+
+
+     case "business_owner": {
+  const response = await businessOwnerService.getAllBuyers(params);
+
+  // 🧩 Extract the API payload properly
+  const apiData = response?.data?.data || {};
+
+  // ✅ Extract buyers list and metadata safely
+  const buyers = apiData?.data || [];
+  const totalItems = apiData?.totalItems || buyers.length;
+  const totalPages = apiData?.totalPages || Math.ceil(totalItems / (params.pageSize || 10));
+  const totalActive = apiData?.totalActive ?? 0;
+  const totalInactive = apiData?.totalInactive ?? 0;
+  const totalDeleted = apiData?.totalDeleted ?? 0;
+  const pageIndex = apiData?.pageIndex ?? params.pageIndex ?? 0;
+  const pageSize = apiData?.pageSize ?? params.pageSize ?? 10;
+
+  return {
+    data: buyers,
+    totalItems,
+    totalPages,
+    totalActive,
+    totalInactive,
+    totalDeleted,
+    pageIndex,
+    pageSize,
+  };
+}
 
       default:
         throw new Error(`Unsupported role: ${normalizedRole}`);
