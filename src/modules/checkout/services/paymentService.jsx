@@ -33,3 +33,30 @@ export const checkRegistrationNumber = async (registrationNumber) => {
   const res = await apiClient.get(`/business-owner/check-registration/${registrationNumber}`);
   return res.data;
 };
+
+// GET /api/payments/invoice/:userId
+// export const getInvoice = async (userId) => {
+//     try {
+//         // Replace apiClient with your actual HTTP client logic (e.g., fetch or axios)
+//         const response = await fetch(`/api/payments/invoice/${userId}`, {
+//              method: 'GET',
+//              headers: {
+//                  'Content-Type': 'application/json',
+//                  // Include any necessary authentication headers/cookies
+//              },
+//              // Assuming this handles cookie inclusion if needed
+//              // withCredentials: true, 
+//         });
+
+//         if (!response.ok) {
+//             const errorData = await response.json();
+//             throw new Error(errorData.message || "Failed to fetch invoice");
+//         }
+        
+//         return await response.json(); // <-- returns { invoicePdf: '...' }
+//     } catch (err) {
+//         console.error("Error in getInvoice service:", err);
+//         // Better error handling for the component
+//         throw new Error(err.message || "Failed to get invoice due to network error"); 
+//     }
+// };
