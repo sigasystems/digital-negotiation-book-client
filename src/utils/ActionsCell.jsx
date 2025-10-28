@@ -1,19 +1,43 @@
 import { Eye, Edit, Trash2, CheckCircle, XCircle, Save } from "lucide-react";
 import { Button } from "@headlessui/react";
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import ViewContent from "@/components/common/ViewContent";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const [loadingAction, setLoadingAction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [details, setDetails] = useState(null);
-  const navigate = useNavigate();
+
+const navigate = useNavigate();
+
+const navigateToEditPage = () => {
+  if (!record?.id) {
+    toast.error("Invalid record");
+    return;
+  }
+
+  switch (role) {
+    case "super_admin":
+      navigate(`/business-owner/${record.id}`, { state: record });
+      break;
+
+    case "business_owner":
+      navigate(`/buyer/${record.id}`, { state: record });
+      break;
+
+    default:
+      toast.error(`Unsupported role: ${role}`);
+      break;
+  }
+};
+
 
   const userInfo = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const role = userInfo?.userRole || "super_admin";
+  const role = userInfo?.userRole
+
   const record = row?.original || {};
   const isActive = record.status === "active";
 
@@ -50,7 +74,7 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
     },
 
     edit: () => {
-      navigate(`/user/${record.id}`, { state: record });
+      navigateToEditPage();
     },
 
     activate: () =>
@@ -79,13 +103,9 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
       );
     },
 
-    update: () =>
-      runAction(
-        "update",
-        () => roleBasedDataService.update(role, record.id, record),
-        "Updated successfully",
-        "Failed to update record"
-      ),
+    update: () => {
+      navigateToEditPage();
+    },
   };
 
   /** ✅ Icon + color mapping */

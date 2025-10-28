@@ -3,22 +3,25 @@ import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-// Pages
+// 🔹 Core layout and route protection
+import Layout from "@/components/layout/Layout";
+import ProtectedRoute from "@/app/routes/ProtectedRoute";
+
+// 🔹 Pages
 import Login from "@/modules/auth/pages/Login";
 import ResetPassword from "@/modules/passwordReset/pages/ResetPassword";
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
 import Users from "@/modules/dashboard/pages/Users";
 import ResponsiveDashboard from "@/modules/dashboard/components/DashboardContent";
-import UserPage from "@/modules/dashboard/pages/UserPage";
+import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
+import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
+import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
 
-// Optional: ProtectedRoute wrapper
-import ProtectedRoute from "@/app/routes/ProtectedRoute";
-import Layout from "@/components/layout/Layout";
-import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
-import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
-import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
+// 🔹 Role-specific pages
+import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
+import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -52,7 +55,11 @@ function AppContent() {
   }, [dispatch, navigate]);
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center text-gray-600 text-lg">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -60,9 +67,9 @@ function AppContent() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/success" element={<SuccessPage />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/paymentsuccess" element={<PaymentSuccess />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
 
@@ -84,10 +91,18 @@ function AppContent() {
           }
         />
         <Route
-          path="/user/:id"
+          path="/business-owner/:id"
           element={
             <ProtectedRoute>
-              <UserPage />
+              <BusinessOwnerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buyer/:id"
+          element={
+            <ProtectedRoute>
+              <BuyerPage />
             </ProtectedRoute>
           }
         />
