@@ -12,6 +12,10 @@ export default function ResponsiveDashboard() {
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [emailFilter, setEmailFilter] = useState("");
+   const [totalPages, setTotalPages] = useState(1);
+   const [activeUsers, setActiveUsers] = useState(0)
+   const [inactiveUsers, setInactiveUsers] = useState(0)
+   const [deletedUsers, setDeletedUsers] = useState(0)
 
   const user = sessionStorage.getItem("user");
   const userRole = JSON.parse(user)?.userRole || "guest";
@@ -20,13 +24,23 @@ export default function ResponsiveDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data: fetchedData, total } = await roleBasedDataService.getDashboardData(userRole, { pageIndex, pageSize });
+      const response = await roleBasedDataService.getDashboardData(userRole, {
+        pageIndex,
+        pageSize,
+      });
+      const { data: fetchedData, totalItems, totalPages, totalDeleted, totalInactive, totalActive } = response || {};
+
       setData(fetchedData || []);
-      setTotalItems(total || 0);
+      setTotalItems(totalItems || 0);
+      setTotalPages(totalPages || 1);
+      setActiveUsers(totalActive || 0)
+      setInactiveUsers(totalInactive || 0)
+      setDeletedUsers(totalDeleted || 0)
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
       setData([]);
       setTotalItems(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -54,9 +68,9 @@ export default function ResponsiveDashboard() {
 
   const stats = [
     { label: "Total Users", value: totalItems, color: "text-indigo-600" },
-    { label: "Active Users", value: 0, color: "text-green-600" },
-    { label: "Inactive Users", value: 0, color: "text-gray-600" },
-    { label: "Deleted Users", value: 0, color: "text-red-600" },
+    { label: "Active Users", value: activeUsers, color: "text-green-600" },
+    { label: "Inactive Users", value: inactiveUsers, color: "text-gray-600" },
+    { label: "Deleted Users", value: deletedUsers, color: "text-red-600" },
   ];
 
   if (loading) {
@@ -132,6 +146,7 @@ export default function ResponsiveDashboard() {
             setPageIndex={setPageIndex}
             setPageSize={setPageSize}
             totalItems={totalItems}
+            totalPages={totalPages}
           />
         </div>
       </div>
