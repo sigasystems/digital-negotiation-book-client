@@ -63,7 +63,7 @@ export const ROLE_CONFIG = {
       is_approved: "isApproved",
     },
     UI_TO_API: {
-      first_name: "first_name",
+      firstName: "first_name",
       lastName: "last_name",
       email: "email",
       phoneNumber: "phoneNumber",
@@ -86,7 +86,7 @@ export const ROLE_CONFIG = {
         fields: [
           "businessName",
           "registrationNumber",
-          "first_name",
+          "firstName",
           "lastName",
           "email",
           "phoneNumber",
