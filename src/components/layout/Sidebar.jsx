@@ -1,5 +1,5 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -13,18 +13,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { logout } from "@/app/store/slices/authSlice";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
+  const [userRole, setUserRole] = useState("guest");
+  const navigate = useNavigate();
 
   const toggleCollapse = () => setCollapsed(!collapsed);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  // Pull user from Redux
-  const user = useSelector((state) => state.auth.user);
-  const userRole = user?.userRole || "guest";
+
+  useEffect(() => {
+    try {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        setUserRole(parsed?.userRole || "guest");
+      }
+    } catch (err) {
+      console.error("Failed to parse user from sessionStorage:", err);
+      setUserRole("guest");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("user");
+    navigate("/login");
+  };
 
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
