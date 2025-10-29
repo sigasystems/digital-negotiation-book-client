@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   X,
   Building2,
@@ -15,9 +15,19 @@ import {
 const ViewContent = ({ isOpen, onClose, owner }) => {
   if (!isOpen || !owner) return null;
 
-  const isBuyer = !!owner.buyersCompanyName || !!owner.contactEmail;
-  const isProduct = !!owner.productName || !!owner.species || !!owner.code;
+  // ✅ Normalize API response
+  const data = useMemo(() => {
+    if (!owner) return {};
+    if (owner.buyer) return owner.buyer; // from { buyer: {...} }
+    if (owner.product) return owner.product; // in case of { product: {...} }
+    return owner; // already flat
+  }, [owner]);
 
+  // Identify entity type
+  const isBuyer = !!data.buyersCompanyName || !!data.contactEmail;
+  const isProduct = !!data.productName || !!data.species || !!data.code;
+
+  // Build sections dynamically
   let sections = [];
 
   if (isProduct) {
@@ -26,144 +36,163 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         title: "Product Information",
         icon: <Package className="w-4 h-4" />,
         fields: [
-          { label: "Product Name", value: owner.productName },
-          { label: "Species", value: owner.species },
-          { label: "Code", value: owner.code }
+          { label: "Product Name", value: data.productName },
+          { label: "Species", value: data.species },
+          { label: "Code", value: data.code },
         ],
       },
       {
         title: "Specifications",
         icon: <Fish className="w-4 h-4" />,
         fields: [
-          { label: "Size", value: Array.isArray(owner.size) ? owner.size.join(", ") : owner.size },
-          { label: "Created At", value: owner.createdAt },
-          { label: "Updated At", value: owner.updatedAt },
+          {
+            label: "Size",
+            value: Array.isArray(data.size)
+              ? data.size.join(", ")
+              : data.size,
+          },
+          { label: "Created At", value: data.createdAt },
+          { label: "Updated At", value: data.updatedAt },
         ],
       },
     ];
   } else if (isBuyer) {
     sections = [
-        {
-          title: "Company Details",
-          icon: <Building2 className="w-4 h-4" />,
-          fields: [
-            { label: "Company Name", value: owner.buyersCompanyName },
-            { label: "Registration No", value: owner.registrationNumber },
-            { label: "Tax ID", value: owner.taxId },
-          ],
-        },
-        {
-          title: "Contact Information",
-          icon: <Mail className="w-4 h-4" />,
-          fields: [
-            { label: "Contact Name", value: owner.contactName },
-            { label: "Email", value: owner.contactEmail },
-            { label: "Phone", value: `${owner.countryCode || ""} ${owner.contactPhone || ""}`.trim() },
-          ],
-        },
-        {
-          title: "Address",
-          icon: <MapPin className="w-4 h-4" />,
-          fields: [
-            { label: "Address", value: owner.address },
-            { label: "City", value: owner.city },
-            { label: "State", value: owner.state },
-            { label: "Country", value: owner.country },
-            { label: "Postal Code", value: owner.postalCode },
-          ],
-        },
-        {
-          title: "Account Status",
-          icon: <CheckCircle className="w-4 h-4" />,
-          fields: [
-            { label: "Status", value: owner.status, type: "status" },
-            { label: "Verified", value: owner.isVerified, type: "boolean" },
-            { label: "Deleted", value: owner.isDeleted, type: "boolean-negative" },
-          ],
-        },
-        {
-          title: "Timestamps",
-          icon: <Calendar className="w-4 h-4" />,
-          fields: [
-            { label: "Created", value: owner.createdAt },
-            { label: "Updated", value: owner.updatedAt },
-          ],
-        },
-      ];
+      {
+        title: "Company Details",
+        icon: <Building2 className="w-4 h-4" />,
+        fields: [
+          { label: "Company Name", value: data.buyersCompanyName },
+          { label: "Registration No", value: data.registrationNumber },
+          { label: "Tax ID", value: data.taxId },
+        ],
+      },
+      {
+        title: "Contact Information",
+        icon: <Mail className="w-4 h-4" />,
+        fields: [
+          { label: "Contact Name", value: data.contactName },
+          { label: "Email", value: data.contactEmail },
+          {
+            label: "Phone",
+            value: `${data.countryCode || ""} ${
+              data.contactPhone || ""
+            }`.trim(),
+          },
+        ],
+      },
+      {
+        title: "Address",
+        icon: <MapPin className="w-4 h-4" />,
+        fields: [
+          { label: "Address", value: data.address },
+          { label: "City", value: data.city },
+          { label: "State", value: data.state },
+          { label: "Country", value: data.country },
+          { label: "Postal Code", value: data.postalCode },
+        ],
+      },
+      {
+        title: "Account Status",
+        icon: <CheckCircle className="w-4 h-4" />,
+        fields: [
+          { label: "Status", value: data.status, type: "status" },
+          { label: "Verified", value: data.isVerified, type: "boolean" },
+          { label: "Deleted", value: data.isDeleted, type: "boolean-negative" },
+        ],
+      },
+      {
+        title: "Timestamps",
+        icon: <Calendar className="w-4 h-4" />,
+        fields: [
+          { label: "Created", value: data.createdAt },
+          { label: "Updated", value: data.updatedAt },
+        ],
+      },
+    ];
   } else {
     sections = [
-    {
-      title: "Personal Information",
-      icon: <Shield className="w-4 h-4" />,
-      fields: [
-        { label: "First Name", value: owner.first_name },
-        { label: "Last Name", value: owner.last_name },
-        { label: "Email", value: owner.email },
-        { label: "Phone", value: owner.phoneNumber },
-      ],
-    },
-    {
-      title: "Business Details",
-      icon: <Building2 className="w-4 h-4" />,
-      fields: [
-        { label: "Business Name", value: owner.businessName },
-        { label: "Registration No", value: owner.registrationNumber },
-      ],
-    },
-    {
-      title: "Address",
-      icon: <MapPin className="w-4 h-4" />,
-      fields: [
-        { label: "Street", value: owner.address },
-        { label: "City", value: owner.city },
-        { label: "State", value: owner.state },
-        { label: "Country", value: owner.country },
-        { label: "Postal Code", value: owner.postalCode },
-      ],
-    },
-    {
-      title: "Account Status",
-      icon: <CheckCircle className="w-4 h-4" />,
-      fields: [
-        { label: "Status", value: owner.status, type: "status" },
-        { label: "Verified", value: owner.is_verified, type: "boolean" },
-        { label: "Approved", value: owner.is_approved, type: "boolean" },
-        { label: "Deleted", value: owner.is_deleted, type: "boolean-negative" },
-      ],
-    },
-    {
-      title: "Timestamps",
-      icon: <Calendar className="w-4 h-4" />,
-      fields: [
-        { label: "Created", value: owner.createdAt },
-        { label: "Updated", value: owner.updatedAt },
-      ],
-    },
-  ];
+      {
+        title: "Personal Information",
+        icon: <Shield className="w-4 h-4" />,
+        fields: [
+          { label: "First Name", value: data.first_name },
+          { label: "Last Name", value: data.last_name },
+          { label: "Email", value: data.email },
+          { label: "Phone", value: data.phoneNumber },
+        ],
+      },
+      {
+        title: "Business Details",
+        icon: <Building2 className="w-4 h-4" />,
+        fields: [
+          { label: "Business Name", value: data.businessName },
+          { label: "Registration No", value: data.registrationNumber },
+        ],
+      },
+      {
+        title: "Address",
+        icon: <MapPin className="w-4 h-4" />,
+        fields: [
+          { label: "Street", value: data.address },
+          { label: "City", value: data.city },
+          { label: "State", value: data.state },
+          { label: "Country", value: data.country },
+          { label: "Postal Code", value: data.postalCode },
+        ],
+      },
+      {
+        title: "Account Status",
+        icon: <CheckCircle className="w-4 h-4" />,
+        fields: [
+          { label: "Status", value: data.status, type: "status" },
+          { label: "Verified", value: data.is_verified, type: "boolean" },
+          { label: "Approved", value: data.is_approved, type: "boolean" },
+          { label: "Deleted", value: data.is_deleted, type: "boolean-negative" },
+        ],
+      },
+      {
+        title: "Timestamps",
+        icon: <Calendar className="w-4 h-4" />,
+        fields: [
+          { label: "Created", value: data.createdAt },
+          { label: "Updated", value: data.updatedAt },
+        ],
+      },
+    ];
   }
 
   const renderValue = (field) => {
     if (field.type === "status") {
       const isActive = field.value === "active";
       return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-          isActive
-            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-            : "bg-red-50 text-red-700 border border-red-200"
-        }`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+            isActive
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              isActive ? "bg-emerald-500" : "bg-red-500"
+            }`}
+          />
           {field.value}
         </span>
       );
     }
+
     if (field.type === "boolean" || field.type === "boolean-negative") {
       const isPositive = field.type === "boolean" ? field.value : !field.value;
       return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
-          isPositive
-            ? "bg-emerald-50 text-emerald-700"
-            : "bg-gray-100 text-gray-600"
-        }`}>
+        <span
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
+            isPositive
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-gray-100 text-gray-600"
+          }`}
+        >
           {isPositive ? (
             <CheckCircle className="w-3.5 h-3.5" />
           ) : (
@@ -173,15 +202,20 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         </span>
       );
     }
-    return <span className="text-gray-900 font-medium">{field.value || "—"}</span>;
+
+    return (
+      <span className="text-gray-900 font-medium">
+        {field.value || "—"}
+      </span>
+    );
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -227,7 +261,10 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
         {/* Scrollable Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-180px)] p-6 space-y-6 bg-gray-50">
           {sections.map((section) => (
-            <div key={section.title} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div
+              key={section.title}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            >
               <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                 <div className="text-gray-600">{section.icon}</div>
                 <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">
@@ -241,12 +278,14 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-gray-50 last:border-0"
                   >
                     <div className="flex items-center gap-2">
-                      {field.icon && (<span className="text-gray-400">{field.icon}</span>)}
-                      <span className="text-sm font-medium text-gray-600">{field.label}</span>
+                      {field.icon && (
+                        <span className="text-gray-400">{field.icon}</span>
+                      )}
+                      <span className="text-sm font-medium text-gray-600">
+                        {field.label}
+                      </span>
                     </div>
-                    <div className="sm:text-right">
-                      {renderValue(field)}
-                    </div>
+                    <div className="sm:text-right">{renderValue(field)}</div>
                   </div>
                 ))}
               </div>

@@ -9,12 +9,13 @@ import {
   UserPlus,
   Package,
   PlusCircle,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-export default function Sidebar({ collapsed, setCollapsed }) {
+export default function Sidebar({ collapsed, setCollapsed, onClose }) {
   const [userRole, setUserRole] = useState("guest");
   const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("user");
     navigate("/login");
+    if (onClose) onClose();
   };
 
   const navItems = [
@@ -47,34 +49,44 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       ? [{ name: "Users", icon: Users, path: "/users" }]
       : []),
 
-  // Show Add Buyer only for business_owner
-  ...(userRole === "business_owner"
-    ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
-        { name: "Products", icon: Package, path: "/products" },
-        { name: "Add Product", icon: PlusCircle, path: "/add-product" },
-        { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
-      ]
-    : []),
+    // Show Add Buyer only for business_owner
+    ...(userRole === "business_owner"
+      ? [
+          { name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
+          { name: "Products", icon: Package, path: "/products" },
+          { name: "Add Product", icon: PlusCircle, path: "/add-product" },
+          { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
+        ]
+      : []),
 
     // Show Add Business Owner only for super_admin
     ...(userRole === "super_admin"
-      ? [{ name: "Add Business Owner", icon: UserPlus, path: "/add-business-owner" }]
+      ? [
+          {
+            name: "Add Business Owner",
+            icon: UserPlus,
+            path: "/add-business-owner",
+          },
+        ]
       : []),
 
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
-
   return (
     <aside
       className={cn(
-        "hidden lg:flex fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex-col transition-all duration-300 z-40",
+        "flex fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex-col transition-all duration-300 z-40",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-16 border-b">
-        {!collapsed && <h2 className="text-xl font-bold text-indigo-600">MyApp</h2>}
+        {!collapsed && (
+          <h2 className="text-xl font-bold text-indigo-600">DNB</h2>
+        )}
+        
+        {/* Desktop collapse button */}
         <Button
           variant="ghost"
           size="icon"
@@ -88,6 +100,18 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             )}
           />
         </Button>
+
+        {/* Mobile close button */}
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="lg:hidden cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        )}
       </div>
 
       {/* Nav links */}
@@ -96,6 +120,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           <NavLink
             key={item.name}
             to={item.path}
+            onClick={() => onClose && onClose()}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",

@@ -5,57 +5,47 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/app/store/slices/authSlice";
 
-export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get user from Redux store
   const { user } = useSelector((state) => state.auth);
 
-  // Links for public sections
-  const links = [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Contact", href: "#contact" },
-  ];
-
-  // Logout handler
   const handleLogout = () => {
-    dispatch(logout()); // Clears Redux + cookies
+    dispatch(logout());
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("user");
     setLogoutOpen(false);
-    navigate("/");
+    navigate("/login");
   };
 
   return (
-    <header className="fixed w-full z-10 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition"
-        >
-          Digital Negotiation Book
-        </Link>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center gap-6">
-          {links.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-gray-700 hover:text-indigo-600 font-medium transition"
+    <header className="fixed top-0 left-0 w-full z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 md:px-6 h-16">
+        <div className="flex items-center gap-3">
+          {/* Mobile Menu Button */}
+          {showSidebarButton && (
+            <button
+              className="lg:hidden text-gray-700 hover:text-indigo-600 transition"
+              onClick={onMenuClick}
             >
-              {link.name}
-            </a>
-          ))}
+              <Menu size={24} />
+            </button>
+          )}
 
-          {/* User Section */}
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition"
+          >
+            Digital Negotiation Book
+          </Link>
+        </div>
+
+        {/* Desktop Right Side */}
+        <div className="hidden md:flex items-center gap-6">
           {!user ? (
             <Link
               to="/login"
@@ -95,54 +85,8 @@ export default function Navbar() {
               )}
             </div>
           )}
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-gray-700 hover:text-indigo-600 transition"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-md animate-slideDown">
-          <nav className="flex flex-col px-6 py-4 space-y-3">
-            {links.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-indigo-600 font-medium"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.name}
-              </a>
-            ))}
-
-            {user ? (
-              <button
-                className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-                onClick={() => {
-                  setMobileOpen(false);
-                  setLogoutOpen(true);
-                }}
-              >
-                <LogOut className="w-5 h-5" /> Logout
-              </button>
-            ) : (
-              <Link
-                to="/login"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
-                onClick={() => setMobileOpen(false)}
-              >
-                Login
-              </Link>
-            )}
-          </nav>
         </div>
-      )}
+      </div>
 
       {/* Logout Modal */}
       <LogoutDialog
