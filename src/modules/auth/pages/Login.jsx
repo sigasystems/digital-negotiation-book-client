@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "@/app/store/slices/authSlice";
+import axios from "axios";
 
 import {
   Form,
@@ -20,25 +19,44 @@ import { validateField } from "@/utils/validation";
 
 export default function Login() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user, loading, error } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async (values) => {
-    dispatch(loginUser(values));
-  };
-  // ✅ Redirect if logged in
-  useEffect(() => {
-    if (user) {
-      toast.success(`Welcome back, ${user.name || "User"}!`);
-      sessionStorage.setItem("user", JSON.stringify(user));
-      navigate("/dashboard");
+ const onSubmit = async (values) => {
+  setLoading(true);
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) throw new Error("VITE_API_URL not defined in .env");
+
+    const response = await axios.post(`${apiUrl}/auth/login`, values, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const resData = response.data;
+    const { accessToken, tokenPayload } = resData.data || {};
+
+    if (!accessToken || !tokenPayload) {
+      throw new Error("Malformed server response — missing token or user data");
     }
-  }, [user, navigate]);
+
+    sessionStorage.setItem("authToken", accessToken);
+    sessionStorage.setItem("user", JSON.stringify(tokenPayload));
+
+    toast.success(`Welcome back, ${tokenPayload.name || "User"}!`);
+    navigate("/dashboard");
+  } catch (err) {
+    const errorMsg =
+      err.response?.data?.message || err.message || "Login failed";
+    console.error("Login error:", err);
+    toast.error(errorMsg);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
@@ -111,9 +129,6 @@ export default function Login() {
                   </FormItem>
                 )}
               />
-
-              {/* Error message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
 
               {/* Submit Button */}
               <Button
