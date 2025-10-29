@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { normalizeData, denormalizeData } from "@/utils/normalizeUtils";
 
-export const useUserProfile = (id, roleType, config, hiddenFields) => {
+export const useUserProfile = (id, apiRole, uiRole, config, hiddenFields) => {
   const [data, setData] = useState({});
   const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -20,19 +20,18 @@ export const useUserProfile = (id, roleType, config, hiddenFields) => {
       const sessionUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const payload = { id };
 
-      // ✅ Only add ownerId if business_owner needs it for nested buyer fetching
-      if (roleType === "business_owner" && sessionUser?.id) {
+      if (apiRole === "business_owner" && sessionUser?.id) {
         payload.ownerId = sessionUser.id;
       }
 
-      const res = await roleBasedDataService.getById(roleType, payload);
+      const res = await roleBasedDataService.getById(apiRole, payload);
       let record = res?.data?.data || res?.data || res;
 
-      // ✅ handle nested response
+      // Handle nested objects
       if (record?.buyer) record = record.buyer;
       if (record?.businessOwner) record = record.businessOwner;
 
-      const normalized = normalizeData(record, roleType, config, hiddenFields);
+      const normalized = normalizeData(record, uiRole, config, hiddenFields);
       setData(normalized);
       setOriginalData(JSON.parse(JSON.stringify(normalized)));
     } catch (err) {
@@ -62,8 +61,8 @@ export const useUserProfile = (id, roleType, config, hiddenFields) => {
         return;
       }
 
-      const payload = denormalizeData(changedFields, roleType, config, hiddenFields);
-      await roleBasedDataService.update(roleType, { id }, payload);
+      const payload = denormalizeData(changedFields, uiRole, config, hiddenFields);
+      await roleBasedDataService.update(apiRole, { id }, payload);
 
       toast.success("Profile updated successfully");
       setOriginalData(JSON.parse(JSON.stringify(data)));

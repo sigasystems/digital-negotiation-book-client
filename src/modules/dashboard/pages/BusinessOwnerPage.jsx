@@ -12,9 +12,11 @@ const BusinessOwnerPage = () => {
   const navigate = useNavigate();
 
   const { data, loading, saving, hasChanges, handleChange, handleSubmit } =
-    useUserProfile(id, "super_admin", ROLE_CONFIG, HIDDEN_FIELDS);
+    useUserProfile(id, "super_admin", "business_owner", ROLE_CONFIG, HIDDEN_FIELDS);
 
-  const config = ROLE_CONFIG.super_admin;
+  const config = ROLE_CONFIG.business_owner;
+
+  const READ_ONLY_FIELDS = ["status", "isVerified", "isDeleted", "isApproved"];
 
   if (loading) {
     return (
@@ -37,6 +39,7 @@ const BusinessOwnerPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      {/* Header */}
       <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -58,7 +61,9 @@ const BusinessOwnerPage = () => {
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Business Owner Profile
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500">Owner ID: {id}</p>
+                <p className="text-xs sm:text-sm text-slate-500">
+                  Owner ID: {id}
+                </p>
               </div>
             </div>
           </div>
@@ -106,8 +111,16 @@ const BusinessOwnerPage = () => {
                           </label>
                           <Input
                             value={data[key] ?? ""}
-                            onChange={(e) => handleChange(key, e.target.value)}
-                            className="bg-slate-50 hover:bg-white transition-all duration-150 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            onChange={(e) =>
+                              !READ_ONLY_FIELDS.includes(key) &&
+                              handleChange(key, e.target.value)
+                            }
+                            disabled={READ_ONLY_FIELDS.includes(key)}
+                            className={`${
+                              READ_ONLY_FIELDS.includes(key)
+                                ? "bg-slate-100 text-slate-600 cursor-not-allowed border-slate-200"
+                                : "bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            } transition-all duration-150`}
                             placeholder={`Enter ${FIELD_LABELS[key] || key}`}
                           />
                         </div>

@@ -11,12 +11,20 @@ const BuyerPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // ✅ Business owner viewing a buyer
-  const { data, loading, saving, hasChanges, handleChange, handleSubmit } =
-    useUserProfile(id, "business_owner", ROLE_CONFIG, HIDDEN_FIELDS);
+  // ✅ Use business_owner for API calls, super_admin for mapping (buyer fields)
+  const {
+    data,
+    loading,
+    saving,
+    hasChanges,
+    handleChange,
+    handleSubmit,
+  } = useUserProfile(id, "business_owner", "super_admin", ROLE_CONFIG, HIDDEN_FIELDS);
 
-  // ✅ Use buyer config, not super_admin
-  const config = ROLE_CONFIG.business_owner;
+  const config = ROLE_CONFIG.super_admin;
+
+  // ✅ Define read-only fields explicitly
+  const READ_ONLY_FIELDS = ["status", "isVerified", "isDeleted", "isApproved"];
 
   if (loading) {
     return (
@@ -29,9 +37,8 @@ const BuyerPage = () => {
     );
   }
 
-  // Config check
   if (!config || !config.sections) {
-    console.error("ROLE_CONFIG.buyer.sections missing");
+    console.error("ROLE_CONFIG.super_admin.sections missing");
     return (
       <div className="text-center text-red-600 mt-20 font-medium">
         Configuration missing for Buyer role.
@@ -39,7 +46,6 @@ const BuyerPage = () => {
     );
   }
 
-  // Empty data check
   if (!data || Object.keys(data).length === 0) {
     return (
       <div className="text-center text-gray-500 mt-20">
@@ -117,8 +123,16 @@ const BuyerPage = () => {
                           </label>
                           <Input
                             value={data[key] ?? ""}
-                            onChange={(e) => handleChange(key, e.target.value)}
-                            className="bg-slate-50 hover:bg-white transition-all duration-150 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            onChange={(e) =>
+                              !READ_ONLY_FIELDS.includes(key) &&
+                              handleChange(key, e.target.value)
+                            }
+                            disabled={READ_ONLY_FIELDS.includes(key)}
+                            className={`${
+                              READ_ONLY_FIELDS.includes(key)
+                                ? "bg-slate-100 text-slate-600 cursor-not-allowed border-slate-200"
+                                : "bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            } transition-all duration-150`}
                             placeholder={`Enter ${FIELD_LABELS[key] || key}`}
                           />
                         </div>
