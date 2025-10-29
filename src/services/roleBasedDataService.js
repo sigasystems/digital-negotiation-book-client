@@ -106,15 +106,28 @@ const apiData = response?.data?.data || {};
 
     switch (normalizedRole) {
       case "super_admin": {
-        // For super admin, just pass the id
         const response = await dashboardService.getBusinessOwnerById(record.id);
         return response?.data?.data || response?.data || response;
       }
 
       case "business_owner": {
-        // For business_owner, need both ownerId and buyerId
+      const type =
+        record.type ||
+        (record.productName ? "product" : "buyer");
+
+      if (type === "buyer") {
         const response = await businessOwnerService.getBuyerById(record.id);
         return response?.data?.data || response?.data || response;
+      }
+
+      if (type === "product") {
+        const response = await businessOwnerService.getProductById(record.id);
+        return response?.data?.data || response?.data || response;
+      }
+
+      throw new Error(
+        "Unsupported record type for business_owner. Expected 'buyer' or 'product'."
+      );
       }
 
       default:

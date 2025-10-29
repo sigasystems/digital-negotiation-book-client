@@ -1,12 +1,48 @@
 import React from "react";
-import { X, Building2, Mail, MapPin, Calendar, CheckCircle, Shield, XCircle } from "lucide-react";
+import {
+  X,
+  Building2,
+  Mail,
+  MapPin,
+  Calendar,
+  CheckCircle,
+  Shield,
+  XCircle,
+  Package,
+  Fish,
+} from "lucide-react";
+
 const ViewContent = ({ isOpen, onClose, owner }) => {
   if (!isOpen || !owner) return null;
 
   const isBuyer = !!owner.buyersCompanyName || !!owner.contactEmail;
+  const isProduct = !!owner.productName || !!owner.species || !!owner.code;
 
-  const sections = isBuyer
-    ? [
+  let sections = [];
+
+  if (isProduct) {
+    sections = [
+      {
+        title: "Product Information",
+        icon: <Package className="w-4 h-4" />,
+        fields: [
+          { label: "Product Name", value: owner.productName },
+          { label: "Species", value: owner.species },
+          { label: "Code", value: owner.code }
+        ],
+      },
+      {
+        title: "Specifications",
+        icon: <Fish className="w-4 h-4" />,
+        fields: [
+          { label: "Size", value: Array.isArray(owner.size) ? owner.size.join(", ") : owner.size },
+          { label: "Created At", value: owner.createdAt },
+          { label: "Updated At", value: owner.updatedAt },
+        ],
+      },
+    ];
+  } else if (isBuyer) {
+    sections = [
         {
           title: "Company Details",
           icon: <Building2 className="w-4 h-4" />,
@@ -53,8 +89,9 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
             { label: "Updated", value: owner.updatedAt },
           ],
         },
-      ]
-    : [
+      ];
+  } else {
+    sections = [
     {
       title: "Personal Information",
       icon: <Shield className="w-4 h-4" />,
@@ -100,9 +137,10 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
       fields: [
         { label: "Created", value: owner.createdAt },
         { label: "Updated", value: owner.updatedAt },
-      ]
-    }
+      ],
+    },
   ];
+  }
 
   const renderValue = (field) => {
     if (field.type === "status") {
@@ -152,14 +190,26 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
+                {isProduct ? (
+                  <Package className="w-5 h-5 text-white" />
+                ) : isBuyer ? (
+                  <Building2 className="w-5 h-5 text-white" />
+                ) : (
+                  <Shield className="w-5 h-5 text-white" />
+                )}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">
-                  {isBuyer ? "Buyer Details" : "Business Owner Details"}
+                  {isProduct
+                    ? "Product Details"
+                    : isBuyer
+                    ? "Buyer Details"
+                    : "Business Owner Details"}
                 </h2>
                 <p className="text-sm text-gray-300 mt-0.5">
-                  {isBuyer
+                  {isProduct
+                    ? "Detailed information about the product"
+                    : isBuyer
                     ? "Detailed information about the buyer"
                     : "Detailed information about the business owner"}
                 </p>
@@ -191,7 +241,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-gray-50 last:border-0"
                   >
                     <div className="flex items-center gap-2">
-                      {field.icon && <span className="text-gray-400">{field.icon}</span>}
+                      {field.icon && (<span className="text-gray-400">{field.icon}</span>)}
                       <span className="text-sm font-medium text-gray-600">{field.label}</span>
                     </div>
                     <div className="sm:text-right">

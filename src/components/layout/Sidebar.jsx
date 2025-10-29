@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -7,6 +7,8 @@ import {
   LogOut,
   ChevronRight,
   UserPlus,
+  Package,
+  PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +16,9 @@ import { cn } from "@/lib/utils";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const user = sessionStorage.getItem("user");
-  const userRole = JSON.parse(user).userRole || "guest"
+  const userRole = JSON.parse(user)?.userRole || "guest";
+
+  const toggleCollapse = () => setCollapsed(!collapsed);
 
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -26,7 +30,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   // Show Add Buyer only for business_owner
   ...(userRole === "business_owner"
-    ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" }]
+    ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
+        { name: "Products", icon: Package, path: "/products" },
+        { name: "Add Product", icon: PlusCircle, path: "/add-product" },
+      ]
     : []),
 
       ...(userRole === "super_admin"
@@ -35,8 +42,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
-
-  const toggleCollapse = () => setCollapsed(!collapsed);
 
   return (
       <aside
