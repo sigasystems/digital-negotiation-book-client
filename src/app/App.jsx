@@ -24,6 +24,7 @@ import Products from "@/modules/product/pages/Products";
 // 🔹 Role-specific pages
 import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
 import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
+import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -31,38 +32,38 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const initUser = async () => {
-      try {
-        let sessionUser = sessionStorage.getItem("user");
-        sessionUser = sessionUser ? JSON.parse(sessionUser) : null;
+  // useEffect(() => {
+  //   const initUser = async () => {
+  //     try {
+  //       let sessionUser = sessionStorage.getItem("user");
+  //       sessionUser = sessionUser ? JSON.parse(sessionUser) : null;
 
-        if (!sessionUser) {
-          // No session user → redirect to login
-          navigate("/login", { replace: true });
-          return;
-        }
+  //       if (!sessionUser) {
+  //         // No session user → redirect to login
+  //         navigate("/login", { replace: true });
+  //         return;
+  //       }
 
-        dispatch({ type: "auth/loginUser/fulfilled", payload: sessionUser });
-        setUser(sessionUser);
-      } catch (err) {
-        console.error("Error loading user:", err);
-        navigate("/login", { replace: true });
-      } finally {
-        setLoading(false);
-      }
-    }
+  //       dispatch({ type: "auth/loginUser/fulfilled", payload: sessionUser });
+  //       setUser(sessionUser);
+  //     } catch (err) {
+  //       console.error("Error loading user:", err);
+  //       navigate("/login", { replace: true });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
 
-    initUser();
-  }, [dispatch, navigate]);
+  //   initUser();
+  // }, [dispatch, navigate]);
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center text-gray-600 text-lg">
-        Loading...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center text-gray-600 text-lg">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
   return (
     <Layout>
@@ -113,6 +114,15 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AddBuyerForm />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/plan-purchase"
+          element={
+            <ProtectedRoute>
+              <PlanPurchase />
             </ProtectedRoute>
           }
         />

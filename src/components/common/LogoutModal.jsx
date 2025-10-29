@@ -1,4 +1,5 @@
-import {
+
+  import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -7,20 +8,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 export default function LogoutDialog({ isOpen, onClose, onLogout }) {
-
-  const navigate = useNavigate();
-  const handleLogout = () => {
-  sessionStorage.removeItem("user");
-  sessionStorage.removeItem("authToken");
-  toast.success("Logged out successfully!");
-  navigate("/");
-  onClose();
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md text-center">
@@ -42,7 +31,10 @@ export default function LogoutDialog({ isOpen, onClose, onLogout }) {
             Cancel
           </Button>
           <Button
-            onClick={handleLogout}
+            onClick={() => {
+              onLogout();
+              onClose();
+            }}
             className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white cursor-pointer"
           >
             Logout

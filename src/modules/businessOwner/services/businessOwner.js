@@ -41,6 +41,13 @@ export const businessOwnerService = {
     return api.get(`/business-owner/${ownerId}/buyers/search`, params);
   },
 
+  getPaymentById : (paymentId) =>
+  {
+    if (!paymentId) throw new Error("Payment ID is required");
+    return api.get(`/api/payment/${paymentId}`);
+  },
+
+  
   checkRegistrationNumber: (registrationNumber) => {
     if (!registrationNumber)
       throw new Error("Registration number is required");

@@ -76,7 +76,7 @@ export default function PlansPage() {
     <div className="min-h-screen bg-gray-50 py-16 px-6">
       {/* Header */}
       <div className="max-w-3xl mx-auto text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900">Choose a Plan</h1>
+        <h1 className="cursor-pointer  text-4xl font-bold text-gray-900">Choose a Plan</h1>
         <p className="text-gray-600 mt-2">
           Flexible pricing for all business sizes. Upgrade or cancel anytime.
         </p>
@@ -90,7 +90,7 @@ export default function PlansPage() {
             onClick={() =>
               setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")
             }
-            className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
+            className={`cursor-pointer relative inline-flex h-6 w-12 items-center rounded-full transition ${
               billingCycle === "yearly" ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
@@ -186,7 +186,7 @@ export default function PlansPage() {
       // If logged in, navigate to checkout
       navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
     }}
-    className={`inline-flex items-center justify-center w-full py-2 font-semibold rounded-lg ${
+    className={`cursor-pointer inline-flex items-center justify-center w-full py-2 font-semibold rounded-lg ${
       plan.isDefault
         ? "bg-indigo-600 hover:bg-indigo-700 text-white"
         : "bg-gray-800 hover:bg-gray-900 text-white"
