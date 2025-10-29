@@ -178,11 +178,12 @@ export default function PlansPage() {
             <CardFooter className="mt-6 px-6">
               
 <button
-    onClick={() => {
-      if (!isLoggedIn) {
-        toast.error("Please log in to choose a plan");
-        return;
-      }
+    onClick={() =>
+       {
+        // if (!isLoggedIn) {
+        //   toast.error("Please log in to choose a plan");
+        //   return;
+        // }
       // If logged in, navigate to checkout
       navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
     }}
