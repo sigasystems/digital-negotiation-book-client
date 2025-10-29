@@ -142,21 +142,21 @@ return actionsColumn
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
-      {/* Filter input */}
-      {/* Filter input */}
-{table.getAllColumns().some(col => col.id === filterKey) && (
-  <div className="mb-4">
-    <Input
-      placeholder={`Filter by ${filterKey}...`}
-      value={table.getColumn(filterKey)?.getFilterValue() || ""}
-      onChange={(e) =>
-        table.getColumn(filterKey)?.setFilterValue(e.target.value)
-      }
-      className="max-w-md"
-    />
-  </div>
-)}
-
+        {table.getAllColumns().some(col => col.id === filterKey) && (
+          <div className="mb-4">
+            <Input
+              placeholder={`Filter by ${filterKey
+                .replace(/([A-Z])/g, " $1") // adds space before capital letters
+                .replace(/^./, (str) => str.toUpperCase()) // capitalize first letter
+              }...`}
+              value={table.getColumn(filterKey)?.getFilterValue() || ""}
+              onChange={(e) =>
+                table.getColumn(filterKey)?.setFilterValue(e.target.value)
+              }
+              className="max-w-md"
+            />
+          </div>
+        )}
 
       <Table className="min-w-[1000px]">
         <TableHeader>

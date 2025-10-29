@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
@@ -8,6 +7,8 @@ import {
   LogOut,
   ChevronRight,
   UserPlus,
+  Package,
+  PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "@/app/store/slices/authSlice";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
+
+  const toggleCollapse = () => setCollapsed(!collapsed);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   // Pull user from Redux
@@ -31,13 +34,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       ? [{ name: "Users", icon: Users, path: "/users" }]
       : []),
 
-    // Show Add Buyer & Plan Purchase for business_owner
-    ...(userRole === "business_owner"
-      ? [
-          { name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
-          { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
-        ]
-      : []),
+  // Show Add Buyer only for business_owner
+  ...(userRole === "business_owner"
+    ? [{ name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
+        { name: "Products", icon: Package, path: "/products" },
+        { name: "Add Product", icon: PlusCircle, path: "/add-product" },
+        { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
+      ]
+    : []),
 
     // Show Add Business Owner only for super_admin
     ...(userRole === "super_admin"
@@ -47,11 +51,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
-  const toggleCollapse = () => setCollapsed(!collapsed);
-  const handleLogout = () => {
-    dispatch(logout());
-    // navigate("/login");
-  };
 
   return (
     <aside

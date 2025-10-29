@@ -87,5 +87,10 @@ export const businessOwnerService = {
     if (!buyerId) throw new Error("Buyer ID is required");
     return api.delete(`/business-owner/delete-buyer/${buyerId}`);
   },
+
+  getProductById: (productId) => {
+    if (!productId) throw new Error("Product ID is required");
+    return api.get(`/product/get-product/${productId}`);
+  },
 };
 

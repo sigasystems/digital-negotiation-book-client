@@ -18,6 +18,8 @@ import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
 import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
+import AddProduct from "@/modules/product/pages/AddProduct";
+import Products from "@/modules/product/pages/Products";
 
 // 🔹 Role-specific pages
 import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
@@ -129,6 +131,22 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AddBusinessOwner />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-product"
+          element={
+            <ProtectedRoute>
+              <AddProduct />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <Products />
             </ProtectedRoute>
           }
         />
