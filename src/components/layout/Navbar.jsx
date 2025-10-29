@@ -2,17 +2,20 @@ import { useState } from "react";
 import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/app/store/slices/authSlice";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Fetch user from session storage
-  const sessionUserData = sessionStorage.getItem("user");
-  const sessionUser = sessionUserData ? JSON.parse(sessionUserData) : null;
+  // Get user from Redux store
+  const { user } = useSelector((state) => state.auth);
 
+  // Links for public sections
   const links = [
     { name: "Features", href: "#features" },
     { name: "Pricing", href: "#pricing" },
@@ -20,11 +23,13 @@ export default function Navbar() {
     { name: "Contact", href: "#contact" },
   ];
 
+  // Logout handler
   const handleLogout = () => {
-    sessionStorage.removeItem("user");
+    dispatch(logout()); // Clears Redux + cookies
     sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("user");
     setLogoutOpen(false);
-    window.location.href = "/login";
+    navigate("/");
   };
 
   return (
@@ -51,7 +56,7 @@ export default function Navbar() {
           ))}
 
           {/* User Section */}
-          {!sessionUser ? (
+          {!user ? (
             <Link
               to="/login"
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
@@ -66,7 +71,7 @@ export default function Navbar() {
               >
                 <User className="w-5 h-5 text-gray-700" />
                 <span className="text-gray-700 font-medium">
-                  {sessionUser?.name || "User"}
+                  {user?.name || "User"}
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${
@@ -116,7 +121,7 @@ export default function Navbar() {
               </a>
             ))}
 
-            {sessionUser ? (
+            {user ? (
               <button
                 className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
                 onClick={() => {
