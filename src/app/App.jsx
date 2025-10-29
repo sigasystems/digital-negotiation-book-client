@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 // 🔹 Core layout and route protection
 import Layout from "@/components/layout/Layout";
@@ -20,42 +19,48 @@ import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
 import AddProduct from "@/modules/product/pages/AddProduct";
 import Products from "@/modules/product/pages/Products";
-
-// 🔹 Role-specific pages
 import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
 import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
 import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
 
 function AppContent() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const initUser = async () => {
-      try {
-        let sessionUser = sessionStorage.getItem("user");
-        sessionUser = sessionUser ? JSON.parse(sessionUser) : null;
+useEffect(() => {
+  const sessionUser = sessionStorage.getItem("user");
+  const currentPath = window.location.pathname;
 
-        if (!sessionUser) {
-          // No session user → redirect to login
-          navigate("/login", { replace: true });
-          return;
-        }
+  const publicPaths = [
+    "/",
+    "/login",
+    "/forgot-password",
+    "/checkout",
+    "/success",
+    "/paymentsuccess",
+  ];
 
-        dispatch({ type: "auth/loginUser/fulfilled", payload: sessionUser });
-        setUser(sessionUser);
-      } catch (err) {
-        console.error("Error loading user:", err);
-        navigate("/login", { replace: true });
-      } finally {
-        setLoading(false);
-      }
+  if (!sessionUser) {
+    // Only redirect if not already on a public route
+    if (!publicPaths.includes(currentPath)) {
+      navigate("/login", { replace: true });
     }
+    setLoading(false);
+    return;
+  }
 
-    initUser();
-  }, [dispatch, navigate]);
+  try {
+    const parsedUser = JSON.parse(sessionUser);
+    setUser(parsedUser);
+  } catch (err) {
+    console.error("Failed to parse user session:", err);
+    sessionStorage.removeItem("user");
+    navigate("/login", { replace: true });
+  } finally {
+    setLoading(false);
+  }
+}, [navigate]);
 
   if (loading) {
     return (
@@ -80,7 +85,7 @@ function AppContent() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <ResponsiveDashboard />
             </ProtectedRoute>
           }
@@ -88,7 +93,7 @@ function AppContent() {
         <Route
           path="/users"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <Users userRole={user?.userRole} />
             </ProtectedRoute>
           }
@@ -96,7 +101,7 @@ function AppContent() {
         <Route
           path="/business-owner/:id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <BusinessOwnerPage />
             </ProtectedRoute>
           }
@@ -104,7 +109,7 @@ function AppContent() {
         <Route
           path="/buyer/:id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <BuyerPage />
             </ProtectedRoute>
           }
@@ -112,16 +117,15 @@ function AppContent() {
         <Route
           path="/add-buyer"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <AddBuyerForm />
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/plan-purchase"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <PlanPurchase />
             </ProtectedRoute>
           }
@@ -129,7 +133,7 @@ function AppContent() {
         <Route
           path="/add-business-owner"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <AddBusinessOwner />
             </ProtectedRoute>
           }
@@ -137,7 +141,7 @@ function AppContent() {
         <Route
           path="/add-product"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <AddProduct />
             </ProtectedRoute>
           }
@@ -145,7 +149,7 @@ function AppContent() {
         <Route
           path="/products"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <Products />
             </ProtectedRoute>
           }

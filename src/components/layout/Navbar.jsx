@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
+import { Menu, LogOut, X, ChevronDown, User } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,7 +7,8 @@ import { logout } from "@/app/store/slices/authSlice";
 
 export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -18,77 +19,174 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("user");
     setLogoutOpen(false);
-    navigate("/login");
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+    navigate("/");
   };
 
+  const navLinks = [
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Products", path: "/products" },
+    { label: "Buyers", path: "/users" },
+    { label: "Reports", path: "/reports" },
+    { label: "Settings", path: "/settings" },
+  ];
+
+  const userName = user?.first_name
+    ? `${user.first_name} ${user.last_name || ""}`.trim()
+    : user?.name || "User";
+
   return (
-    <header className="fixed top-0 left-0 w-full z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="flex items-center justify-between px-4 md:px-6 h-16">
-        <div className="flex items-center gap-3">
-          {/* Mobile Menu Button */}
+    <header className="fixed top-0 left-0 w-full z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 max-w-[1920px] mx-auto">
+        {/* Left Side - Logo & Sidebar Toggle */}
+        <div className="flex items-center gap-3 sm:gap-4">
           {showSidebarButton && (
             <button
-              className="lg:hidden text-gray-700 hover:text-indigo-600 transition"
+              className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg"
               onClick={onMenuClick}
+              aria-label="Open sidebar"
             >
-              <Menu size={24} />
+              <Menu size={20} />
             </button>
           )}
 
-          {/* Logo */}
           <Link
             to="/"
-            className="text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition"
+            className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap"
           >
-            Digital Negotiation Book
+            <span className="hidden sm:inline">Digital Negotiation Book</span>
+            <span className="sm:hidden">DNB</span>
           </Link>
         </div>
 
-        {/* Desktop Right Side */}
-        <div className="hidden md:flex items-center gap-6">
-          {!user ? (
+        {/* Right Side - Desktop Menu */}
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+          {/* Nav Links */}
+          {navLinks.map((link) => (
             <Link
-              to="/login"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+              key={link.label}
+              to={link.path}
+              className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
             >
-              Login
+              {link.label}
             </Link>
-          ) : (
+          ))}
+
+          {/* User Section */}
+          {user ? (
             <div className="relative">
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
               >
-                <User className="w-5 h-5 text-gray-700" />
-                <span className="text-gray-700 font-medium">
-                  {user?.name || "User"}
+                <User className="w-4 h-4 text-gray-700" />
+                <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                  {userName}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    userMenuOpen ? "rotate-180" : ""
+                  className={`w-4 h-4 text-gray-700 transition-transform ${
+                    userDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-44 bg-white rounded-md shadow-lg border border-gray-100 z-50">
-                  <button
-                    onClick={() => {
-                      setLogoutOpen(true);
-                      setUserMenuOpen(false);
-                    }}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"
-                  >
-                    <LogOut className="w-4 h-4" /> Logout
-                  </button>
-                </div>
+              {/* Dropdown Menu */}
+              {userDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setUserDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-1">
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        setLogoutOpen(true);
+                      }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </>
               )}
             </div>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+            >
+              Login
+            </Link>
           )}
         </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
-      {/* Logout Modal */}
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
+          <nav className="px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
+            {/* Nav Links */}
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition"
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* User Section */}
+            {user ? (
+              <>
+                <div className="border-t border-gray-200 my-3 pt-3">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
+                    <User className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm font-medium text-gray-700 truncate">
+                      {userName}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setLogoutOpen(true);
+                    }}
+                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="border-t border-gray-200 my-3 pt-3">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition text-center"
+                >
+                  Login
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
       <LogoutDialog
         isOpen={logoutOpen}
         onClose={() => setLogoutOpen(false)}
