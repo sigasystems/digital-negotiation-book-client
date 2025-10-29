@@ -81,7 +81,7 @@ export default function Hero() {
 
             {/* Feature Highlights */}
             <div 
-              className="flex flex-wrap gap-3"
+              className="cursor-pointer flex flex-wrap gap-3"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',

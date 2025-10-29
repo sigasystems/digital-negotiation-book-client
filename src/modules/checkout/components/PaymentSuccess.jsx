@@ -77,7 +77,7 @@ export default function PaymentSuccess() {
     navigate("/");
   }, [navigate]);
 
-  const formatPrice = (price) => `${orderData.currencySymbol}${parseFloat(price || "0").toFixed(2)}`;
+  const formatPrice = (price) => `${orderData.currencySymbol}${parseFloat(price || "0").toFixed(2)}`; 
 
   const handlePrintReceipt = () => {
     const w = window.open("", "_blank");
