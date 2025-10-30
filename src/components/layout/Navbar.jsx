@@ -86,8 +86,8 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
-              >
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100hover:bg-gray-200 rounded-lg transition cursor-pointer"
+              > 
                 <User className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
                   {userName}
