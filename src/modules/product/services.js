@@ -10,10 +10,13 @@ const api = {
   delete: (url) => apiClient.delete(url, authConfig()),
 };
 
-// 🧩 Product API
 export const productService = {
   createProducts: (payload) => api.post("/product/add-product", payload),
 
   getAllProducts: (page, limit) =>
     api.get("/product/getall-products", { page, limit }),
+
+  getProductById: (id) => api.get(`/product/get-product/${id}`),
+  updateProduct: (id, payload) => api.put(`/product/update-product/${id}`, payload),
+  deleteProduct: (id) => api.delete(`/product/delete-product/${id}`),
 };

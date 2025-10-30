@@ -22,6 +22,7 @@ import Products from "@/modules/product/pages/Products";
 import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
 import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
 import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
+import Product from "@/modules/dashboard/pages/Product";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -151,6 +152,14 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <Products />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <Product />
             </ProtectedRoute>
           }
         />

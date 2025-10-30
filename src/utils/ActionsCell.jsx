@@ -13,9 +13,25 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
 
 const navigate = useNavigate();
 
+  const userInfo = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const role = userInfo?.userRole;
+  const record = row?.original || {};
+  const isActive = record.status === "active";
+
+  const getErrorMessage = (err, fallback = "Something went wrong") =>
+    err?.response?.data?.message || err?.message || fallback;
+
 const navigateToEditPage = () => {
   if (!record?.id) {
     toast.error("Invalid record");
+    return;
+  }
+
+    // Detect record type
+    const isProduct =
+      record?.productName !== undefined || record?.code !== undefined;
+    if (isProduct) {
+      navigate(`/product/${record.id}`, { state: record });
     return;
   }
 
@@ -23,26 +39,14 @@ const navigateToEditPage = () => {
     case "super_admin":
       navigate(`/business-owner/${record.id}`, { state: record });
       break;
-
     case "business_owner":
       navigate(`/buyer/${record.id}`, { state: record });
       break;
-
     default:
       toast.error(`Unsupported role: ${role}`);
       break;
   }
 };
-
-
-  const userInfo = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const role = userInfo?.userRole
-
-  const record = row?.original || {};
-  const isActive = record.status === "active";
-
-  const getErrorMessage = (err, fallback = "Something went wrong") =>
-    err?.response?.data?.message || err?.message || fallback;
 
   const runAction = async (key, fn, successMsg, fallbackError) => {
     setLoadingAction(key);
@@ -73,9 +77,7 @@ const navigateToEditPage = () => {
       }
     },
 
-    edit: () => {
-      navigateToEditPage();
-    },
+    edit: () => navigateToEditPage(),
 
     activate: () =>
       runAction(
@@ -95,17 +97,23 @@ const navigateToEditPage = () => {
 
     delete: () => {
       if (!window.confirm("Are you sure you want to delete this record?")) return;
+
+      const isProduct =
+        record?.productName !== undefined || record?.code !== undefined;
+
+      const payload = isProduct
+        ? { id: record.id, type: "product" }
+        : record.id;
+
       runAction(
         "delete",
-        () => roleBasedDataService.softDelete(role, record.id),
+        () => roleBasedDataService.softDelete(role, payload),
         "Deleted successfully",
         "Failed to delete record"
       );
     },
 
-    update: () => {
-      navigateToEditPage();
-    },
+    update: () => navigateToEditPage(),
   };
 
   /** ✅ Icon + color mapping */
