@@ -319,19 +319,6 @@ export default function PlansPage() {
           })}
         </div>
 
-        {/* Footer */}
-        {!isLoggedIn && (
-          <p className="text-center text-sm text-gray-600 mt-8">
-            Please{" "}
-            <button
-              onClick={() => navigate("/login")}
-              className="text-blue-600 hover:underline"
-            >
-              log in
-            </button>{" "}
-            to subscribe
-          </p>
-        )}
       </div>
     </div>
   );
