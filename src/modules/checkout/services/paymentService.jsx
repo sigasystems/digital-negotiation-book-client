@@ -21,7 +21,6 @@ export const becomeBusinessOwner = async (payload) => {
       payload,
       { withCredentials: true }
     );
-    console.log("Become business owner succcesfully done !!!...Onboard succesfully......",payload)
     return response.data; 
   } catch (err) {
     console.error("Error in becomeBusinessOwner service:", err);
@@ -33,6 +32,11 @@ export const checkRegistrationNumber = async (registrationNumber) => {
   const res = await apiClient.get(`/business-owner/check-registration/${registrationNumber}`);
   return res.data;
 };
+
+export const getPaymentById = async (paymentId) => {
+  if (!paymentId) throw new Error("Payment ID is required");
+  return apiClient.get(`/payments/${paymentId}`);
+}
 
 // GET /api/payments/invoice/:userId
 // export const getInvoice = async (userId) => {
