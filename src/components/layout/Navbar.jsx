@@ -51,7 +51,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         <div className="flex items-center gap-3 sm:gap-4">
           {showSidebarButton && (
             <button
-              className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg"
+              className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
               onClick={onMenuClick}
               aria-label="Open sidebar"
             >
@@ -133,11 +133,11 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
         {/* Mobile Menu Button */}
         <button
-          className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg"
+          className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileMenuOpen ? <X size={20} /> : <ChevronDown size={20} />}
         </button>
       </div>
 

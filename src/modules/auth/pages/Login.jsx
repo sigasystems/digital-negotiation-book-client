@@ -23,13 +23,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
-    defaultValues: { email: "", password: "" },
+    defaultValues: { businessName: "", email: "", password: "" },
   });
 
  const onSubmit = async (values) => {
   setLoading(true);
   try {
-     const resData = await login(values)
+     const resData = await login(values);
     const { accessToken, tokenPayload } = resData?.data || {};
 
     if (!accessToken || !tokenPayload) {
@@ -43,7 +43,7 @@ export default function Login() {
     navigate("/dashboard");
   } catch (err) {
     const errorMsg =
-      err.response?.data?.message || err.message || "Login failed";
+      err.response?.data?.message || err.message || err.response?.data?.error || err || "Login failed";
     console.error("Login error:", err);
     toast.error(errorMsg);
   } finally {
@@ -67,6 +67,26 @@ export default function Login() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+              <FormField
+                control={form.control}
+                name="businessName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Business Name
+                    </FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="e.g. Ocean Fresh Seafood"
+                        {...field}
+                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
               {/* Email */}
               <FormField
                 control={form.control}
