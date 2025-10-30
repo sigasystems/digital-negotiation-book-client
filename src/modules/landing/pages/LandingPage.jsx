@@ -4,6 +4,9 @@ import Features from "../components/Features";
 import Testimonials from "../components/Testimonials";
 import CTA from "../components/CTA";
 import PlansPage from "../components/PlansPage";
+import { useSelector } from "react-redux";
+
+
 
 export default function LandingPage() {
   const hasReloaded = useRef(false);
