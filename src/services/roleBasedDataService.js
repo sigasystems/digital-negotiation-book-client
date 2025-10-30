@@ -1,5 +1,6 @@
 import { dashboardService } from "@/modules/dashboard/services/dashboardService";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
+import { productService } from "@/modules/product/services";
 
 export const roleBasedDataService = {
   async getDashboardData(role, params = {}) {
@@ -226,7 +227,15 @@ async softDelete(role, id) {
     }
 
     case "business_owner": {
-      const res = await businessOwnerService.deleteBuyer(id);
+      const isProduct = typeof id === "object" ? id.type === "product" : false;
+      const actualId = typeof id === "object" ? id.id : id;
+
+      if (isProduct) {
+        const res = await productService.deleteProduct(actualId);
+        return res?.data || res;
+      }
+
+      const res = await businessOwnerService.deleteBuyer(actualId);
       return res?.data || res;
     }
 
