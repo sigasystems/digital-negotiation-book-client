@@ -1,26 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, LogOut, X, ChevronDown, User } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "@/app/store/slices/authSlice";
 
 export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => state.auth);
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Failed to parse user from sessionStorage:", err);
+        sessionStorage.removeItem("user");
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
-    dispatch(logout());
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("user");
     setLogoutOpen(false);
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
+    setUser(null);
     navigate("/");
   };
 
@@ -73,7 +81,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             </Link>
           ))}
 
-          {/* User Section */}
+          {/* User / Login Section */}
           {user ? (
             <div className="relative">
               <button
@@ -149,9 +157,8 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               </Link>
             ))}
 
-            {/* User Section */}
+            {/* User / Login Section */}
             {user ? (
-              <>
                 <div className="border-t border-gray-200 my-3 pt-3">
                   <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
                     <User className="w-4 h-4 text-gray-600" />
@@ -170,7 +177,6 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                     Logout
                   </button>
                 </div>
-              </>
             ) : (
               <div className="border-t border-gray-200 my-3 pt-3">
                 <Link
@@ -186,7 +192,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         </div>
       )}
 
-      {/* Logout Confirmation Modal */}
+      {/* Logout Modal */}
       <LogoutDialog
         isOpen={logoutOpen}
         onClose={() => setLogoutOpen(false)}
