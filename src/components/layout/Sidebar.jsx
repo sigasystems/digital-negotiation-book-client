@@ -10,6 +10,7 @@ import {
   Package,
   PlusCircle,
   X,
+  MoveLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -71,6 +72,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       : []),
 
     { name: "Settings", icon: Settings, path: "/settings" },
+    { name: "Back to Home", icon: MoveLeft, path: "/" },
   ];
 
   return (
