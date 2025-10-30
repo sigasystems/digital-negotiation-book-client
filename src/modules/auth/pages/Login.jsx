@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
 
 import {
   Form,
@@ -30,15 +29,8 @@ export default function Login() {
  const onSubmit = async (values) => {
   setLoading(true);
   try {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    if (!apiUrl) throw new Error("VITE_API_URL not defined in .env");
-
-    const response = await axios.post(`${apiUrl}/auth/login`, values, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const resData = response.data;
-    const { accessToken, tokenPayload } = resData.data || {};
+     const resData = await login(values)
+    const { accessToken, tokenPayload } = resData?.data || {};
 
     if (!accessToken || !tokenPayload) {
       throw new Error("Malformed server response — missing token or user data");
