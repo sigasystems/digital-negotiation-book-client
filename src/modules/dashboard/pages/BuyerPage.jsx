@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Save, X } from "lucide-react";
 import { FIELD_LABELS, ROLE_CONFIG, HIDDEN_FIELDS } from "@/app/config/roleConfig";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import ConfirmationModal from "@/components/common/ConfirmationModal"; // ✅ Import modal
 
 const BuyerPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // ✅ Use business_owner for API calls, super_admin for mapping (buyer fields)
+  // Use correct mapping between buyer <-> business_owner
   const {
     data,
     loading,
@@ -21,9 +22,9 @@ const BuyerPage = () => {
     handleSubmit,
   } = useUserProfile(id, "business_owner", "super_admin", ROLE_CONFIG, HIDDEN_FIELDS);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // ✅ Modal state
   const config = ROLE_CONFIG.super_admin;
 
-  // ✅ Define read-only fields explicitly
   const READ_ONLY_FIELDS = ["status", "isVerified", "isDeleted", "isApproved"];
 
   if (loading) {
@@ -53,6 +54,16 @@ const BuyerPage = () => {
       </div>
     );
   }
+
+  const handleSaveClick = () => {
+    if (!hasChanges) return;
+    setIsConfirmOpen(true);
+  };
+
+  const confirmSave = async () => {
+    setIsConfirmOpen(false);
+    await handleSubmit();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
@@ -157,7 +168,7 @@ const BuyerPage = () => {
               Cancel
             </Button>
             <Button
-              onClick={handleSubmit}
+              onClick={handleSaveClick}
               disabled={saving || !hasChanges}
               className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
             >
@@ -176,6 +187,17 @@ const BuyerPage = () => {
           </div>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmSave}
+        title="Confirm Save"
+        description="Are you sure you want to save these changes? This will update the buyer’s profile information."
+        confirmText="Save Changes"
+        cancelText="Cancel"
+        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+      />
     </div>
   );
 };

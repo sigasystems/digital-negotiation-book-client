@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Save, X, Building2 } from "lucide-react";
 import { FIELD_LABELS, ROLE_CONFIG, HIDDEN_FIELDS } from "@/app/config/roleConfig";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 const BusinessOwnerPage = () => {
   const { id } = useParams();
@@ -13,6 +14,8 @@ const BusinessOwnerPage = () => {
 
   const { data, loading, saving, hasChanges, handleChange, handleSubmit } =
     useUserProfile(id, "super_admin", "business_owner", ROLE_CONFIG, HIDDEN_FIELDS);
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // ✅ Modal control
 
   const config = ROLE_CONFIG.business_owner;
 
@@ -37,6 +40,16 @@ const BusinessOwnerPage = () => {
     );
   }
 
+  const handleSaveClick = () => {
+    if (!hasChanges) return;
+    setIsConfirmOpen(true);
+  };
+
+  const confirmSave = async () => {
+    setIsConfirmOpen(false);
+    await handleSubmit();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       {/* Header */}
@@ -47,7 +60,7 @@ const BusinessOwnerPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="hover:bg-slate-100"
+              className="hover:bg-slate-100 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Back</span>
@@ -139,15 +152,15 @@ const BusinessOwnerPage = () => {
               variant="outline"
               onClick={() => navigate(-1)}
               disabled={saving}
-              className="w-full sm:w-auto hover:bg-slate-100"
+              className="w-full sm:w-auto hover:bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={handleSubmit}
+              onClick={handleSaveClick}
               disabled={saving || !hasChanges}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50  cursor-pointer"
             >
               {saving ? (
                 <>
@@ -167,6 +180,17 @@ const BusinessOwnerPage = () => {
         {/* Spacer for mobile sticky button */}
         <div className="h-20 sm:hidden" />
       </main>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmSave}
+        title="Confirm Save"
+        description="Are you sure you want to save these changes? This will update the business owner's profile."
+        confirmText="Save Changes"
+        cancelText="Cancel"
+        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+      />
     </div>
   );
 };

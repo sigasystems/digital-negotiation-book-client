@@ -16,4 +16,10 @@ export const productService = {
 
   getAllProducts: (page, limit) =>
     api.get("/product/getall-products", { page, limit }),
+
+  getProductById: (id) => api.get(`/product/get-product/${id}`),
+
+  updateProduct: (id, data) => api.put(`/product/update-product/${id}`, data),
+
+  deleteProduct: (id) => api.delete(`/product/delete-product/${id}`),
 };
