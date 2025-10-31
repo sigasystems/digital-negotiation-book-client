@@ -1,4 +1,5 @@
 import { apiClient } from "@/utils/apiClient";
+import { get } from "react-hook-form";
 
 // 🔒 Helper to attach auth headers to every request
 const authConfig = (extra = {}) => ({
@@ -38,19 +39,7 @@ const api = {
 
   reviewBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}/review`, payload),
 
-  // ✅ Get All Payments (clean + fully aligned)
-  getAllPayments: ({
-    pageIndex = 1,
-    pageSize = 10,
-    status,
-    search,
-  } = {}) =>
-    api.get("/payments/getallpayments", {
-      pageIndex,
-      pageSize,
-      status,
-      search,
-    }),
+    getAllPayments : () => api.get("/payments/getallpayments") 
 };
 
 export default dashboardService;
