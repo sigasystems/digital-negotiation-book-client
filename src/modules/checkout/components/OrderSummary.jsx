@@ -189,8 +189,15 @@ export default function OrderSummary({
                 <span className="font-semibold text-slate-900">Total</span>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-slate-900">
-                    {calculateTotal()} {selectedPlan.currency}
-                  </p>
+  {selectedPlan.price === 0 ? (
+    <>You’re starting your <span className="text-green-600">trial plan</span> 🎉</>
+  ) : (
+    <>
+      {calculateTotal()} {selectedPlan.currency}
+    </>
+  )}
+</p>
+
                   <p className="text-xs text-slate-500">
                     per {billingCycle === "monthly" ? "month" : "year"}
                   </p>
