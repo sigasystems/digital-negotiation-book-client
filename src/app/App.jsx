@@ -23,6 +23,7 @@ import BusinessOwnerPage from "@/modules/dashboard/pages/BusinessOwnerPage";
 import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
 import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
 import ViewProduct from "@/modules/product/pages/ViewProduct";
+import CreateOfferDraft from "@/modules/offerDraft/pages/CreateOfferDraft";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -160,6 +161,14 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <ViewProduct />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-offer-draft"
+          element={
+            <ProtectedRoute user={user}>
+              <CreateOfferDraft />
             </ProtectedRoute>
           }
         />
