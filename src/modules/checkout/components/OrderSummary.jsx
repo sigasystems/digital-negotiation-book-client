@@ -53,7 +53,7 @@ export default function OrderSummary({
     setSubmitting(true);
 
     try {
-      // 1️⃣ Register user
+      // :one: Register user
       const registerRes = await apiClient.post("/auth/login", {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -66,7 +66,7 @@ export default function OrderSummary({
         return;
       }
 
-      // 2️⃣ Auto-login user
+      // :two: Login user automatically
       const data = await login({
         email: formData.email,
         password: formData.password,
@@ -79,6 +79,7 @@ export default function OrderSummary({
         sessionStorage.removeItem("user");
         sessionStorage.setItem("authToken", token);
         sessionStorage.setItem("user", JSON.stringify(tokenPayload));
+        // toast.success("Logged in successfully!");
       } else {
         const message =
           data?.data?.message || "Something went wrong! Please try again later.";
@@ -88,8 +89,7 @@ export default function OrderSummary({
 
       const user = tokenPayload;
       if (!user) throw new Error("Auto login failed");
-
-      // 3️⃣ Create Stripe checkout session
+      // :three: Create Stripe checkout session
       const paymentPayload = {
         userId: user.id,
         planId: selectedPlan.id,
@@ -100,7 +100,6 @@ export default function OrderSummary({
       if (paymentRes?.url) {
         showSuccess("Redirecting to Stripe checkout...");
 
-        // 4️⃣ Store pending business data for success page
         sessionStorage.setItem(
           "pendingBusinessData",
           JSON.stringify({
@@ -111,8 +110,19 @@ export default function OrderSummary({
           })
         );
 
-        // 5️⃣ Redirect to Stripe
         window.location.href = paymentRes.url;
+      const ownerPayload = {
+        planId: selectedPlan.id,
+        billingCycle,
+        userId: user.id,
+        ...formData,
+      };
+      const ownerRes = await becomeBusinessOwner(ownerPayload);
+      if (!ownerRes?.success) {
+        showError(ownerRes?.message || "Failed to create business owner.");
+        return;
+      }
+        console.log("All done ....!!!")
       } else {
         showError("Checkout URL not received from server.");
       }
