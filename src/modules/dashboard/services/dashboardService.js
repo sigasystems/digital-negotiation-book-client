@@ -20,7 +20,7 @@ const api = {
 };
 
 // 🧠 Business Owner API services
-export const dashboardService = {
+ const dashboardService = {
   createBusinessOwner: (payload) => api.post("/superadmin/create-business-owner", payload),
 
   getAllBusinessOwners: ({ pageIndex = 0, pageSize = 10, withBuyers = false } = {}) =>
@@ -37,4 +37,20 @@ export const dashboardService = {
   softDeleteBusinessOwner: (id) => api.delete(`/superadmin/business-owner/${id}`),
 
   reviewBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}/review`, payload),
+
+  // ✅ Get All Payments (clean + fully aligned)
+  getAllPayments: ({
+    pageIndex = 1,
+    pageSize = 10,
+    status,
+    search,
+  } = {}) =>
+    api.get("/payments/getallpayments", {
+      pageIndex,
+      pageSize,
+      status,
+      search,
+    }),
 };
+
+export default dashboardService;

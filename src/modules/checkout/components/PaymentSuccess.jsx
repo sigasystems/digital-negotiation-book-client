@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { becomeBusinessOwner } from "../services/paymentService";
 import { formatDate, formatTime } from "@/utils/formateDate";
 import { PaymentStatusView } from "../utils/statusPayment";
-import { useDispatch } from "react-redux";
 import { setPaymentId, setPaymentStatus } from "@/app/store/slices/paymentSlice";
+import { getAllPlans } from "@/modules/landing/services/planService";
 
 const CURRENCY_SYMBOL = {
   INR: "₹",
@@ -12,59 +13,22 @@ const CURRENCY_SYMBOL = {
   EUR: "€",
 };
 
-const MOCK_PLAN_PRICES = {
-  "745c7918-8b87-4498-ba8a-27f2eb98bfc8": {
-    name: "Pro",
-    priceMonthly: "299.00",
-    priceYearly: "2999.00",
-    currency: "INR",
-  },
-  "d1d98dd8-779e-4777-9ca7-19a1413ac78d": {
-    name: "Basic",
-    priceMonthly: "199.00",
-    priceYearly: "1999.00",
-    currency: "INR",
-  },
+// 🔹 utility to calculate plan end date
+const getNextBillingDate = (cycle) => {
+  const now = new Date();
+  const next = new Date(now);
+  cycle === "yearly"
+    ? next.setFullYear(now.getFullYear() + 1)
+    : next.setMonth(now.getMonth() + 1);
+  return next;
 };
 
+// 🔹 initial local data
 const getInitialOrderData = () => {
   try {
     const rawData = sessionStorage.getItem("pendingBusinessData");
-    const parsedData = rawData ? JSON.parse(rawData) : {};
-
-    const planId =
-      parsedData.planId || "d1d98dd8-779e-4777-9ca7-19a1413ac78d";
-    const billingCycle = parsedData.billingCycle || "monthly";
-
-    const planDetails =
-      MOCK_PLAN_PRICES[planId] ||
-      MOCK_PLAN_PRICES["d1d98dd8-779e-4777-9ca7-19a1413ac78d"];
-    const mockPriceKey =
-      billingCycle === "yearly" ? "priceYearly" : "priceMonthly";
-
-    const initialPrice = planDetails[mockPriceKey] || "199.00";
-    const currencyCode = planDetails.currency || "INR";
-
-    return {
-      businessName: parsedData.businessName || "Your Business",
-      email: parsedData.email || "user@example.com",
-      planId,
-      billingCycle,
-
-      planName: planDetails.name || "Basic Plan",
-      planPrice: initialPrice,
-      total: initialPrice,
-      currencySymbol: CURRENCY_SYMBOL[currencyCode] || "₹",
-      currencyCode,
-
-      cardLast4: "1234",
-      cardType: "Visa",
-      transactionId: "TXN-9876543210",
-      invoicePdf: null,
-      ...parsedData,
-    };
-  } catch (error) {
-    console.error("Failed to parse session storage data:", error);
+    return rawData ? JSON.parse(rawData) : {};
+  } catch {
     return {};
   }
 };
@@ -72,11 +36,34 @@ const getInitialOrderData = () => {
 export default function PaymentSuccess() {
   const [status, setStatus] = useState("processing");
   const [orderData, setOrderData] = useState(getInitialOrderData());
+  const [availablePlans, setAvailablePlans] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [setupError, setSetupError] = useState(null);
   const hasRun = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // 🔹 load plan data from backend
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const plans = await getAllPlans();
+        const planMap = plans.reduce((acc, p) => {
+          acc[p.id] = {
+            name: p.name,
+            priceMonthly: p.priceMonthly,
+            priceYearly: p.priceYearly,
+            currency: p.currency || "INR",
+          };
+          return acc;
+        }, {});
+        setAvailablePlans(planMap);
+      } catch (err) {
+        console.error("Failed to load plans:", err);
+      }
+    };
+    loadPlans();
+  }, []);
 
   const handleGoToDashboard = useCallback(() => {
     sessionStorage.removeItem("pendingBusinessData");
@@ -89,13 +76,17 @@ export default function PaymentSuccess() {
     navigate("/");
   }, [navigate]);
 
-  const formatPrice = (price) =>
-    `${orderData.currencySymbol}${parseFloat(price || "0").toFixed(2)}`;
+  const formatPrice = (price, symbol) =>
+    `${symbol}${parseFloat(price || "0").toFixed(2)}`;
 
   const handlePrintReceipt = () => {
     const w = window.open("", "_blank");
     w.document.write(
-      `<h1>Receipt</h1><p>Total: ${formatPrice(orderData.planPrice)}</p>`
+      `<h1>Receipt</h1>
+       <p>Plan: ${orderData.planName}</p>
+       <p>Amount: ${formatPrice(orderData.planPrice, orderData.currencySymbol)}</p>
+       <p>Transaction ID: ${orderData.transactionId}</p>
+       <p>Valid Till: ${orderData.planEndDate}</p>`
     );
     w.document.close();
     w.print();
@@ -107,46 +98,64 @@ export default function PaymentSuccess() {
       hasRun.current = true;
 
       const sessionData = getInitialOrderData();
-      const now = new Date();
-      const nextBillingDate = new Date(now);
-      sessionData.billingCycle === "yearly"
-        ? nextBillingDate.setFullYear(nextBillingDate.getFullYear() + 1)
-        : nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+      const planId =
+        sessionData.planId ||
+        Object.keys(availablePlans)[0] ||
+        "default-plan-id";
+      const billingCycle = sessionData.billingCycle || "monthly";
+      const planInfo = availablePlans[planId];
 
-      setOrderData((prev) => ({
-        ...prev,
+      if (!planInfo) return;
+
+      const now = new Date();
+      const nextBillingDate = getNextBillingDate(billingCycle);
+      const currencyCode = planInfo.currency || "INR";
+
+      const formattedData = {
         ...sessionData,
-        nextBilling: formatDate(nextBillingDate),
-        time: formatTime(now),
+        planId,
+        billingCycle,
+        planName: planInfo.name,
+        planPrice:
+          billingCycle === "yearly"
+            ? planInfo.priceYearly
+            : planInfo.priceMonthly,
+        currencyCode,
+        currencySymbol: CURRENCY_SYMBOL[currencyCode] || "₹",
         date: formatDate(now),
-      }));
+        time: formatTime(now),
+        planStartDate: formatDate(now),
+        planEndDate: formatDate(nextBillingDate),
+        nextBilling: formatDate(nextBillingDate),
+      };
+
+      setOrderData(formattedData);
 
       try {
+        // animated fake steps
         for (let i = 1; i <= 4; i++) {
           setCurrentStep(i);
           await new Promise((r) => setTimeout(r, 600));
         }
 
-        const res = await becomeBusinessOwner(sessionData);
+        const res = await becomeBusinessOwner(formattedData);
 
         if (res?.success && res.data) {
           dispatch(setPaymentId(res.data.paymentId || null));
           dispatch(setPaymentStatus("success"));
 
-          // ✅ Update stored user role after success
           const existingUser = sessionStorage.getItem("user");
           if (existingUser) {
             try {
               const userObj = JSON.parse(existingUser);
-              userObj.userRole = "business_owner"; // update role
-              if (res.data.userId) userObj.id = res.data.userId; // optional if backend returns it
+              userObj.userRole = "business_owner";
+              if (res.data.userId) userObj.id = res.data.userId;
               sessionStorage.setItem("user", JSON.stringify(userObj));
             } catch (e) {
-              console.warn("Failed to update user role in session:", e);
+              console.warn("Failed to update user role:", e);
             }
           }
 
-          // ✅ also mark setup complete
           sessionStorage.setItem("businessSetupComplete", "true");
 
           setOrderData((prev) => ({
@@ -168,8 +177,8 @@ export default function PaymentSuccess() {
       }
     };
 
-    handleBusinessCreation();
-  }, [dispatch]);
+    if (Object.keys(availablePlans).length) handleBusinessCreation();
+  }, [dispatch, availablePlans]);
 
   return (
     <PaymentStatusView
@@ -180,11 +189,9 @@ export default function PaymentSuccess() {
       handleGoToDashboard={handleGoToDashboard}
       handleReturnToPricing={handleReturnToPricing}
       handlePrintReceipt={handlePrintReceipt}
-      formatPrice={formatPrice}
+      formatPrice={(price) =>
+        formatPrice(price, orderData.currencySymbol || "₹")
+      }
     />
   );
 }
-
-
-
-
