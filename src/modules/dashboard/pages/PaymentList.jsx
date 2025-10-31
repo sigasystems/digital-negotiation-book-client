@@ -1,12 +1,19 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Loader2, CheckCircle, XCircle, CreditCard, Search } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+  Search,
+} from "lucide-react";
 import dashboardService from "../services/dashboardService";
+import { Pagination } from "@/utils/Pagination";
 
 const PaymentList = () => {
   const [payments, setPayments] = useState([]);
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
@@ -16,11 +23,12 @@ const PaymentList = () => {
     setLoading(true);
     try {
       const res = await dashboardService.getAllPayments({
-        pageIndex,
+        pageIndex: pageIndex + 1, // backend is 1-based
         pageSize,
         status: statusFilter,
         search,
       });
+
       const data = res?.data?.data || {};
       setPayments(data.payments || []);
       setTotal(data.total || 0);
@@ -33,7 +41,7 @@ const PaymentList = () => {
 
   useEffect(() => {
     fetchPayments();
-  }, [pageIndex, statusFilter]);
+  }, [pageIndex, pageSize, statusFilter]);
 
   const totalPages = Math.ceil(total / pageSize) || 1;
 
@@ -70,7 +78,10 @@ const PaymentList = () => {
           </select>
 
           <button
-            onClick={fetchPayments}
+            onClick={() => {
+              setPageIndex(0);
+              fetchPayments();
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition"
           >
             Apply
@@ -102,76 +113,89 @@ const PaymentList = () => {
               </tr>
             </thead>
             <tbody>
-              {payments.map((p, idx) => ( 
-                <tr
-                  key={p.id || idx}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="p-3 border-b text-gray-600">
-                    {(pageIndex - 1) * pageSize + idx + 1}
-                  </td>
-                  <td className="p-3 border-b text-gray-900">
-                    <div className="font-medium">
-                      {p.User
-                        ? `${p.User.first_name} ${p.User.last_name}`
-                        : "Unknown User"}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {p.User?.email || "No email"}
-                    </div>
-                  </td>
-                  <td className="p-3 border-b text-gray-800">
-                    <div className="font-semibold">{p.Plan?.name || "—"}</div>
-                    <div className="text-xs text-gray-500">
-                      {p.Plan?.billingCycle || "N/A"}
-                    </div>
-                  </td>
-                  <td className="p-3 border-b font-medium text-gray-900">
-                    ₹{p.amount}
-                  </td>
-                  <td className="p-3 border-b">
-                    {p.status === "success" ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
-                        <CheckCircle className="w-3 h-3" /> Success
-                      </span>
-                    ) : p.status === "failed" ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full">
-                        <XCircle className="w-3 h-3" /> Failed
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">
-                        Pending
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3 border-b text-gray-700">
-                    {p.paymentMethod || "—"}
-                  </td>
-                  <td className="p-3 border-b text-gray-600">
-                    {new Date(p.createdAt).toLocaleString("en-IN", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
-                  </td>
-                  <td className="p-3 border-b text-gray-600 text-xs font-mono">
-                    {p.transactionId || "—"}
-                  </td>
-                  <td className="p-3 border-b">
-                    {p.invoicePdf ? (
-                      <a
-                        href={p.invoicePdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm"
-                      >
-                        View
-                      </a>
-                    ) : (
-                      <span className="text-gray-400 text-sm">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {payments.map((p, idx) => {
+                const isTrial = p.amount === 0;
+                return (
+                  <tr
+                    key={p.id || idx}
+                    className={`hover:bg-gray-50 transition-colors ${
+                      isTrial ? "bg-yellow-50" : ""
+                    }`}
+                  >
+                    <td className="p-3 border-b text-gray-600">
+                      {pageIndex * pageSize + idx + 1}
+                    </td>
+                    <td className="p-3 border-b text-gray-900">
+                      <div className="font-medium">
+                        {p.User
+                          ? `${p.User.first_name} ${p.User.last_name}`
+                          : "Unknown User"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {p.User?.email || "No email"}
+                      </div>
+                    </td>
+                    <td className="p-3 border-b text-gray-800">
+                      <div className="font-semibold">
+                        {p.Plan?.name || (isTrial ? "Trial Plan" : "—")}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {p.Plan?.billingCycle || (isTrial ? "Trial Period" : "N/A")}
+                      </div>
+                    </td>
+                    <td
+                      className={`p-3 border-b font-medium ${
+                        isTrial ? "text-amber-600" : "text-gray-900"
+                      }`}
+                    >
+                      {isTrial ? "Trial Plan" : `₹${p.amount}`}
+                    </td>
+                    <td className="p-3 border-b">
+                      {p.status === "success" ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                          <CheckCircle className="w-3 h-3" /> Success
+                        </span>
+                      ) : p.status === "failed" ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full">
+                          <XCircle className="w-3 h-3" /> Failed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">
+                          Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-3 border-b text-gray-700">
+                      {p.paymentMethod || (isTrial ? "Trial Access" : "—")}
+                    </td>
+                    <td className="p-3 border-b text-gray-600">
+                      {new Date(p.createdAt).toLocaleString("en-IN", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </td>
+                    <td className="p-3 border-b text-gray-600 text-xs font-mono">
+                      {p.transactionId || (isTrial ? "Trial Session" : "—")}
+                    </td>
+                    <td className="p-3 border-b">
+                      {p.invoicePdf ? (
+                        <a
+                          href={p.invoicePdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">
+                          {isTrial ? "N/A" : "—"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -179,37 +203,16 @@ const PaymentList = () => {
 
       {/* Pagination */}
       {payments.length > 0 && (
-        <div className="flex items-center justify-between mt-6 text-sm">
-          <button
-            onClick={() => setPageIndex((prev) => Math.max(1, prev - 1))}
-            disabled={pageIndex === 1}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              pageIndex === 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            Prev
-          </button>
-
-          <p className="text-gray-700">
-            Page {pageIndex} of {totalPages}
-          </p>
-
-          <button
-            onClick={() =>
-              setPageIndex((prev) => Math.min(totalPages, prev + 1))
-            }
-            disabled={pageIndex === totalPages}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              pageIndex === totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          pageIndex={pageIndex}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={(page) => setPageIndex(page)}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPageIndex(0);
+          }}
+        />
       )}
     </div>
   );
