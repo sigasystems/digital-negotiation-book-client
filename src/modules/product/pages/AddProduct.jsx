@@ -6,6 +6,7 @@ import { InputField } from "@/components/common/InputField";
 import { Toast } from "@/components/common/Toast";
 import { productService } from "../services";
 import { useToast } from "@/app/hooks/useToast";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 // 🧩 Reusable size field group
 const SizeFields = memo(({ sizes, onChange, onAdd, onRemove }) => {
@@ -66,6 +67,7 @@ const AddProduct = () => {
     { code: "", productName: "", species: "", size: [""] },
   ]);
   const [loading, setLoading] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // ✅ Update field inside a product
   const handleChange = useCallback((index, e) => {
@@ -120,10 +122,9 @@ const AddProduct = () => {
     []
   );
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // ✅ Validate all products
     for (const [i, p] of products.entries()) {
       if (!p.code.trim() || !p.productName.trim() || !p.species.trim()) {
         showToast("error", `All fields are required for product ${i + 1}.`);
@@ -135,6 +136,12 @@ const AddProduct = () => {
       }
     }
 
+    setIsConfirmOpen(true);
+  };
+
+  const confirmSubmit = async () => {
+    setIsConfirmOpen(false);
+
     const payload = products.map((p) => ({
       code: p.code,
       productName: p.productName,
@@ -143,6 +150,8 @@ const AddProduct = () => {
     }));
 
     setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
       await productService.createProducts(payload);
       showToast("success", "Products added successfully!");
@@ -165,6 +174,17 @@ const AddProduct = () => {
         ))}
       </div>
 
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmSubmit}
+        title="Confirm Product Addition"
+        description="Are you sure you want to add these products? Please double-check the details before proceeding."
+        confirmText="Yes, Add Products"
+        cancelText="Cancel"
+        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+      />
+
       <div className="max-w-5xl mx-auto w-full">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:gap-4 mb-6 sm:mb-8">
@@ -178,9 +198,9 @@ const AddProduct = () => {
           </button>
 
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 flex items-center gap-3 mb-2">
               Add Products
-              {loading && <Spinner className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />}
+              {loading && <Spinner size="md" variant="default" />}
             </h1>
             <p className="text-gray-600 text-xs sm:text-sm">
               Register multiple products under your business (up to 5 at once)
@@ -195,7 +215,6 @@ const AddProduct = () => {
         >
           {products.map((p, index) => (
             <div key={index} className="border-b border-gray-200 last:border-b-0">
-              {/* Header */}
               <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5 md:px-10 md:py-6 bg-gray-50">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="p-2 sm:p-3 bg-indigo-50 rounded-lg text-indigo-600">
@@ -216,7 +235,7 @@ const AddProduct = () => {
                 )}
               </div>
 
-              {/* Product fields */}
+              {/* Product Fields */}
               <div className="px-4 py-5 sm:px-6 sm:py-6 md:px-10 md:py-8 space-y-5 sm:space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                   <InputField
@@ -269,9 +288,8 @@ const AddProduct = () => {
             </div>
           ))}
 
-          {/* Footer Actions */}
+          {/* Footer */}
           <div className="px-4 py-5 sm:px-6 sm:py-6 md:px-10 md:py-8 bg-gray-50">
-            {/* Add Another Product Button */}
             <div className="mb-4 sm:mb-5">
               <button
                 type="button"
@@ -284,7 +302,6 @@ const AddProduct = () => {
               </button>
             </div>
 
-            {/* Submit/Cancel Buttons */}
             <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
               <button
                 type="button"
@@ -301,7 +318,7 @@ const AddProduct = () => {
               >
                 {loading ? (
                   <>
-                    <Spinner className="w-4 h-4" />
+                    <Spinner size="sm" variant="light" />
                     <span>Adding...</span>
                   </>
                 ) : (

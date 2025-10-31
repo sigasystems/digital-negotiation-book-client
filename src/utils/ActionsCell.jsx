@@ -3,38 +3,19 @@ import { Button } from "@headlessui/react";
 import { useState, useMemo } from "react";
 import ViewContent from "@/components/common/ViewContent";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
+import { productService } from "@/modules/product/services";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { Spinner } from "@/components/ui/spinner";
 
 export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
   const [loadingAction, setLoadingAction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
   const [details, setDetails] = useState(null);
 
 const navigate = useNavigate();
-
-const navigateToEditPage = () => {
-  if (!record?.id) {
-    toast.error("Invalid record");
-    return;
-  }
-
-  switch (role) {
-    case "super_admin":
-      navigate(`/business-owner/${record.id}`, { state: record });
-      break;
-
-    case "business_owner":
-      navigate(`/buyer/${record.id}`, { state: record });
-      break;
-
-    default:
-      toast.error(`Unsupported role: ${role}`);
-      break;
-  }
-};
-
-
   const userInfo = JSON.parse(sessionStorage.getItem("user") || "{}");
   const role = userInfo?.userRole
 
@@ -55,11 +36,53 @@ const navigateToEditPage = () => {
       toast.error(getErrorMessage(err, fallbackError));
     } finally {
       setLoadingAction(null);
+      setPendingAction(null);
     }
   };
 
+  const navigateToEditPage = () => {
+    if (!record?.id) {
+      toast.error("Invalid record");
+      return;
+    }
+
+    const entityType =
+      record?.type ||
+      (record.productName ? "product" : null) ||
+      (record.businessName ? "business_owner" : null) ||
+      (record.buyersCompanyName ? "buyer" : null);
+
+    switch (entityType) {
+      case "product":
+        navigate(`/product/${record.id}`, { state: record });
+        break;
+      case "business_owner":
+        navigate(`/business-owner/${record.id}`, { state: record });
+        break;
+      case "buyer":
+        navigate(`/buyer/${record.id}`, { state: record });
+        break;
+      default:
+        toast.error(`Unsupported entity type: ${entityType || "unknown"}`);
+        break;
+    }
+  };
+
+  const getRecordDisplayName = (record) =>
+    record.businessName ||
+    record.buyersCompanyName ||
+    `${record.first_name || ""} ${record.last_name || ""}`.trim() ||
+    record.productName ||
+    record.name ||
+    "this record";
+
   const actionHandlers = {
     view: async () => {
+      if (record.productName || record.type === "product") {
+        navigate(`/product/${record.id}`, { state: record });
+        return;
+      }
+
       setLoadingAction("view");
       try {
         const data = await roleBasedDataService.getById(role, record);
@@ -74,41 +97,74 @@ const navigateToEditPage = () => {
     },
 
     edit: () => {
+      setLoadingAction("edit");
       navigateToEditPage();
+      setTimeout(() => setLoadingAction(null), 300); // small UX delay
     },
 
-    activate: () =>
-      runAction(
-        "activate",
-        () => roleBasedDataService.activate(role, record.id),
-        "Activated successfully",
-        "Failed to activate record"
-      ),
+    activate: () => {
+      const name = getRecordDisplayName(record);
+      setPendingAction({
+        key: "activate",
+        title: "Activate Record",
+        description: `Are you sure you want to activate ${name}?`,
+        fn: () =>
+          runAction(
+            "activate",
+            () => roleBasedDataService.activate(role, record.id),
+            `${name} activated successfully`,
+            `Failed to activate ${name}`
+          ),
+      });
+    },
 
-    deactivate: () =>
-      runAction(
-        "deactivate",
-        () => roleBasedDataService.deactivate(role, record.id),
-        "Deactivated successfully",
-        "Failed to deactivate record"
-      ),
+    deactivate: () => {
+      const name = getRecordDisplayName(record);
+      setPendingAction({
+        key: "deactivate",
+        title: "Deactivate Record",
+        description: `Are you sure you want to deactivate ${name}?`,
+        fn: () =>
+          runAction(
+            "deactivate",
+            () => roleBasedDataService.deactivate(role, record.id),
+            `${name} deactivated successfully`,
+            `Failed to deactivate ${name}`
+          ),
+      });
+    },
 
     delete: () => {
-      if (!window.confirm("Are you sure you want to delete this record?")) return;
-      runAction(
-        "delete",
-        () => roleBasedDataService.softDelete(role, record.id),
-        "Deleted successfully",
-        "Failed to delete record"
-      );
+      const name = getRecordDisplayName(record);
+      const isProduct = record.productName || record.type === "product";
+
+      setPendingAction({
+        key: "delete",
+        title: "Delete Record",
+        description: `Are you sure you want to delete ${name}? This action cannot be undone.`,
+        fn: () =>
+          runAction(
+            "delete",
+            async () => {
+              if (isProduct) {
+                await productService.deleteProduct(record.id); // ✅ direct API
+              } else {
+                await roleBasedDataService.softDelete(role, record.id);
+              }
+            },
+            `${name} deleted successfully`,
+            `Failed to delete ${name}`
+          ),
+      });
     },
 
     update: () => {
+      setLoadingAction("update");
       navigateToEditPage();
+      setTimeout(() => setLoadingAction(null), 300);
     },
   };
 
-  /** ✅ Icon + color mapping */
   const actionIcons = {
     view: { icon: Eye, color: "text-blue-600 hover:bg-blue-50" },
     edit: { icon: Edit, color: "text-indigo-600 hover:bg-indigo-50" },
@@ -148,13 +204,34 @@ const navigateToEditPage = () => {
             onClick={handler}
             disabled={!!loadingAction}
             className={`p-1 rounded-md transition-colors duration-150 ${color} ${
-              loadingAction === key ? "opacity-50 cursor-wait" : "cursor-pointer"
+              loadingAction === key ? "opacity-70 cursor-wait" : "cursor-pointer"
             }`}
           >
-            <Icon className="w-4 h-4" />
+            {loadingAction === key ? (
+              <Spinner className="size-4" />
+            ) : (
+              <Icon className="w-4 h-4" />
+            )}
           </Button>
         ))}
       </div>
+
+      {pendingAction && (
+        <ConfirmationModal
+          isOpen={!!pendingAction}
+          onClose={() => setPendingAction(null)}
+          onConfirm={pendingAction.fn}
+          title={pendingAction.title}
+          description={pendingAction.description}
+          confirmText="Yes"
+          cancelText="No"
+          confirmButtonColor={
+            pendingAction.key === "delete"
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-blue-600 hover:bg-blue-700"
+          }
+        />
+      )}
 
       <ViewContent
         isOpen={isModalOpen}
