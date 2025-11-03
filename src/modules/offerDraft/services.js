@@ -11,19 +11,19 @@ const api = {
 };
 
 // Offer Draft API services
-export const offerDraftServices = {
+export const offerDraftService = {
   // ✅ Create Offer Draft
   createDraft: (data) => api.post("/offer-draft/create-draft", data),
 
-  // ✅ Get all drafts (optional if you’ll need listing)
-  getAllDrafts: (params) => api.get("/offer-drafts", params),
+  // ✅ Get all drafts with pagination
+  getAllOfferDrafts: ({ pageIndex = 0, pageSize = 10 } = {}) => api.get("/offer-draft/get-all", { pageIndex, pageSize }),
 
   // ✅ Get a single draft by ID
-  getDraftById: (id) => api.get(`/offer-drafts/${id}`),
+  getDraftById: (id) => api.get(`/offer-draft/get/${id}`),
 
   // ✅ Update a draft by ID
-  updateDraft: (id, data) => api.put(`/offer-drafts/${id}`, data),
+  updateDraft: (id, data) => api.patch(`/offer-draft/update/${id}`, data),
 
   // ✅ Delete a draft by ID
-  deleteDraft: (id) => api.delete(`/offer-drafts/${id}`),
+  deleteDraft: (id) => api.delete(`/offer-draft/${id}`),
 };

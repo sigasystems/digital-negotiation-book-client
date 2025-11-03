@@ -41,18 +41,22 @@ const navigate = useNavigate();
   };
 
   const navigateToEditPage = () => {
-    if (!record?.id) {
+    if (!record?.id && !record?.draftNo) {
       toast.error("Invalid record");
       return;
     }
 
     const entityType =
       record?.type ||
+      (record.draftNo ? "offer_draft" : null) ||
       (record.productName ? "product" : null) ||
       (record.businessName ? "business_owner" : null) ||
       (record.buyersCompanyName ? "buyer" : null);
 
     switch (entityType) {
+      case "offer_draft":
+        navigate(`/offer-draft/${record.draftNo}`, { state: record });
+        break;
       case "product":
         navigate(`/product/${record.id}`, { state: record });
         break;
@@ -78,6 +82,11 @@ const navigate = useNavigate();
 
   const actionHandlers = {
     view: async () => {
+      if (record.draftNo || record.type === "offer_draft") {
+        navigate(`/offer-draft/${record.draftNo || record.id}`, { state: record });
+        return;
+      }
+
       if (record.productName || record.type === "product") {
         navigate(`/product/${record.id}`, { state: record });
         return;
