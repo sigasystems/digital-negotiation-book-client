@@ -7,6 +7,7 @@ import { productService } from "@/modules/product/services";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { offerDraftService } from "@/modules/offerDraft/services";
 import { Spinner } from "@/components/ui/spinner";
 
 export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
@@ -25,15 +26,27 @@ const navigate = useNavigate();
   const getErrorMessage = (err, fallback = "Something went wrong") =>
     err?.response?.data?.message || err?.message || fallback;
 
+  const actionLoadingMessages = {
+    activate: "Activating...",
+    deactivate: "Deactivating...",
+    delete: "Deleting...",
+    update: "Updating...",
+    edit: "Opening editor...",
+    view: "Loading...",
+  };
+
   const runAction = async (key, fn, successMsg, fallbackError) => {
     setLoadingAction(key);
+    const toastId = toast.loading(actionLoadingMessages[key] || "Processing...");
     try {
+      await new Promise((res) => setTimeout(res, 2000));
+
       await fn();
-      if (successMsg) toast.success(successMsg);
+      toast.success(successMsg || "Action completed", { id: toastId });
       refreshData?.();
     } catch (err) {
       console.error(`${key} failed:`, err);
-      toast.error(getErrorMessage(err, fallbackError));
+      toast.error(getErrorMessage(err, fallbackError), { id: toastId });
     } finally {
       setLoadingAction(null);
       setPendingAction(null);
@@ -93,13 +106,15 @@ const navigate = useNavigate();
       }
 
       setLoadingAction("view");
+      const toastId = toast.loading("Fetching details...");
       try {
         const data = await roleBasedDataService.getById(role, record);
         setDetails(data);
         setIsModalOpen(true);
+        toast.success("Loaded successfully", { id: toastId });
       } catch (err) {
         console.error("Error fetching details:", err);
-        toast.error(getErrorMessage(err, "Failed to fetch details"));
+        toast.error(getErrorMessage(err, "Failed to fetch details"), { id: toastId });
       } finally {
         setLoadingAction(null);
       }
@@ -107,8 +122,9 @@ const navigate = useNavigate();
 
     edit: () => {
       setLoadingAction("edit");
+      toast.loading("Opening edit page...", { duration: 1500 });
       navigateToEditPage();
-      setTimeout(() => setLoadingAction(null), 300); // small UX delay
+      setTimeout(() => setLoadingAction(null), 300);
     },
 
     activate: () => {
@@ -144,8 +160,18 @@ const navigate = useNavigate();
     },
 
     delete: () => {
-      const name = getRecordDisplayName(record);
       const isProduct = record.productName || record.type === "product";
+      const isOfferDraft = record.draftNo || record.type === "offer_draft";
+
+      let name;
+      if (isOfferDraft) {
+        const draftName = record.draftName ? record.draftName.trim() : "";
+        name = `Offer Draft ${draftName} (${record.draftNo || record.id})`;
+      } else if (isProduct) {
+        name = record.productName || "Product";
+      } else {
+        name = getRecordDisplayName(record);
+      }
 
       setPendingAction({
         key: "delete",
@@ -155,8 +181,10 @@ const navigate = useNavigate();
           runAction(
             "delete",
             async () => {
-              if (isProduct) {
-                await productService.deleteProduct(record.id); // ✅ direct API
+              if (isOfferDraft) {
+                await offerDraftService.deleteDraft(record.draftNo || record.id);
+              } else if (isProduct) {
+                await productService.deleteProduct(record.id);
               } else {
                 await roleBasedDataService.softDelete(role, record.id);
               }
@@ -165,12 +193,6 @@ const navigate = useNavigate();
             `Failed to delete ${name}`
           ),
       });
-    },
-
-    update: () => {
-      setLoadingAction("update");
-      navigateToEditPage();
-      setTimeout(() => setLoadingAction(null), 300);
     },
   };
 
