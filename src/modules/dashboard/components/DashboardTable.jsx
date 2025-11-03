@@ -36,7 +36,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted"];
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -71,18 +71,24 @@ export default function DashboardTable({
             header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
+              const isActive =
+                status === "active" ||
+                status === "open" ||
+                status === true ||
+                status === "yes";
+
               return (
                 <span
                   className={`flex items-center gap-2 font-medium ${
-                    status === "active" ? "text-green-600" : "text-red-600"
+                    isActive ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   <Circle
                     className={`w-3 h-3 ${
-                      status === "active" ? "fill-green-500" : "fill-red-500"
+                      isActive ? "fill-green-500" : "fill-red-500"
                     }`}
                   />
-                  {status}
+                  {String(status)}
                 </span>
               );
             },
@@ -103,10 +109,74 @@ export default function DashboardTable({
           };
         }
 
+        if (key === "sizeBreakups") {
+          return {
+            id: key,
+            accessorKey: key,
+            header: "Size Breakups",
+            cell: ({ row }) => {
+              const breakups = row.original.sizeBreakups;
+              if (!Array.isArray(breakups) || !breakups.length) return "-";
+
+              return (
+                <div className="flex flex-col gap-1">
+                  {breakups.map((b, i) => (
+                    <ul
+                      key={i}
+                      className="text-xs flex flex-row gap-1"
+                    >
+                      <li>
+                        <strong>Size:</strong> {b.size ?? "-"}
+                      </li>
+                      <li>
+                        <strong>Breakup:</strong> {b.breakup ?? "-"}
+                      </li>
+                      <li>
+                        <strong>Price:</strong> ${b.price ?? "-"}
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              );
+            },
+          };
+        }
+
         return {
           id: key,
           accessorKey: key,
           header: key.charAt(0).toUpperCase() + key.slice(1),
+          cell: ({ row }) => {
+            const value = row.getValue(key);
+
+            if (Array.isArray(value)) {
+              return (
+                <div className="flex flex-col gap-1">
+                  {value.map((v, i) => (
+                    <span key={i} className="text-gray-700 text-sm">
+                      {typeof v === "object"
+                        ? Object.entries(v)
+                            .map(([k, val]) => `${k}: ${val}`)
+                            .join(", ")
+                        : String(v ?? "")}
+                    </span>
+                  ))}
+                </div>
+              );
+            }
+
+            if (typeof value === "object" && value !== null) {
+              return (
+                <span className="text-gray-700 text-sm">
+                  {Object.entries(value)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join(", ")}
+                </span>
+              );
+            }
+
+            return <span className="text-gray-700">{String(value ?? "")}</span>;
+          },
         };
       });
 
@@ -142,13 +212,12 @@ return actionsColumn
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
-        {table.getAllColumns().some(col => col.id === filterKey) && (
+        {table.getAllColumns().some((col) => col.id === filterKey) && (
           <div className="mb-4">
             <Input
               placeholder={`Filter by ${filterKey
-                .replace(/([A-Z])/g, " $1") // adds space before capital letters
-                .replace(/^./, (str) => str.toUpperCase()) // capitalize first letter
-              }...`}
+                .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (str) => str.toUpperCase())}...`}
               value={table.getColumn(filterKey)?.getFilterValue() || ""}
               onChange={(e) =>
                 table.getColumn(filterKey)?.setFilterValue(e.target.value)

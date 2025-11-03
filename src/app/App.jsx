@@ -25,6 +25,8 @@ import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
 import ViewProduct from "@/modules/product/pages/ViewProduct";
 import CreateOfferDraft from "@/modules/offerDraft/pages/CreateOfferDraft";
 import PaymentList from "@/modules/dashboard/pages/PaymentList";
+import OfferDrafts from "@/modules/offerDraft/pages/OfferDrafts";
+import ViewOfferDraft from "@/modules/offerDraft/pages/ViewOfferDraft";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -178,6 +180,22 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <CreateOfferDraft />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/offer-draft"
+          element={
+            <ProtectedRoute user={user}>
+              <OfferDrafts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/offer-draft/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <ViewOfferDraft />
             </ProtectedRoute>
           }
         />

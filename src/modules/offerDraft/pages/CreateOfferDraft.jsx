@@ -1,13 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
-import { offerDraftServices } from "../services";
-import { InputField } from "@/components/common/InputField";
+import { offerDraftService } from "../services";
 
 import Header from "../components/Header";
 import Section from "../components/Section";
 import ReadOnlyField from "../components/ReadOnlyField";
-// import DatePicker from "../components/DatePicker";
+import { InputField } from "@/components/common/InputField";
+import DatePicker from "../components/DatePicker";
 import ProductSection from "../components/ProductSection";
 import Footer from "../components/Footer";
 
@@ -21,6 +21,60 @@ const REQUIRED_FIELDS = [
 ];
 
 const EMPTY_BREAKUP = { size: "", breakup: "", price: "" };
+
+  const validateForm = (formData, total) => {
+    for (const field of REQUIRED_FIELDS) {
+      if (!formData[field]?.trim())
+        return `${field.replace(/([A-Z])/g, " $1")} is required`;
+    }
+
+    for (const [i, s] of formData.sizeBreakups.entries()) {
+      if (!s.size || !s.breakup || !s.price)
+        return `All fields required in size breakup row ${i + 1}`;
+      if (isNaN(+s.breakup) || isNaN(+s.price))
+        return `Breakup/Price must be numeric in row ${i + 1}`;
+    }
+
+    const grand = +formData.grandTotal;
+    if (isNaN(grand)) return "Grand total must be numeric.";
+    if (grand !== total)
+      return `Grand Total (${grand}) must equal Total (${total}).`;
+
+    return null;
+  };
+
+  const validateDates = (offerValidityDate, shipmentDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (offerValidityDate && offerValidityDate < today)
+      return "Offer validity date cannot be earlier than today.";
+
+    if (shipmentDate && shipmentDate < today)
+      return "Shipment date cannot be earlier than today.";
+
+    if (shipmentDate && offerValidityDate && shipmentDate < offerValidityDate)
+      return "Shipment date cannot be earlier than the offer validity date.";
+
+    return null;
+  };
+
+  const formatPayload = (formData, total) => ({
+    ...formData,
+    total,
+    grandTotal: +formData.grandTotal,
+    offerValidityDate: formData.offerValidityDate
+      ? format(new Date(formData.offerValidityDate), "yyyy-MM-dd")
+      : null,
+    shipmentDate: formData.shipmentDate
+      ? format(new Date(formData.shipmentDate), "yyyy-MM-dd")
+      : null,
+    sizeBreakups: formData.sizeBreakups.map((s) => ({
+      size: s.size,
+      breakup: +s.breakup,
+      price: +s.price,
+    })),
+  });
 
 const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -63,27 +117,27 @@ const CreateOfferDraft = () => {
   );
 
   /* ---------------- HANDLERS ---------------- */
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleBreakupChange = (index, field, value) => {
+  const handleBreakupChange = useCallback((index, field, value) => {
     setFormData((prev) => {
       const updated = [...prev.sizeBreakups];
-      if (!updated[index]) return prev;
       updated[index] = { ...updated[index], [field]: value };
       return { ...prev, sizeBreakups: updated };
     });
-  };
+  }, []);
 
-  const addBreakupRow = () =>
+  const handleAddRow = useCallback(() => {
     setFormData((prev) => ({
       ...prev,
       sizeBreakups: [...prev.sizeBreakups, { ...EMPTY_BREAKUP }],
     }));
+  }, []);
 
-  const removeBreakupRow = (index) =>
+  const handleRemoveRow = useCallback((index) => {
     setFormData((prev) => {
       const updated = prev.sizeBreakups.filter((_, i) => i !== index);
       return {
@@ -91,61 +145,37 @@ const CreateOfferDraft = () => {
         sizeBreakups: updated.length ? updated : [{ ...EMPTY_BREAKUP }],
       };
     });
+  }, []);
 
-  const handleDateSelect = (key, date) => {
+  const handleDateSelect = useCallback((key, date) => {
     if (!date) return;
     setFormData((prev) => ({ ...prev, [key]: format(date, "yyyy-MM-dd") }));
     setOpenPicker((prev) => ({
       ...prev,
       [key === "offerValidityDate" ? "validity" : "shipment"]: false,
     }));
-  };
-
-  const validateForm = () => {
-    for (const f of REQUIRED_FIELDS)
-      if (!formData[f]?.trim())
-        return `${f.replace(/([A-Z])/g, " $1")} is required`;
-
-    for (const [i, s] of formData.sizeBreakups.entries()) {
-      if (!s.size || !s.breakup || !s.price)
-        return `All fields required in size breakup row ${i + 1}`;
-      if (isNaN(+s.breakup) || isNaN(+s.price))
-        return `Breakup/Price must be numeric in row ${i + 1}`;
-    }
-
-    const grand = +formData.grandTotal;
-    if (isNaN(grand)) return "Grand total must be numeric.";
-    if (grand !== total)
-      return `Grand Total (${grand}) must equal Total (${total}).`;
-
-    return null;
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = validateForm();
-    if (error) return toast.error(error);
+
+    const formError = validateForm(formData, total);
+    if (formError) return toast.error(formError);
+
+    const offerDate = formData.offerValidityDate
+      ? new Date(formData.offerValidityDate)
+      : null;
+    const shipDate = formData.shipmentDate
+      ? new Date(formData.shipmentDate)
+      : null;
+
+    const dateError = validateDates(offerDate, shipDate);
+    if (dateError) return toast.error(dateError);
 
     setLoading(true);
     try {
-      const payload = {
-        ...formData,
-        total,
-        grandTotal: +formData.grandTotal,
-        offerValidityDate: formData.offerValidityDate
-          ? new Date(formData.offerValidityDate)
-          : null,
-        shipmentDate: formData.shipmentDate
-          ? new Date(formData.shipmentDate)
-          : null,
-        sizeBreakups: formData.sizeBreakups.map((s) => ({
-          size: s.size,
-          breakup: +s.breakup,
-          price: +s.price,
-        })),
-      };
-
-      const res = await offerDraftServices.createDraft(payload);
+      const payload = formatPayload(formData, total);
+      const res = await offerDraftService.createDraft(payload);
       if (res?.status === 201 || res?.data?.success) {
         toast.success("Offer draft created successfully!");
         setFormData(initialForm);
@@ -211,18 +241,38 @@ const CreateOfferDraft = () => {
             </div>
           </Section>
 
-          {/* DRAFT DETAILS + PRODUCT SECTION */}
+          <Section title="📅 Dates">
+            <div className="grid sm:grid-cols-2 gap-6">
+              <DatePicker
+                label="Offer Validity Date"
+                value={formData.offerValidityDate}
+                onSelect={(date) => handleDateSelect("offerValidityDate", date)}
+                open={openPicker.validity}
+                setOpen={(val) =>
+                  setOpenPicker((p) => ({ ...p, validity: val }))
+                }
+              />
+              <DatePicker
+                label="Shipment Date"
+                value={formData.shipmentDate}
+                onSelect={(date) => handleDateSelect("shipmentDate", date)}
+                open={openPicker.shipment}
+                setOpen={(val) =>
+                  setOpenPicker((p) => ({ ...p, shipment: val }))
+                }
+              />
+            </div>
+          </Section>
+
           <Section title="📝 Draft Details">
             <ProductSection
               formData={formData}
               handleChange={handleChange}
               handleBreakupChange={handleBreakupChange}
-              addBreakupRow={addBreakupRow}
-              removeBreakupRow={removeBreakupRow}
+              addBreakupRow={handleAddRow}
+              removeBreakupRow={handleRemoveRow}
               total={total}
-              handleDateSelect={handleDateSelect}
-              openPicker={openPicker}
-              setOpenPicker={setOpenPicker}
+              readOnly={false}
             />
           </Section>
 
