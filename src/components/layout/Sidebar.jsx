@@ -64,10 +64,15 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
     // Show Add Business Owner only for super_admin
     ...(userRole === "super_admin"
       ? [
+          // {
+          //   name: "Add Business Owner",
+          //   icon: ,UserPlus
+          //   path: "/add-business-owner",
+          // },
           {
-            name: "Add Business Owner",
+            name: "Payment List",
             icon: UserPlus,
-            path: "/add-business-owner",
+            path: "/payments-list",
           },
         ]
       : []),

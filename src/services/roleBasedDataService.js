@@ -1,5 +1,5 @@
-import { dashboardService } from "@/modules/dashboard/services/dashboardService";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
+import dashboardService from "@/modules/dashboard/services/dashboardService";
 
 export const roleBasedDataService = {
   async getDashboardData(role, params = {}) {

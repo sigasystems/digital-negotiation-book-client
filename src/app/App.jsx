@@ -24,6 +24,7 @@ import BuyerPage from "@/modules/dashboard/pages/BuyerPage";
 import PlanPurchase from "@/modules/businessOwner/pages/PlanPurchase";
 import ViewProduct from "@/modules/product/pages/ViewProduct";
 import CreateOfferDraft from "@/modules/offerDraft/pages/CreateOfferDraft";
+import PaymentList from "@/modules/dashboard/pages/PaymentList";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -137,6 +138,14 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <AddBusinessOwner />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payments-list"
+          element={
+            <ProtectedRoute user={user}>
+              <PaymentList />
             </ProtectedRoute>
           }
         />

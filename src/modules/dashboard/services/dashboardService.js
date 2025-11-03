@@ -1,4 +1,5 @@
 import { apiClient } from "@/utils/apiClient";
+import { get } from "react-hook-form";
 
 // 🔒 Helper to attach auth headers to every request
 const authConfig = (extra = {}) => ({
@@ -20,7 +21,7 @@ const api = {
 };
 
 // 🧠 Business Owner API services
-export const dashboardService = {
+ const dashboardService = {
   createBusinessOwner: (payload) => api.post("/superadmin/create-business-owner", payload),
 
   getAllBusinessOwners: ({ pageIndex = 0, pageSize = 10, withBuyers = false } = {}) =>
@@ -37,4 +38,8 @@ export const dashboardService = {
   softDeleteBusinessOwner: (id) => api.delete(`/superadmin/business-owner/${id}`),
 
   reviewBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}/review`, payload),
+
+    getAllPayments : () => api.get("/payments/getallpayments") 
 };
+
+export default dashboardService;
