@@ -14,11 +14,11 @@ import {
   TableHead,
   TableCell,
 } from "../../../components/ui/table";
-import { Input } from "../../../components/ui/input";
 import { Checkbox } from "../../../components/ui/checkbox";
 import { ActionsCell } from "@/utils/ActionsCell";
 import { Circle } from "lucide-react";
 import { Pagination } from "@/utils/Pagination";
+import { SearchFilters } from "@/components/common/SearchFilters";
 
 export default function DashboardTable({
   data = [],
@@ -26,12 +26,12 @@ export default function DashboardTable({
   setRowSelection,
   fetchOwners,
   userActions = [],
-  filterKey = "email",
   pageIndex,
   pageSize,
   setPageIndex,
   setPageSize,
   totalItems,
+  onSearch,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -71,21 +71,16 @@ export default function DashboardTable({
             header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
-              const isActive =
-                status === "active" ||
-                status === "open" ||
-                status === true ||
-                status === "yes";
-
+              const isOpen = status === "open";
               return (
                 <span
                   className={`flex items-center gap-2 font-medium ${
-                    isActive ? "text-green-600" : "text-red-600"
+                    isOpen ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   <Circle
                     className={`w-3 h-3 ${
-                      isActive ? "fill-green-500" : "fill-red-500"
+                      isOpen ? "fill-green-500" : "fill-red-500"
                     }`}
                   />
                   {String(status)}
@@ -109,73 +104,15 @@ export default function DashboardTable({
           };
         }
 
-        if (key === "sizeBreakups") {
-          return {
-            id: key,
-            accessorKey: key,
-            header: "Size Breakups",
-            cell: ({ row }) => {
-              const breakups = row.original.sizeBreakups;
-              if (!Array.isArray(breakups) || !breakups.length) return "-";
-
-              return (
-                <div className="flex flex-col gap-1">
-                  {breakups.map((b, i) => (
-                    <ul
-                      key={i}
-                      className="text-xs flex flex-row gap-1"
-                    >
-                      <li>
-                        <strong>Size:</strong> {b.size ?? "-"}
-                      </li>
-                      <li>
-                        <strong>Breakup:</strong> {b.breakup ?? "-"}
-                      </li>
-                      <li>
-                        <strong>Price:</strong> ${b.price ?? "-"}
-                      </li>
-                    </ul>
-                  ))}
-                </div>
-              );
-            },
-          };
-        }
-
         return {
           id: key,
           accessorKey: key,
           header: key.charAt(0).toUpperCase() + key.slice(1),
           cell: ({ row }) => {
             const value = row.getValue(key);
-
-            if (Array.isArray(value)) {
-              return (
-                <div className="flex flex-col gap-1">
-                  {value.map((v, i) => (
-                    <span key={i} className="text-gray-700 text-sm">
-                      {typeof v === "object"
-                        ? Object.entries(v)
-                            .map(([k, val]) => `${k}: ${val}`)
-                            .join(", ")
-                        : String(v ?? "")}
-                    </span>
-                  ))}
-                </div>
-              );
-            }
-
-            if (typeof value === "object" && value !== null) {
-              return (
-                <span className="text-gray-700 text-sm">
-                  {Object.entries(value)
-                    .map(([k, v]) => `${k}: ${v}`)
-                    .join(", ")}
-                </span>
-              );
-            }
-
-            return <span className="text-gray-700">{String(value ?? "")}</span>;
+            if (typeof value === "object" && value !== null)
+              return JSON.stringify(value);
+            return <span>{String(value ?? "")}</span>;
           },
         };
       });
@@ -212,33 +149,30 @@ return actionsColumn
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
-        {table.getAllColumns().some((col) => col.id === filterKey) && (
-          <div className="mb-4">
-            <Input
-              placeholder={`Filter by ${filterKey
-                .replace(/([A-Z])/g, " $1")
-              .replace(/^./, (str) => str.toUpperCase())}...`}
-              value={table.getColumn(filterKey)?.getFilterValue() || ""}
-              onChange={(e) =>
-                table.getColumn(filterKey)?.setFilterValue(e.target.value)
-              }
-              className="max-w-md"
-            />
-          </div>
-        )}
+      <SearchFilters
+        fields={[
+          { name: "draftNo", label: "Draft No", type: "number" },
+          { name: "draftName", label: "Draft Name", type: "text" },
+          {
+            name: "status",
+            label: "Status",
+            type: "select",
+            options: [
+              { label: "Open", value: "open" },
+              { label: "Close", value: "close" },
+            ],
+          },
+        ]}
+        onSearch={onSearch}
+      />
 
       <Table className="min-w-[1000px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="whitespace-nowrap bg-gray-50 font-semibold text-gray-700 border-b-2 border-gray-200"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                <TableHead key={header.id}>
+                  {flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
             </TableRow>
@@ -247,16 +181,10 @@ return actionsColumn
 
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row, index) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() ? "selected" : undefined}
-                className={`transition-colors ${
-                  row.getIsSelected() ? "bg-blue-50" : ""
-                } ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-gray-100`}
-              >
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
                 {row.getAllCells().map((cell) => (
-                  <TableCell key={cell.id} className="whitespace-nowrap text-gray-700">
+                  <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -264,11 +192,8 @@ return actionsColumn
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-32 text-center text-gray-500">
-                <div className="flex flex-col items-center justify-center gap-1">
-                  <p className="font-medium">No results found</p>
-                  <p className="text-sm text-gray-400">Try adjusting your filters</p>
-                </div>
+              <TableCell colSpan={columns.length} className="text-center">
+                No results found
               </TableCell>
             </TableRow>
           )}
