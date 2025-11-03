@@ -57,6 +57,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Products", icon: Package, path: "/products" },
           { name: "Add Product", icon: PlusCircle, path: "/add-product" },
           { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
+          { name: "create offer draft", icon: UserPlus, path: "/create-offer-draft" },
         ]
       : []),
 
@@ -65,7 +66,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       ? [
           // {
           //   name: "Add Business Owner",
-          //   icon: UserPlus,
+          //   icon: ,UserPlus
           //   path: "/add-business-owner",
           // },
           {
