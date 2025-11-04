@@ -1,131 +1,186 @@
-"use client";
 import React, { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Loader2, CreditCard } from "lucide-react";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Loader2,
+  CreditCard,
+  CheckCircle2,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import dashboardService from "../services/dashboardService";
-import { Pagination } from "@/utils/Pagination";
-
+import { usePagination } from "@/app/hooks/usePagination";
 
 const PaymentList = () => {
   const [payments, setPayments] = useState([]);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const fetchPayments = async () => {
-    setLoading(true);
-    try {
-      const res = await dashboardService.getAllPayments();
-      const data = res?.data?.data;
-
-      // Adjust if your API returns an array directly
-      const fetched = data?.payments || [];
-      setPayments(fetched);
-      setTotalPages(data?.totalPages || 1);
-    } catch (err) {
-      console.error("Error fetching payments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { pageIndex, pageSize, totalPages, setPageIndex } = usePagination({
+    totalItems,
+    initialPageSize: 6,
+  });
 
   useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        setLoading(true);
+        const res = await dashboardService.getAllPayments({
+          pageIndex: pageIndex + 1,
+          pageSize,
+        });
+
+        const data = res?.data?.data;
+        setPayments(data?.payments || []);
+        setTotalItems(data?.totalCount || data?.payments?.length || 0);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPayments();
-  }, []);
+  }, [pageIndex, pageSize]);
+
+  const getStatusBadge = (status) => {
+    const color =
+      status === "success"
+        ? "bg-green-100 text-green-800"
+        : status === "failed"
+        ? "bg-red-100 text-red-800"
+        : "bg-yellow-100 text-yellow-800";
+
+    return (
+      <Badge className={`${color} capitalize px-3 py-1 rounded-full text-xs`}>
+        {status}
+      </Badge>
+    );
+  };
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="animate-spin h-8 w-8 text-gray-500" />
+      </div>
+    );
+
+  if (payments.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center text-gray-500">
+        <CreditCard className="h-12 w-12 mb-3 text-gray-400" />
+        <p>No payments found</p>
+      </div>
+    );
 
   return (
-    <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
-        <h2 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-          <CreditCard className="w-6 h-6 text-blue-600" />
-          Payment Management
+    <div className="p-8 min-h-screen bg-gray-50">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-semibold tracking-tight text-gray-800">
+          Payment History
         </h2>
+        <span className="text-sm text-gray-500">
+          Showing {pageIndex * pageSize + 1}-
+          {Math.min((pageIndex + 1) * pageSize, totalItems)} of {totalItems}
+        </span>
       </div>
 
-      {/* Loader / Table */}
-      {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-        </div>
-      ) : payments.length === 0 ? (
-        <p className="text-gray-500 text-center py-10">No payments found.</p>
-      ) : (
-        <div className="overflow-x-auto border border-gray-200 rounded-xl">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 text-gray-700 text-xs uppercase">
-              <tr>
-                <th className="p-3 border-b">#</th>
-                <th className="p-3 border-b">User</th>
-                <th className="p-3 border-b">Plan</th>
-                <th className="p-3 border-b">Amount</th>
-                <th className="p-3 border-b">Status</th>
-                <th className="p-3 border-b">Method</th>
-                <th className="p-3 border-b">Date</th>
-                <th className="p-3 border-b">Transaction</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((p, idx) => (
-                <tr key={p.id || idx} className="hover:bg-gray-50 transition-colors">
-                  <td className="p-3 border-b text-gray-600">{idx + 1}</td>
-                  <td className="p-3 border-b text-gray-900">
-                    <div className="font-medium">
-                      {p.User
-                        ? `${p.User.first_name} ${p.User.last_name}`
-                        : "Unknown User"}
-                    </div>
-                    <div className="text-xs text-gray-500">{p.User?.email || "—"}</div>
-                  </td>
-                  <td className="p-3 border-b text-gray-800">
-                    <div className="font-semibold">{p.Plan?.name || "—"}</div>
-                    <div className="text-xs text-gray-500">{p.Plan?.billingCycle || "—"}</div>
-                  </td>
-                  <td className="p-3 border-b font-medium text-gray-900">
-                    ₹{p.amount ?? 0}
-                  </td>
-                  <td className="p-3 border-b">
-                    {p.status === "success" ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
-                        <CheckCircle className="w-3 h-3" /> Success
-                      </span>
-                    ) : p.status === "failed" ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full">
-                        <XCircle className="w-3 h-3" /> Failed
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">
-                        Pending
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3 border-b text-gray-700">{p.paymentMethod || "—"}</td>
-                  <td className="p-3 border-b text-gray-600">
-                    {new Date(p.createdAt).toLocaleString("en-IN", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
-                  </td>
-                  <td className="p-3 border-b text-xs font-mono text-gray-600">
-                    {p.transactionId || "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {payments.map((payment) => (
+          <Card
+            key={payment.id}
+            className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow bg-white rounded-2xl"
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center justify-between">
+                <span className="text-lg font-semibold text-gray-800">
+                  {payment?.Plan?.name || "N/A"}
+                </span>
+                {getStatusBadge(payment?.status)}
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-3 text-sm text-gray-600">
+              <Separator />
+              <div className="grid grid-cols-2 gap-y-2">
+                <span className="text-gray-500">Amount:</span>
+                <span className="font-medium text-gray-900 text-right">
+                  ₹{payment.amount}
+                </span>
+
+                <span className="text-gray-500">Plan Type:</span>
+                <span className="text-right">
+                  {payment?.Plan?.billingCycle || "-"}
+                </span>
+
+                <span className="text-gray-500">Currency:</span>
+                <span className="text-right">{payment.currency}</span>
+
+                <span className="text-gray-500">Transaction ID:</span>
+                <span
+                  className="text-right truncate max-w-[150px]"
+                  title={payment.transactionId}
+                >
+                  {payment.transactionId}
+                </span>
+
+                <span className="text-gray-500">Date:</span>
+                <span className="text-right">
+                  {new Date(payment.createdAt).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-between items-center pt-3">
+                <div>
+                  <p className="text-xs text-gray-500">Customer</p>
+                  <p className="font-medium text-gray-800">
+                    {payment?.User?.first_name} {payment?.User?.last_name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {payment?.User?.email}
+                  </p>
+                </div>
+                {payment?.status === "success" ? (
+                  <CheckCircle2 className="text-green-500 h-6 w-6" />
+                ) : (
+                  <XCircle className="text-red-500 h-6 w-6" />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Pagination */}
-      {payments.length > 0 && (
-        <Pagination
-          pageIndex={pageIndex}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          onPageChange={setPageIndex}
-          onPageSizeChange={setPageSize}
-        />
-      )}
+      <div className="flex justify-center items-center gap-4 mt-10">
+        <button
+          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40"
+          onClick={() => setPageIndex(pageIndex - 1)}
+          disabled={pageIndex === 0}
+        >
+          <ChevronLeft className="h-4 w-4" /> Prev
+        </button>
+
+        <span className="text-sm text-gray-700">
+          Page {pageIndex + 1} of {totalPages || 1}
+        </span>
+
+        <button
+          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40"
+          onClick={() => setPageIndex(pageIndex + 1)}
+          disabled={pageIndex + 1 >= totalPages}
+        >
+          Next <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 };

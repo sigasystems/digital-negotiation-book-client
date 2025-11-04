@@ -65,11 +65,19 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
     // Show Add Business Owner only for super_admin
     ...(userRole === "super_admin"
       ? [
+<<<<<<< Updated upstream
           // {
           //   name: "Add Business Owner",
           //   icon: ,UserPlus
           //   path: "/add-business-owner",
           // },
+=======
+          {
+            name: "Add Business Owner",
+            icon: UserPlus,
+            path: "/add-business-owner",
+          },
+>>>>>>> Stashed changes
           {
             name: "Payment List",
             icon: UserPlus,

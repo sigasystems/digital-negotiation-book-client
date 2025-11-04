@@ -4,7 +4,7 @@ import { Check, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { createPayment } from "../services/paymentService";
+import {  createPayment } from "../services/paymentService";
 import { apiClient } from "@/utils/apiClient";
 import { login } from "@/modules/auth/services/authService";
 import { showError, showSuccess } from "@/utils/toastService";
@@ -117,11 +117,6 @@ export default function OrderSummary({
         userId: user.id,
         ...formData,
       };
-      const ownerRes = await becomeBusinessOwner(ownerPayload);
-      if (!ownerRes?.success) {
-        showError(ownerRes?.message || "Failed to create business owner.");
-        return;
-      }
         console.log("All done ....!!!")
       } else {
         showError("Checkout URL not received from server.");
