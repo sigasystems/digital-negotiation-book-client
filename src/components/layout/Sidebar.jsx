@@ -15,25 +15,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { getSession } from "@/utils/auth";
 
 export default function Sidebar({ collapsed, setCollapsed, onClose }) {
-  const [userRole, setUserRole] = useState("guest");
+  const [sessionUser, setSessionUser] = useState(null);
   const navigate = useNavigate();
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
   useEffect(() => {
-    try {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsed = JSON.parse(storedUser);
-        setUserRole(parsed?.userRole || "guest");
-      }
-    } catch (err) {
-      console.error("Failed to parse user from sessionStorage:", err);
-      setUserRole("guest");
-    }
+    const user = getSession();
+    setSessionUser(user);
   }, []);
+
+  const userRole = sessionUser?.userRole || "guest";
+  const businessName = sessionUser?.businessName || "";
 
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
@@ -57,7 +53,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Products", icon: Package, path: "/products" },
           { name: "Add Product", icon: PlusCircle, path: "/add-product" },
           { name: "Plan Purchase", icon: UserPlus, path: "/plan-purchase" },
-          { name: "create offer draft", icon: UserPlus, path: "/create-offer-draft" },
+          { name: "Create Offer Draft", icon: UserPlus, path: "/create-offer-draft" },
           { name: "Offer Drafts", icon: Package, path: "/offer-draft" },
         ]
       : []),
@@ -65,25 +61,11 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
     // Show Add Business Owner only for super_admin
     ...(userRole === "super_admin"
       ? [
-          // {
-          //   name: "Add Business Owner",
-          //   icon: ,UserPlus
-          //   path: "/add-business-owner",
-          // },
-          {
-            name: "Add Business Owner",
-            icon: UserPlus,
-            path: "/add-business-owner",
-          },
-          {
-            name: "Payment List",
-            icon: UserPlus,
-            path: "/payments-list",
-          },
+          { name: "Add Business Owner", icon: UserPlus, path: "/add-business-owner" },
+          { name: "Payment List", icon: UserPlus, path: "/payments-list" },
         ]
       : []),
 
-    { name: "Settings", icon: Settings, path: "/settings" },
     { name: "Back to Home", icon: MoveLeft, path: "/" },
   ];
 
@@ -97,10 +79,15 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-16 border-b">
         {!collapsed && (
-          <h2 className="text-xl font-bold text-indigo-600">DNB</h2>
+          <div className="flex flex-col">
+            <h2 className="text-xl font-bold text-indigo-600">DNB</h2>
+            {businessName && (
+              <span className="text-sm font-medium text-gray-600 truncate max-w-[180px]">
+                {businessName}
+              </span>
+            )}
+          </div>
         )}
-        
-        {/* Desktop collapse button */}
         <Button
           variant="ghost"
           size="icon"
@@ -110,7 +97,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           <ChevronRight
             className={cn(
               "w-5 h-5 transition-transform",
-              collapsed ? "rotate-180" : "rotate-0"
+              collapsed ? "rotate-0" : "rotate-180"
             )}
           />
         </Button>

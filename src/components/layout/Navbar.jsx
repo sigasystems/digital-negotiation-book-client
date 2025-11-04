@@ -2,24 +2,18 @@ import { useState, useEffect } from "react";
 import { Menu, LogOut, X, ChevronDown, User } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
+import { getSession } from "@/utils/auth";
 
 export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [sessionUser, setSessionUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Failed to parse user from sessionStorage:", err);
-        sessionStorage.removeItem("user");
-      }
-    }
+    const user = getSession();
+    setSessionUser(user);
   }, []);
 
   const handleLogout = () => {
@@ -28,7 +22,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     setLogoutOpen(false);
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
-    setUser(null);
+    setSessionUser(null);
     navigate("/");
   };
 
@@ -40,9 +34,12 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     { label: "Settings", path: "/settings" },
   ];
 
-  const userName = user?.first_name
-    ? `${user.first_name} ${user.last_name || ""}`.trim()
-    : user?.name || "User";
+  const userName =
+    sessionUser?.first_name
+      ? `${sessionUser.first_name} ${sessionUser.last_name || ""}`.trim()
+      : sessionUser?.name || "";
+
+  const businessName = sessionUser?.businessName || "";
 
   return (
     <header className="fixed top-0 left-0 w-full z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -61,16 +58,18 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
           <Link
             to="/"
-            className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap"
+            className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap sm:ml-80"
           >
-            <span className="hidden sm:inline">Digital Negotiation Book</span>
-            <span className="sm:hidden">DNB</span>
+            <span className="hidden sm:inline sm:ml-4">Digital Negotiation Book</span>
+
+            <span className="sm:hidden">
+              DNB | <span className="text-black">{businessName ? `  ${businessName}` : ""}</span>
+            </span>
           </Link>
         </div>
 
         {/* Right Side - Desktop Menu */}
         <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-          {/* Nav Links */}
           {navLinks.map((link) => (
             <Link
               key={link.label}
@@ -81,13 +80,13 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             </Link>
           ))}
 
-          {/* User / Login Section */}
-          {user ? (
+          {sessionUser ? (
+            userName ? (
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100hover:bg-gray-200 rounded-lg transition cursor-pointer"
-              > 
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
+              >
                 <User className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
                   {userName}
@@ -99,7 +98,6 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                 />
               </button>
 
-              {/* Dropdown Menu */}
               {userDropdownOpen && (
                 <>
                   <div
@@ -121,6 +119,15 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                 </>
               )}
             </div>
+            ) : (
+              <button
+                onClick={() => setLogoutOpen(true)}
+                className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            )
           ) : (
             <Link
               to="/login"
@@ -145,7 +152,6 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
           <nav className="px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            {/* Nav Links */}
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -157,15 +163,16 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               </Link>
             ))}
 
-            {/* User / Login Section */}
-            {user ? (
+            {sessionUser ? (
                 <div className="border-t border-gray-200 my-3 pt-3">
+                {userName && (
                   <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
                     <User className="w-4 h-4 text-gray-600" />
                     <span className="text-sm font-medium text-gray-700 truncate">
                       {userName}
                     </span>
                   </div>
+                )}
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
