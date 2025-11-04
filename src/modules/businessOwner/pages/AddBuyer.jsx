@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { businessOwnerService } from "../services/businessOwner";
+import { Building2, UserCircle2, MapPin } from "lucide-react";
+
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const ownerId = user?.businessOwnerId || "";
@@ -48,7 +50,7 @@ export default function AddBuyerForm() {
     if (!formData.country.trim()) return "Country is required";
     if (!formData.countryCode.trim()) return "Country code is required";
 
-    return null; // valid
+    return null;
   };
 
   const handleSubmit = async (e) => {
@@ -73,7 +75,7 @@ export default function AddBuyerForm() {
         response?.data?.message ||
         response?.message ||
         "Failed to add buyer.";
-      showToast(`${message}`, "error");
+      showToast(message, "error");
     }
   } catch (error) {
     console.error("Add Buyer Error:", error);
@@ -81,7 +83,7 @@ export default function AddBuyerForm() {
       error?.response?.data?.message ||
       error?.message ||
       "Failed to add buyer. Please try again.";
-    showToast(`${message}`, "error");
+    showToast(message, "error");
   } finally {
       setLoading(false);
     }
@@ -133,12 +135,14 @@ export default function AddBuyerForm() {
           </p>
         </div>
 
-        {/* Form Card */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl overflow-hidden space-y-0">
           {/* Company Information */}
           <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-indigo-100 rounded-lg text-2xl">🏢</div>
+              <div className="p-3 bg-indigo-100 rounded-lg">
+                <Building2 className="w-6 h-6 text-indigo-600" />
+              </div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Company Information</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -198,7 +202,9 @@ export default function AddBuyerForm() {
           {/* Contact Information */}
           <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-blue-100 rounded-lg text-2xl">👤</div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <UserCircle2 className="w-6 h-6 text-blue-600" />
+              </div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Contact Information</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -260,10 +266,12 @@ export default function AddBuyerForm() {
             </div>
           </div>
 
-          {/* Address Information */}
+          {/* Address */}
           <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-purple-100 rounded-lg text-2xl">📍</div>
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <MapPin className="w-6 h-6 text-purple-600" />
+              </div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Address</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
@@ -314,7 +322,7 @@ export default function AddBuyerForm() {
             </div>
           </div>
 
-          {/* Footer Buttons */}
+          {/* Footer */}
           <div className="px-6 sm:px-8 py-6 bg-gray-50 flex flex-col-reverse sm:flex-row gap-3">
             <button
               type="button"

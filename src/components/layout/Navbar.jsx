@@ -30,8 +30,8 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     { label: "Dashboard", path: "/dashboard" },
     { label: "Products", path: "/products" },
     { label: "Buyers", path: "/users" },
-    { label: "Reports", path: "/reports" },
-    { label: "Settings", path: "/settings" },
+    // { label: "Reports", path: "/reports" },
+    // { label: "Settings", path: "/settings" },
   ];
 
   const userName =
@@ -60,10 +60,10 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             to="/"
             className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap sm:ml-80"
           >
-            <span className="hidden sm:inline sm:ml-4">Digital Negotiation Book</span>
+            <span className="hidden sm:inline sm:ml-1">Digital Negotiation Book</span>
 
             <span className="sm:hidden">
-              DNB | <span className="text-black">{businessName ? `  ${businessName}` : ""}</span>
+              DNB <span className="text-black">{businessName ? `|  ${businessName}` : ""}</span>
             </span>
           </Link>
         </div>
