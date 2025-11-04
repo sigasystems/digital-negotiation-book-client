@@ -38,7 +38,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId"];
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -71,7 +71,7 @@ export default function DashboardTable({
             header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
-              const isOpen = status === "active";
+              const isOpen = status === "active" || status === "open";
               return (
                 <span
                   className={`flex items-center gap-2 font-medium ${
