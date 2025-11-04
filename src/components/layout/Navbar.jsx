@@ -26,13 +26,23 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     navigate("/");
   };
 
-  const navLinks = [
+  let navLinks = [];
+
+  if (sessionUser?.userRole === "super_admin") {
+    navLinks = [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Business Owners", path: "/users" },
+      { label: "Payment List", path: "/payments-list" },
+    ];
+  } else if (sessionUser?.userRole === "business_owner") {
+  navLinks = [
     { label: "Dashboard", path: "/dashboard" },
-    { label: "Products", path: "/products" },
     { label: "Buyers", path: "/users" },
-    // { label: "Reports", path: "/reports" },
-    // { label: "Settings", path: "/settings" },
+    { label: "Products", path: "/products" },
   ];
+  } else {
+    navLinks = [{ label: "Dashboard", path: "/dashboard" }];
+  }
 
   const userName =
     sessionUser?.first_name
@@ -58,9 +68,9 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
           <Link
             to="/"
-            className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap sm:ml-80"
+            className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap"
           >
-            <span className="hidden sm:inline sm:ml-1">Digital Negotiation Book</span>
+            <span className="hidden sm:inline sm:ml-[15rem]">Digital Negotiation Book</span>
 
             <span className="sm:hidden">
               DNB <span className="text-black">{businessName ? `|  ${businessName}` : ""}</span>
