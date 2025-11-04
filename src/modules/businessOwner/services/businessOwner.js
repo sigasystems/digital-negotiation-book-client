@@ -44,7 +44,7 @@ export const businessOwnerService = {
   getPaymentById : (paymentId) =>
   {
     if (!paymentId) throw new Error("Payment ID is required");
-    return api.get(`/api/payment/${paymentId}`);
+    return api.get(`/payments/${paymentId}`);
   },
 
   

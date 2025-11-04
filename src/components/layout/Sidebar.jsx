@@ -71,6 +71,11 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           //   path: "/add-business-owner",
           // },
           {
+            name: "Add Business Owner",
+            icon: UserPlus,
+            path: "/add-business-owner",
+          },
+          {
             name: "Payment List",
             icon: UserPlus,
             path: "/payments-list",
