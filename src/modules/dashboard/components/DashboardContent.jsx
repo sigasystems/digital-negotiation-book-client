@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
-import { MobileCard, Pagination } from "@/utils/Pagination";
+import { MobileCard } from "@/utils/Pagination";
 import DashboardTable from "./DashboardTable";
-import { ActionsCell } from "@/utils/ActionsCell";
+import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
 
 export default function ResponsiveDashboard() {
   const [data, setData] = useState([]);
@@ -11,7 +11,7 @@ export default function ResponsiveDashboard() {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
-  const [emailFilter, setEmailFilter] = useState("");
+  const [emailFilter] = useState("");
    const [totalPages, setTotalPages] = useState(1);
    const [activeUsers, setActiveUsers] = useState(0)
    const [inactiveUsers, setInactiveUsers] = useState(0)
@@ -20,6 +20,8 @@ export default function ResponsiveDashboard() {
   const user = sessionStorage.getItem("user");
   const userRole = JSON.parse(user)?.userRole || "guest";
   const userActions = [];
+
+  useReloadOncePerSession("landingPageReloaded")
 
   const fetchData = async () => {
     setLoading(true);

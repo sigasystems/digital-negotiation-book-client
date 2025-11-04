@@ -12,3 +12,13 @@ export const getUserFromCookie = () => {
   }
   return null;
 };
+
+export const getSession = () => {
+  try {
+    const user = sessionStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  } catch (err) {
+    console.error("Failed to parse session user:", err);
+    return null;
+  }
+};

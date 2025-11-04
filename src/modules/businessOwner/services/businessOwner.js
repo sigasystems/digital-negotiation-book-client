@@ -31,14 +31,14 @@ export const businessOwnerService = {
   },
 
   searchBuyers: (ownerId, filters = {}) => {
-    if (!ownerId) throw new Error("Owner ID is required");
-    const params = {};
-    if (filters.country) params.country = filters.country;
-    if (filters.status) params.status = filters.status;
-    if (filters.isVerified !== undefined)
-      params.isVerified = filters.isVerified;
+    const query = {};
+      if (filters.country) query.country = filters.country;
+      if (filters.status) query.status = filters.status;
+      if (filters.isVerified !== undefined) query.isVerified = filters.isVerified;
+      if (filters.page !== undefined) query.page = filters.page;
+    if (filters.limit !== undefined) query.limit = filters.limit;
 
-    return api.get(`/business-owner/${ownerId}/buyers/search`, params);
+    return api.get(`/business-owner/${ownerId}/buyers/search`, { params: query });
   },
 
   getPaymentById : (paymentId) =>

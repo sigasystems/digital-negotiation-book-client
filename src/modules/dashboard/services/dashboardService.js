@@ -1,7 +1,6 @@
 import { apiClient } from "@/utils/apiClient";
-import { get } from "react-hook-form";
 
-// 🔒 Helper to attach auth headers to every request
+// 🔒 Helper to attach auth headers
 const authConfig = (extra = {}) => ({
   headers: {
     Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
@@ -11,7 +10,7 @@ const authConfig = (extra = {}) => ({
   ...extra,
 });
 
-// 🧩 Generic API methods for reusability
+// 🧩 Generic API methods
 const api = {
   get: (url, params) => apiClient.get(url, authConfig({ params })),
   post: (url, data) => apiClient.post(url, data, authConfig()),
@@ -39,7 +38,11 @@ const api = {
 
   reviewBusinessOwner: (id, payload) => api.patch(`/superadmin/business-owner/${id}/review`, payload),
 
-    getAllPayments : () => api.get("/payments/getallpayments") 
+    getAllPayments : () => api.get("/payments/getallpayments"),
+
+  searchBusinessOwners: (params = {}) => {
+  return api.get("/superadmin/business-owners/search", params);
+},
 };
 
 export default dashboardService;

@@ -1,7 +1,7 @@
 // Users.jsx
 import React, { useState, useEffect } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
-import { MobileCard, Pagination } from "@/utils/Pagination";
+import { MobileCard } from "@/utils/Pagination";
 import DashboardTable from "../components/DashboardTable";
 import { ActionsCell } from "@/utils/ActionsCell";
 
@@ -12,7 +12,7 @@ export default function Users({ userRole }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
-  const [emailFilter, setEmailFilter] = useState("");
+  const [filters, setFilters] = useState({});
   const [totalPages, setTotalPages] = useState(1);
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
@@ -25,11 +25,19 @@ export default function Users({ userRole }) {
           ? userRole.userRole
           : userRole;
 
-      const response = await roleBasedDataService.getDashboardData(role, {
+      let response;
+      if (Object.keys(filters).length > 0) {
+        response = await roleBasedDataService.search(role, {
+          ...filters,
+          page: pageIndex,
+          limit: pageSize,
+        });
+      } else {
+        response = await roleBasedDataService.getDashboardData(role, {
         pageIndex,
         pageSize,
-        filter: emailFilter,
       });
+      }
 
     const { data: rows, totalItems, totalPages } = response || {};
 
@@ -46,19 +54,63 @@ export default function Users({ userRole }) {
     }
   };
 
+  const handleSearch = (searchFilters) => {
+    setFilters(searchFilters);
+    setPageIndex(0);
+  };
+
   useEffect(() => {
     fetchUsers();
-  }, [pageIndex, pageSize, emailFilter]);
+  }, [pageIndex, pageSize, filters]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-gray-600">Loading users...</p>
         </div>
       </div>
     );
+  }
+
+  let searchFields = [];
+
+  if (userRole === "business_owner") {
+    searchFields = [
+      { name: "country", label: "Country", type: "text", placeholder: "Enter country" },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        options: [
+          { value: "", label: "All" },
+          { value: "active", label: "Active" },
+          { value: "inactive", label: "Inactive" },
+        ],
+      },
+    ];
+  }
+
+  if (userRole === "super_admin") {
+    searchFields = [
+      { name: "first_name", label: "First Name", type: "text", placeholder: "Enter first name" },
+      { name: "last_name", label: "Last Name", type: "text", placeholder: "Enter last name" },
+      { name: "email", label: "Email", type: "text", placeholder: "Enter email" },
+      { name: "businessName", label: "Business Name", type: "text", placeholder: "Enter business name" },
+      { name: "phoneNumber", label: "Phone Number", type: "text", placeholder: "Enter phone number" },
+      { name: "postalCode", label: "Postal Code", type: "text", placeholder: "Enter postal code" },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        options: [
+          { value: "", label: "All" },
+          { value: "active", label: "Active" },
+          { value: "inactive", label: "Inactive" },
+        ],
+      },
+    ];
   }
 
   return (
@@ -113,6 +165,8 @@ export default function Users({ userRole }) {
             setPageIndex={setPageIndex}
             setPageSize={setPageSize}
             totalItems={totalItems}
+            onSearch={handleSearch}
+            searchFields={searchFields}
           />
         </div>
       </div>

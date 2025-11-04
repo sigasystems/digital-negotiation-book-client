@@ -37,10 +37,8 @@ const apiData = response?.data?.data || {};
      case "business_owner": {
   const response = await businessOwnerService.getAllBuyers(params);
 
-  // 🧩 Extract the API payload properly
   const apiData = response?.data?.data || {};
 
-  // ✅ Extract buyers list and metadata safely
   const buyers = apiData?.data || [];
   const totalItems = apiData?.totalItems || buyers.length;
   const totalPages = apiData?.totalPages || Math.ceil(totalItems / (params.pageSize || 10));
@@ -71,26 +69,71 @@ const apiData = response?.data?.data || {};
     const normalizedRole =
       typeof role === "object" && role?.userRole ? role.userRole : role;
 
+    const { pageIndex = 0, pageSize = 10, ...filters } = params;
+
     switch (normalizedRole) {
       case "super_admin": {
-        const response = await dashboardService.getAllBusinessOwners(params);
-        const data = response?.data?.data || response?.data || [];
-        const total =
-          response?.data?.totalItems || response?.total || data.length;
-        return { data, total };
+        const queryParams = {};
+
+        Object.entries(filters).forEach(([key, val]) => {
+          if (val !== "" && val !== undefined) {
+            queryParams[`params[${key}]`] = val;
+          }
+        });
+
+        queryParams.page = pageIndex;
+        queryParams.limit = pageSize;
+
+        const response = await dashboardService.searchBusinessOwners(queryParams);
+
+        const apiData = response?.data?.data || {};
+        const businessOwners = apiData?.businessOwners || apiData?.data || [];
+        const totalItems = apiData?.totalItems || businessOwners.length;
+        const totalPages = apiData?.totalPages || Math.ceil(totalItems / pageSize);
+
+        return {
+          data: businessOwners,
+          totalItems,
+          totalPages,
+          totalActive: apiData?.totalActive ?? 0,
+          totalInactive: apiData?.totalInactive ?? 0,
+          totalDeleted: apiData?.totalDeleted ?? 0,
+          pageIndex,
+          pageSize,
+        };
       }
 
       case "business_owner": {
-        const { ownerId, ...filters } = params;
-        const response = await businessOwnerService.searchBuyers(
-          ownerId,
-          filters
-        );
-        const buyers =
-          response?.data?.buyers || response?.data || response || [];
-        const total =
-          response?.data?.total || response?.total || buyers.length;
-        return { data: buyers, total };
+      const sessionUser = JSON.parse(sessionStorage.getItem("user"));
+      const ownerId = sessionUser?.businessOwnerId || sessionUser?.id;
+
+      if (!ownerId) throw new Error("Owner ID not found in session");
+
+      const response = await businessOwnerService.searchBuyers(ownerId, {
+        ...filters,
+        page: pageIndex,
+        limit: pageSize,
+      });
+
+      const apiData = response?.data?.data || {};
+      const buyers = apiData?.buyers || apiData?.data || [];
+      const totalItems = apiData?.totalItems || buyers.length;
+      const totalPages =
+        apiData?.totalPages || Math.ceil(totalItems / pageSize);
+      const totalActive = apiData?.totalActive ?? 0;
+      const totalInactive = apiData?.totalInactive ?? 0;
+      const totalDeleted = apiData?.totalDeleted ?? 0;
+
+      return {
+        data: buyers,
+        totalItems,
+        totalPages,
+        totalActive,
+        totalInactive,
+        totalDeleted,
+        pageIndex,
+        pageSize,
+      };
       }
 
       default:
@@ -98,7 +141,7 @@ const apiData = response?.data?.data || {};
     }
   },
 
- getById: async (role, record) => {
+  async getById(role, record) {
     if (!record?.id) throw new Error("ID is required");
 
     const normalizedRole =

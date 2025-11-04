@@ -22,4 +22,12 @@ export const productService = {
   updateProduct: (id, data) => api.put(`/product/update-product/${id}`, data),
 
   deleteProduct: (id) => api.delete(`/product/delete-product/${id}`),
+
+  searchProducts: (filters = {}, pageIndex = 0, pageSize = 10) => {
+    return api.get("/product/search", {
+      ...filters,
+      page: pageIndex,
+      limit: pageSize,
+    });
+  },
 };
