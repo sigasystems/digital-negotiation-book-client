@@ -34,3 +34,12 @@ export const validateOfferDates = (offerValidityDate, shipmentDate) => {
 
   return null;
 };  
+
+  export const formatHeader = (key) => {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase());
+};

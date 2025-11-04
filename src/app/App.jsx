@@ -27,6 +27,7 @@ import CreateOfferDraft from "@/modules/offerDraft/pages/CreateOfferDraft";
 import PaymentList from "@/modules/dashboard/pages/PaymentList";
 import OfferDrafts from "@/modules/offerDraft/pages/OfferDrafts";
 import ViewOfferDraft from "@/modules/offerDraft/pages/ViewOfferDraft";
+import NotFound from "@/modules/landing/pages/NotFound";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -85,6 +86,7 @@ useEffect(() => {
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/paymentsuccess" element={<PaymentSuccess />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
+        <Route path="*" element={<NotFound />} />
 
         {/* Protected routes */}
         <Route

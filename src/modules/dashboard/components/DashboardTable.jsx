@@ -19,6 +19,7 @@ import { ActionsCell } from "@/utils/ActionsCell";
 import { Circle } from "lucide-react";
 import { Pagination } from "@/utils/Pagination";
 import { SearchFilters } from "@/components/common/SearchFilters";
+import { formatHeader } from "@/utils/formateDate";
 
 export default function DashboardTable({
   data = [],
@@ -37,7 +38,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId"];
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -106,7 +107,7 @@ export default function DashboardTable({
         return {
           id: key,
           accessorKey: key,
-          header: key.charAt(0).toUpperCase() + key.slice(1),
+          header: formatHeader(key),
           cell: ({ row }) => {
             const value = row.getValue(key);
             if (typeof value === "object" && value !== null)
