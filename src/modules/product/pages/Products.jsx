@@ -11,15 +11,19 @@ export default function Products() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
+  const [filters, setFilters] = useState(null);
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await productService.getAllProducts({
-        pageIndex,
-        pageSize,
-      });
+      let response;
+
+      if (filters && Object.keys(filters).length > 0) {
+        response = await productService.searchProducts(filters, pageIndex, pageSize);
+      } else {
+        response = await productService.getAllProducts({ pageIndex, pageSize });
+      }
 
       const { products, totalItems } = response?.data?.data || {};
       setProducts(products || []);
@@ -31,6 +35,11 @@ export default function Products() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (queryFilters) => {
+    setFilters(queryFilters);
+    setPageIndex(0);
   };
 
   const handleView = async (productId) => {
@@ -47,7 +56,7 @@ export default function Products() {
 
   useEffect(() => {
     fetchProducts();
-  }, [pageIndex, pageSize]);
+  }, [pageIndex, pageSize, filters]);
 
   if (loading) {
     return (
@@ -68,12 +77,18 @@ export default function Products() {
         fetchOwners={fetchProducts}
         userActions={["view", "edit", "delete"]}
         onView={(row) => handleView(row.id)}
-        filterKey="productName"
+        onSearch={handleSearch}
         pageIndex={pageIndex}
         pageSize={pageSize}
         setPageIndex={setPageIndex}
         setPageSize={setPageSize}
         totalItems={totalItems}
+        searchFields={[
+          { name: "code", label: "Code", type: "text" },
+          { name: "productName", label: "Product Name", type: "text" },
+          { name: "species", label: "Species", type: "text" },
+          { name: "size", label: "Size", type: "text", placeholder: "Comma-separated sizes" },
+        ]}
       />
     </div>
   );

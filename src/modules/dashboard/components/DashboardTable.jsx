@@ -32,6 +32,7 @@ export default function DashboardTable({
   setPageSize,
   totalItems,
   onSearch,
+  searchFields = [],
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -41,7 +42,6 @@ export default function DashboardTable({
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    // Selection column
     const selectColumn = {
       id: "select",
       header: ({ table }) => (
@@ -60,7 +60,6 @@ export default function DashboardTable({
       enableSorting: false,
     };
 
-    // Dynamic columns
     const dynamicColumns = Object.keys(data[0])
       .filter((key) => !HIDDEN_KEYS.includes(key))
       .map((key) => {
@@ -71,7 +70,7 @@ export default function DashboardTable({
             header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
-              const isOpen = status === "open";
+              const isOpen = status === "active";
               return (
                 <span
                   className={`flex items-center gap-2 font-medium ${
@@ -149,22 +148,9 @@ return actionsColumn
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
-      <SearchFilters
-        fields={[
-          { name: "draftNo", label: "Draft No", type: "number" },
-          { name: "draftName", label: "Draft Name", type: "text" },
-          {
-            name: "status",
-            label: "Status",
-            type: "select",
-            options: [
-              { label: "Open", value: "open" },
-              { label: "Close", value: "close" },
-            ],
-          },
-        ]}
-        onSearch={onSearch}
-      />
+      {searchFields.length > 0 && (
+        <SearchFilters fields={searchFields} onSearch={onSearch} />
+      )}
 
       <Table className="min-w-[1000px]">
         <TableHeader>

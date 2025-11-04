@@ -84,6 +84,19 @@ export default function OfferDrafts() {
         setPageIndex={setPageIndex}
         setPageSize={setPageSize}
         totalItems={totalItems}
+        searchFields={[
+          { name: "draftNo", label: "Draft No", type: "number", placeholder: "Enter draft number" },
+          { name: "draftName", label: "Draft Name", type: "text", placeholder: "Enter draft name" },
+          {
+            name: "status",
+            label: "Status",
+            type: "select",
+            options: [
+              { label: "Open", value: "open" },
+              { label: "Close", value: "close" },
+            ],
+          },
+        ]}
       />
     </div>
   );
