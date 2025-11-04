@@ -23,6 +23,10 @@ export default function Layout({ children }) {
   const shouldShowSidebar = !noSidebarRoutes.includes(location.pathname);
   const contentPadding = sidebarCollapsed ? "lg:pl-16" : "lg:pl-64";
 
+  // ✅ Apply padding only for internal pages (not login/landing)
+  const shouldHavePadding =
+    shouldShowSidebar && !["/", "/login"].includes(location.pathname);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
@@ -35,7 +39,7 @@ export default function Layout({ children }) {
         </div>
       )}
 
-      {/* ✅ Mobile Sidebar (Drawer) */}
+      {/* Mobile Sidebar */}
       {shouldShowSidebar && (
         <div
           className={cn(
@@ -51,12 +55,12 @@ export default function Layout({ children }) {
               "absolute top-0 left-0 w-64 h-full bg-white shadow-lg transform transition-transform duration-300",
               mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
             )}
-            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+            onClick={(e) => e.stopPropagation()}
           >
             <Sidebar
               collapsed={false}
               setCollapsed={() => {}}
-              onClose={() => setMobileSidebarOpen(false)} // ✅ closes sidebar on link click
+              onClose={() => setMobileSidebarOpen(false)}
             />
           </div>
         </div>
@@ -74,8 +78,16 @@ export default function Layout({ children }) {
           showSidebarButton={shouldShowSidebar}
         />
 
-        {/* Page content */}
-        <main className="flex-1 w-full px-4 py-4 pt-20 md:px-6 md:py-20">
+        {/* ✅ Conditional padding:
+            - No padding for login/landing
+            - Minimal padding on mobile for internal pages
+            - Full padding on desktop */}
+        <main
+          className={cn(
+            "flex-1",
+            shouldHavePadding && "px-4 pt-20 pb-6 lg:pt-20 lg:pl-10 lg:pb-10"
+          )}
+        >
           {children}
         </main>
 
