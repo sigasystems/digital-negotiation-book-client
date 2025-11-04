@@ -92,5 +92,15 @@ export const businessOwnerService = {
     if (!productId) throw new Error("Product ID is required");
     return api.get(`/product/get-product/${productId}`);
   },
+
+  // ✅ uniqueness check (GET)
+  checkUnique: async (params) => {
+    try {
+      const res = await api.get("/business-owner/check-unique", { params });
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 

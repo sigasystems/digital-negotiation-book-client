@@ -5,8 +5,7 @@ const PlanPurchase = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const paymentId = user?.paymentId;
+  const paymentId =localStorage.getItem("paymentId");
 
   useEffect(() => {
     const fetchPlan = async () => {

@@ -35,6 +35,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       Cookies.remove("userInfo"); 
+      sessionStorage.removeItem("user");  
+      sessionStorage.removeItem("pendingBusinessData");
     },
   },
   extraReducers: (builder) => {

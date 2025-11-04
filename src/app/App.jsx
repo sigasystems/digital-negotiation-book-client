@@ -14,7 +14,7 @@ import CheckoutPage from "@/modules/checkout/pages/Checkout";
 import Users from "@/modules/dashboard/pages/Users";
 import ResponsiveDashboard from "@/modules/dashboard/components/DashboardContent";
 import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
-import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
+// import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
 import AddProduct from "@/modules/product/pages/AddProduct";
@@ -44,7 +44,7 @@ useEffect(() => {
     "/forgot-password",
     "/checkout",
     "/success",
-    "/paymentsuccess",
+    // "/paymentsuccess",
   ];
 
   if (!sessionUser) {
@@ -84,7 +84,7 @@ useEffect(() => {
         <Route path="/login" element={<Login />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/success" element={<SuccessPage />} />
-        <Route path="/paymentsuccess" element={<PaymentSuccess />} />
+        {/* <Route path="/paymentsuccess" element={<PaymentSuccess />} /> */}
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="*" element={<NotFound />} />
 

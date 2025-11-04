@@ -57,7 +57,7 @@ export default function PlansPage() {
     const fetchPlans = async () => {
       try {
         const data = await getAllPlans();
-        const order = ["trial", "basic", "pro"];
+        const order = ["basic", "pro" ,"advance"];
         const sortedPlans = data.sort(
           (a, b) => order.indexOf(a.key) - order.indexOf(b.key)
         );
@@ -73,11 +73,6 @@ export default function PlansPage() {
   }, []);
 
   const handlePlanSelect = (plan) => {
-    // if (!isLoggedIn) {
-    //   toast.error("Please log in to continue");
-    //   navigate("/login");
-    //   return;
-    // }
 
     if (currentSubscription?.Plan?.id === plan.id) {
       toast.info("This is your current plan");
@@ -109,7 +104,7 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="h-50% bg-gray-50 py-12 px-4">
       <div className="max-w-6xl mx-auto space-y-10">
 
        
@@ -293,11 +288,11 @@ export default function PlansPage() {
                       </ul>
                     </div>
 
-                    {plan.trialDays > 0 && !isActive && (
+                    {/* {plan.trialDays > 0 && !isActive && (
                       <p className="text-sm text-blue-600 pt-2">
                         {plan.trialDays} days free trial
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </CardContent>
 
