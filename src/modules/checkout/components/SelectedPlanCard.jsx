@@ -67,11 +67,11 @@ export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly
             </div>
           </div>
 
-          {trialDays > 0 && (
+          {/* {trialDays > 0 && (
             <Badge className="bg-green-100 text-green-700 border-green-300">
               🎉 {trialDays}-day Trial
             </Badge>
-          )}
+          )} */}
         </div>
 
         <Separator />

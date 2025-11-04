@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -6,6 +7,8 @@ import { formatDate, formatTime } from "@/utils/formateDate";
 import { PaymentStatusView } from "../utils/statusPayment";
 import { setPaymentId, setPaymentStatus } from "@/app/store/slices/paymentSlice";
 import { getAllPlans } from "@/modules/landing/services/planService";
+import { generateReceiptHTML } from "../utils/sendReceipt";
+// IMPORT THE RECEIPT GENERATOR
 
 const CURRENCY_SYMBOL = {
   INR: "₹",
@@ -13,7 +16,6 @@ const CURRENCY_SYMBOL = {
   EUR: "€",
 };
 
-// 🔹 utility to calculate plan end date
 const getNextBillingDate = (cycle) => {
   const now = new Date();
   const next = new Date(now);
@@ -23,7 +25,6 @@ const getNextBillingDate = (cycle) => {
   return next;
 };
 
-// 🔹 initial local data
 const getInitialOrderData = () => {
   try {
     const rawData = sessionStorage.getItem("pendingBusinessData");
@@ -43,7 +44,6 @@ export default function PaymentSuccess() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // 🔹 load plan data from backend
   useEffect(() => {
     const loadPlans = async () => {
       try {
@@ -79,17 +79,13 @@ export default function PaymentSuccess() {
   const formatPrice = (price, symbol) =>
     `${symbol}${parseFloat(price || "0").toFixed(2)}`;
 
+  // UPDATED: Use the separate receipt component
   const handlePrintReceipt = () => {
-    const w = window.open("", "_blank");
-    w.document.write(
-      `<h1>Receipt</h1>
-       <p>Plan: ${orderData.planName}</p>
-       <p>Amount: ${formatPrice(orderData.planPrice, orderData.currencySymbol)}</p>
-       <p>Transaction ID: ${orderData.transactionId}</p>
-       <p>Valid Till: ${orderData.planEndDate}</p>`
-    );
-    w.document.close();
-    w.print();
+    const receiptWindow = window.open("", "_blank");
+    const htmlContent = generateReceiptHTML(orderData, formatPrice);
+    receiptWindow.document.write(htmlContent);
+    receiptWindow.document.close();
+    setTimeout(() => receiptWindow.print(), 250);
   };
 
   useEffect(() => {
@@ -132,13 +128,15 @@ export default function PaymentSuccess() {
       setOrderData(formattedData);
 
       try {
-        // animated fake steps
         for (let i = 1; i <= 4; i++) {
           setCurrentStep(i);
           await new Promise((r) => setTimeout(r, 600));
         }
 
         const res = await becomeBusinessOwner(formattedData);
+        console.log("response from payment success ....",res)
+        const paymentId = res?.data?.paymentId || null;
+        localStorage.setItem("paymentId", paymentId);
 
         if (res?.success && res.data) {
           dispatch(setPaymentId(res.data.paymentId || null));
@@ -193,5 +191,6 @@ export default function PaymentSuccess() {
         formatPrice(price, orderData.currencySymbol || "₹")
       }
     />
+
   );
 }
