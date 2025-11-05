@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import LoginBG from "@/assets/loginimage.webp";
 
 import {
   Form,
@@ -182,7 +183,7 @@ export default function Login() {
       {/* Right side - image */}
       <div className="w-full md:w-1/2 h-56 sm:h-72 md:h-auto">
         <img
-          src="/src/assets/loginimage.webp"
+          src={LoginBG}
           alt="Login illustration"
           className="w-full h-full object-cover object-center"
         />

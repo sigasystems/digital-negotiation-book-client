@@ -1,8 +1,11 @@
-
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { CheckCircle2, Loader2, Check } from "lucide-react";
 import { formateCurrency } from "@/lib/utils";
 import { getAllPlans } from "../services/planService";
@@ -36,10 +39,9 @@ export default function PlansPage() {
     }
   }, []);
 
-  const parsedUser  = sessionStorage.getItem("user");
-  const paymentId  = parsedUser ? JSON.parse(parsedUser) : null;
+  const parsedUser = sessionStorage.getItem("user");
+  const paymentId = parsedUser ? JSON.parse(parsedUser) : null;
 
-  
   const fetchCurrentSubscription = async (paymentId) => {
     try {
       const response = await getPaymentById(paymentId);
@@ -57,9 +59,9 @@ export default function PlansPage() {
     const fetchPlans = async () => {
       try {
         const data = await getAllPlans();
-        const order = ["basic", "pro" ,"advance"];
+        const order = ["basic", "pro", "advance"];
         const sortedPlans = data.sort(
-          (a, b) => order.indexOf(a.key) - order.indexOf(b.key)
+          (a, b) => order.indexOf(a.key) - order.indexOf(b.key),
         );
         setPlans(sortedPlans);
       } catch (err) {
@@ -73,7 +75,6 @@ export default function PlansPage() {
   }, []);
 
   const handlePlanSelect = (plan) => {
-
     if (currentSubscription?.Plan?.id === plan.id) {
       toast.info("This is your current plan");
       return;
@@ -104,14 +105,11 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="h-50% bg-gray-50 py-12 px-4">
-      <div className="max-w-6xl mx-auto space-y-10">
-
-       
-
+    <div className="">
+      <div className="space-y-10">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+          <h1 className="text-5xl font-bold text-gray-900 mb-2">
             Choose Your Plan
           </h1>
           <p className="text-gray-600">
@@ -131,7 +129,9 @@ export default function PlansPage() {
             </span>
             <button
               onClick={() =>
-                setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")
+                setBillingCycle(
+                  billingCycle === "monthly" ? "yearly" : "monthly",
+                )
               }
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
                 billingCycle === "yearly" ? "bg-blue-600" : "bg-gray-300"
@@ -139,9 +139,7 @@ export default function PlansPage() {
             >
               <span
                 className={`inline-block h-4 w-4 bg-white rounded-full transition ${
-                  billingCycle === "yearly"
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                  billingCycle === "yearly" ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
@@ -157,8 +155,7 @@ export default function PlansPage() {
           </div>
         </div>
 
-
-         {/* Active Plan Banner */}
+        {/* Active Plan Banner */}
         {currentSubscription && (
           <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-5 shadow-sm">
             <div className="flex justify-between items-center">
@@ -176,7 +173,7 @@ export default function PlansPage() {
                     <span className="font-medium">
                       {formateCurrency(
                         currentSubscription.amount,
-                        currentSubscription.currency
+                        currentSubscription.currency,
                       )}
                     </span>
                   </div>
@@ -220,9 +217,7 @@ export default function PlansPage() {
           {plans.map((plan) => {
             const isActive = isActivePlan(plan.id);
             const price =
-              billingCycle === "monthly"
-                ? plan.priceMonthly
-                : plan.priceYearly;
+              billingCycle === "monthly" ? plan.priceMonthly : plan.priceYearly;
 
             return (
               <Card
@@ -313,7 +308,6 @@ export default function PlansPage() {
             );
           })}
         </div>
-
       </div>
     </div>
   );

@@ -6,15 +6,17 @@ import PlansPage from "../components/PlansPage";
 import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
 
 export default function LandingPage() {
-  useReloadOncePerSession("landingPageReloaded")
+  useReloadOncePerSession("landingPageReloaded");
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-screen w-full">
       <Hero />
+      <div className="container mx-auto p-4">
       <Features />
+      <PlansPage />
       <Testimonials />
       <CTA />
-      <PlansPage/>
+      </div>
     </main>
   );
 }
