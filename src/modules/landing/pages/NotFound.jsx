@@ -40,7 +40,7 @@ export default function NotFound() {
 
         <button
           onClick={() => window.history.back()}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition text-sm font-medium w-full sm:w-auto justify-center"
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition text-sm font-medium w-full sm:w-auto justify-center cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           Go Back

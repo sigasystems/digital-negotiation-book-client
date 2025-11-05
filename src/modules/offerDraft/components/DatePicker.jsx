@@ -54,7 +54,7 @@ const DatePicker = ({ label, value, onSelect, open, setOpen, editable = true }) 
             <Button
               variant="outline"
               type="button"
-              className="flex items-center justify-center"
+              className="flex items-center justify-center cursor-pointer"
               disabled={!editable}
             >
               <CalendarIcon className="h-4 w-4" />

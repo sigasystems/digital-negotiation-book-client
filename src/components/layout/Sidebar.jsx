@@ -175,7 +175,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-center text-red-600"
+                  className="w-full justify-center text-red-600 cursor-pointer"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-5 h-5" />
@@ -191,7 +191,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           ) : (
         <Button
           variant="ghost"
-          className="w-full justify-start text-red-600"
+          className="w-full justify-start text-red-600 cursor-pointer"
           onClick={handleLogout}
         >
           <LogOut className="w-5 h-5 mr-2" />

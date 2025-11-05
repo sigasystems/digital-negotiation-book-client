@@ -63,22 +63,22 @@ export default function Footer() {
             © {new Date().getFullYear()} Digital Negotiation Book. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className={` cursor-pointer`}>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer">
                 <Github className="h-5 w-5 text-blue-400 hover:bg-indigo-600" />
               </a>
             </Button>
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className={` cursor-pointer`}>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
                 <Twitter className="h-5 w-5 text-blue-400 hover:bg-indigo-600" />
               </a>
             </Button>
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className={` cursor-pointer`}>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="h-5 w-5 text-blue-400 hover:bg-indigo-600" />
               </a>
             </Button>
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className={` cursor-pointer`}>
               <a href="mailto:contact@yourcompany.com">
                 <Mail className="h-5 w-5 text-blue-400 hover:bg-indigo-600" />
               </a>

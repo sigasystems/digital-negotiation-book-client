@@ -45,7 +45,7 @@ const ConfirmationModal = ({
               onConfirm?.();
               onClose();
             }}
-            className={`px-6 py-2 rounded-xl text-white font-semibold shadow-sm hover:shadow-md transition-all duration-150  cursor-pointer ${confirmButtonColor}`}
+            className={`px-6 py-2 rounded-xl text-white font-semibold shadow-sm hover:shadow-md transition-all duration-150 cursor-pointer ${confirmButtonColor}`}
           >
             {confirmText}
           </Button>

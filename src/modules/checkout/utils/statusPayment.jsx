@@ -279,7 +279,7 @@ export const PaymentStatusView = ({
                 <div className="mt-10 pt-6 border-t border-gray-100">
                   <button
                     onClick={handleGoToDashboard}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl text-base hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 group"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl text-base hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 group cursor-pointer"
                   >
                     <span>Access Your Dashboard</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -350,7 +350,7 @@ export const PaymentStatusView = ({
                       {orderData.invoicePdf ? (
                         <button
                           onClick={() => window.open(orderData.invoicePdf, "_blank")}
-                          className="w-full flex items-center justify-between gap-2 text-blue-600 bg-blue-50 hover:bg-blue-100 py-3 px-4 rounded-lg text-sm transition-colors group"
+                          className="w-full flex items-center justify-between gap-2 text-blue-600 bg-blue-50 hover:bg-blue-100 py-3 px-4 rounded-lg text-sm transition-colors group cursor-pointer"
                         >
                           <span className="flex items-center gap-2">
                             <Download className="w-4 h-4" />
@@ -358,14 +358,21 @@ export const PaymentStatusView = ({
                           </span>
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
+<<<<<<< Updated upstream
                       ) : (                   
                         <Button>
                           Click for Download Invoice
                         </Button>              
+=======
+                      ) : (
+                        <button disabled className="w-full bg-gray-100 py-3 px-4 rounded-lg text-gray-400 text-sm cursor-pointer">
+                          Invoice processing...
+                        </button>
+>>>>>>> Stashed changes
                       )}
                       <button
                         onClick={handlePrintReceipt}
-                        className="w-full flex items-center justify-between gap-2 text-gray-700 bg-gray-50 hover:bg-gray-100 py-3 px-4 rounded-lg text-sm transition-colors group"
+                        className="w-full flex items-center justify-between gap-2 text-gray-700 bg-gray-50 hover:bg-gray-100 py-3 px-4 rounded-lg text-sm transition-colors group cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <Printer className="w-4 h-4" />
@@ -494,14 +501,14 @@ export const PaymentStatusView = ({
                 <div className="mt-10 pt-6 border-t border-gray-100 space-y-3">
                   <button
                     onClick={() => window.open("mailto:support@yourcompany.com?subject=Setup%20Issue%20-%20" + orderData.transactionId, "_self")}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl text-base hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl text-base hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 cursor-pointer"
                   >
                     <UserCheck className="w-5 h-5" />
                     <span>Contact Priority Support</span>
                   </button>
                   <button
                     onClick={handleReturnToPricing}
-                    className="w-full bg-white text-gray-700 border-2 border-gray-200 py-4 px-6 rounded-xl text-base hover:bg-gray-50 transition-colors"
+                    className="w-full bg-white text-gray-700 border-2 border-gray-200 py-4 px-6 rounded-xl text-base hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     Return to Home
                   </button>

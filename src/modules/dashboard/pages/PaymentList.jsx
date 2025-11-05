@@ -162,7 +162,7 @@ const PaymentList = () => {
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 mt-10">
         <button
-          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40 cursor-pointer"
           onClick={() => setPageIndex(pageIndex - 1)}
           disabled={pageIndex === 0}
         >
@@ -174,7 +174,7 @@ const PaymentList = () => {
         </span>
 
         <button
-          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-800 disabled:opacity-40 cursor-pointer"
           onClick={() => setPageIndex(pageIndex + 1)}
           disabled={pageIndex + 1 >= totalPages}
         >

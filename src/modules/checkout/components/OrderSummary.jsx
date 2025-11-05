@@ -203,7 +203,7 @@ export default function OrderSummary({
             <Button
               onClick={handleSubmit}
               disabled={loading || submitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 text-base font-semibold"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 text-base font-semibold cursor-pointer"
             >
               {submitting ? "Processing..." : "Complete Purchase"}
             </Button>
