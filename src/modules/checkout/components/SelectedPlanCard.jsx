@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Check, CreditCard } from "lucide-react";
+import { Check, CreditCard, MoveLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly" }) {
   if (!selectedPlan) {
@@ -36,12 +37,22 @@ export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly
     billingCycle === "yearly" ? priceYearly || 0 : priceMonthly || 0;
 
   return (
-    <Card className="shadow-md border-slate-200 mt-6">
+    <Card className="shadow-md border-slate-200 mt-12">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => window.history.back()}
+            >
+              <MoveLeft className="w-4 h-4" />
+              Back
+            </Button>
+            {/* Plan Name and Description */}
             <CardTitle className="text-xl font-semibold">{name}</CardTitle>
-            <CardDescription className="text-sm text-slate-600 mt-1">
+            <CardDescription className="text-sm text-slate-600 mt-2">
               {description}
             </CardDescription>
           </div>

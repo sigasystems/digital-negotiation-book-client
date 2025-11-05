@@ -1,16 +1,32 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import SelectedPlanCard from "../components/SelectedPlanCard";
 import OrderSummary from "../components/OrderSummary";
-import { InputGroup } from "../utils/InputGroup";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Shield, ArrowLeft, User, Mail, Phone, Building2, MapPin } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  Building2,
+  MapPin,
+  EyeOff,
+  Eye,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import {
+  validateCheckoutForm,
+  validateSingleField,
+} from "../utils/validateCheckoutForm";
 import { becomeBusinessOwner } from "../services/paymentService";
+import useUniqueBusinessField from "../hooks/useUniqueBusinessFileds";
 
 export default function CheckoutPage() {
   const { state } = useLocation();
@@ -18,8 +34,18 @@ export default function CheckoutPage() {
 
   const selectedPlan = state?.selectedPlan;
   const billingCycle = state?.billingCycle || "monthly";
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    checking,
+    errors: uniqueErrors,
+    checkUniqueField,
+    setErrors: setUniqueErrors,
+  } = useUniqueBusinessField();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -37,44 +63,78 @@ export default function CheckoutPage() {
     website: "",
   });
 
+  // Redirect if no plan selected
   if (!selectedPlan) {
     navigate("/plans");
     return null;
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
+  // ✅ Handle field changes with inline validation
+  const handleChange = useCallback(
+    async (e) => {
+      const { name, value } = e.target;
 
-    const handleSubmitfromCheckout = async (e) => {
-      e.preventDefault();
+      setFormData((prev) => ({ ...prev, [name]: value }));
 
-      if (!validateForm()) return;
+      // Validate single field
+      const fieldError = validateSingleField(name, value);
+      setErrors((prev) => ({ ...prev, [name]: fieldError }));
 
-      setLoading(true);
-
-      try {
-        const payload = {
-          planId: selectedPlan.id,
-          billingCycle,
-          ...formData,
-        };
-
-        const res = await becomeBusinessOwner(payload);
-
-        if (res.success) {
-          navigate("/success");
-        } else {
-          alert(res.message || "Something went wrong!");
-        }
-      } catch (err) {
-        alert(err);
-      } finally {
-        setLoading(false);
+      // Clear unique errors when user starts typing again
+      if (uniqueErrors[name]) {
+        setUniqueErrors((prev) => ({ ...prev, [name]: "" }));
       }
-    };
+
+      // Check uniqueness for specific fields (only if value is not empty and no format error)
+      if (
+        ["email", "businessName", "registrationNumber"].includes(name) &&
+        value.trim() &&
+        !fieldError
+      ) {
+        checkUniqueField(name, value);
+      }
+    },
+    [checkUniqueField, uniqueErrors, setUniqueErrors],
+  );
+
+  // ✅ Handle form submission
+  const handleSubmitfromCheckout = async (e) => {
+    e.preventDefault();
+
+    // Combine validation errors
+    const formValidationErrors = validateCheckoutForm(formData);
+    const combinedErrors = { ...formValidationErrors, ...uniqueErrors };
+    setErrors(combinedErrors);
+
+    // Check if there are any errors
+    if (Object.values(combinedErrors).some((err) => err)) {
+      toast.error("Please fix the highlighted errors before continuing.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        planId: selectedPlan.id,
+        billingCycle,
+        ...formData,
+      };
+
+      const res = await becomeBusinessOwner(payload);
+
+      if (res.success) {
+        toast.success("Checkout successful!");
+        navigate("/success");
+      } else {
+        toast.error(res.message || "Something went wrong!");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const calculateTotal = () =>
     billingCycle === "monthly"
@@ -83,29 +143,10 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* <header className="bg-white border-b sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Checkout</h1>
-          </div>
-          <Badge variant="secondary" className="hidden sm:flex items-center gap-1">
-            <Shield className="w-3 h-3" />
-            Secure Payment
-          </Badge>
-        </div>
-      </header> */}
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Form */}
           <div className="lg:col-span-2 space-y-6">
-
-           <div className="lg:col-span-2 space-y-6">
             <SelectedPlanCard
               selectedPlan={selectedPlan}
               billingCycle={billingCycle}
@@ -128,15 +169,11 @@ export default function CheckoutPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmitfromCheckout}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* First Name */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="first_name"
-                        className="text-sm font-medium"
-                      >
-                        First Name <span className="text-red-500">*</span>
-                      </Label>
+                      <Label htmlFor="first_name">First Name *</Label>
                       <Input
                         id="first_name"
                         name="first_name"
@@ -152,13 +189,9 @@ export default function CheckoutPage() {
                       )}
                     </div>
 
+                    {/* Last Name */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="last_name"
-                        className="text-sm font-medium"
-                      >
-                        Last Name <span className="text-red-500">*</span>
-                      </Label>
+                      <Label htmlFor="last_name">Last Name *</Label>
                       <Input
                         id="last_name"
                         name="last_name"
@@ -176,13 +209,14 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Email */}
                     <div className="space-y-2">
                       <Label
                         htmlFor="email"
                         className="text-sm font-medium flex items-center gap-1"
                       >
                         <Mail className="w-3 h-3" />
-                        Email Address <span className="text-red-500">*</span>
+                        Email Address *
                       </Label>
                       <Input
                         id="email"
@@ -198,18 +232,19 @@ export default function CheckoutPage() {
                       )}
                     </div>
 
+                    {/* Phone Number */}
                     <div className="space-y-2">
                       <Label
                         htmlFor="phoneNumber"
                         className="text-sm font-medium flex items-center gap-1"
                       >
                         <Phone className="w-3 h-3" />
-                        Phone Number <span className="text-red-500">*</span>
+                        Phone Number *
                       </Label>
                       <Input
                         id="phoneNumber"
                         name="phoneNumber"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="9876543210"
                         value={formData.phoneNumber}
                         onChange={handleChange}
                         className={errors.phoneNumber ? "border-red-500" : ""}
@@ -220,36 +255,50 @@ export default function CheckoutPage() {
                         </p>
                       )}
                     </div>
+                  </div>
 
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="password"
-                        className="text-sm font-medium flex items-center gap-1"
-                      >
-                        <Mail className="w-3 h-3" />
-                        Password <span className="text-red-500">*</span>
-                      </Label>
+                  {/* Password */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="password"
+                      className="text-sm font-medium flex items-center gap-1"
+                    >
+                      <Mail className="w-3 h-3" />
+                      Password *
+                    </Label>
+                    <div className="relative">
                       <Input
                         id="password"
                         name="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={handleChange}
-                        className={errors.password ? "border-red-500" : ""}
+                        className={`${
+                          errors.password ? "border-red-500" : ""
+                        } pr-10`}
                       />
-                      {errors.password && (
-                        <p className="text-xs text-red-500">
-                          {errors.password}
-                        </p>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
+                    {errors.password && (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    )}
                   </div>
                 </form>
               </CardContent>
             </Card>
 
-            {/* Business Information */}
+            {/* Business Info */}
             <Card className="shadow-md border-slate-200">
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -268,13 +317,9 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Business Name */}
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="businessName"
-                      className="text-sm font-medium"
-                    >
-                      Business Name <span className="text-red-500">*</span>
-                    </Label>
+                    <Label htmlFor="businessName">Business Name *</Label>
                     <Input
                       id="businessName"
                       name="businessName"
@@ -290,11 +335,9 @@ export default function CheckoutPage() {
                     )}
                   </div>
 
+                  {/* Registration Number */}
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="registrationNumber"
-                      className="text-sm font-medium"
-                    >
+                    <Label htmlFor="registrationNumber">
                       Registration Number
                     </Label>
                     <Input
@@ -303,15 +346,20 @@ export default function CheckoutPage() {
                       placeholder="REG-123456"
                       value={formData.registrationNumber}
                       onChange={handleChange}
+                      className={uniqueErrors.registrationNumber ? "border-red-500" : ""
+                      }
                     />
+                    {errors.registrationNumber && (
+                      <p className="text-xs text-red-500">
+                        {errors.registrationNumber}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="taxId" className="text-sm font-medium">
-                      Tax ID / VAT Number
-                    </Label>
+                    <Label htmlFor="taxId">Tax ID / VAT Number</Label>
                     <Input
                       id="taxId"
                       name="taxId"
@@ -322,9 +370,9 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="website" className="text-sm font-medium">
+                    <Label htmlFor="website">
                       Website
-                    </Label>
+                      </Label>
                     <Input
                       id="website"
                       name="website"
@@ -355,9 +403,7 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="address" className="text-sm font-medium">
-                    Street Address <span className="text-red-500">*</span>
-                  </Label>
+                  <Label htmlFor="address">Street Address *</Label>
                   <Input
                     id="address"
                     name="address"
@@ -373,9 +419,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city" className="text-sm font-medium">
-                      City <span className="text-red-500">*</span>
-                    </Label>
+                    <Label htmlFor="city">City *</Label>
                     <Input
                       id="city"
                       name="city"
@@ -390,9 +434,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="state" className="text-sm font-medium">
-                      State / Province
-                    </Label>
+                    <Label htmlFor="state">State / Province</Label>
                     <Input
                       id="state"
                       name="state"
@@ -403,9 +445,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode" className="text-sm font-medium">
-                      Postal Code
-                    </Label>
+                    <Label htmlFor="postalCode">Postal Code</Label>
                     <Input
                       id="postalCode"
                       name="postalCode"
@@ -417,9 +457,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="country" className="text-sm font-medium">
-                    Country <span className="text-red-500">*</span>
-                  </Label>
+                  <Label htmlFor="country">Country *</Label>
                   <Input
                     id="country"
                     name="country"
@@ -434,7 +472,6 @@ export default function CheckoutPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
         </div>
         {/* Right Column */}
           <OrderSummary
