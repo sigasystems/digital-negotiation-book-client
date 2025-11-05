@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { addBusinessOwnerApi } from "./services";
 
 const AddBusinessOwner = () => {
@@ -19,6 +20,8 @@ const AddBusinessOwner = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState([]);
+
+  const navigate = useNavigate()
 
   const showToast = (message, type = "success") => {
     const id = Date.now();
@@ -63,7 +66,7 @@ const AddBusinessOwner = () => {
 };
 
   const handleBack = () => {
-    window.location.href = "/dashboard";
+    navigate(-1)
   };
 
   return (
@@ -97,8 +100,7 @@ const AddBusinessOwner = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-200 w-fit hover:translate-x-1 cursor-pointer"
           >
             <span className="text-lg">←</span>
-            <span className="font-medium hidden sm:inline">Back to Dashboard</span>
-            <span className="font-medium sm:hidden">Back</span>
+            <span className="font-medium">Back</span>
           </button>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
             Add New Business Owner

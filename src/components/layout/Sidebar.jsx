@@ -60,9 +60,9 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
           { name: "Products", icon: Fish, path: "/products" },
           { name: "Add Product", icon: PlusCircle, path: "/add-product" },
-          { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
           { name: "Offer Drafts", icon: ClipboardList, path: "/offer-draft" },
           { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
+          { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
         ]
       : []),
     ...(userRole === "super_admin"

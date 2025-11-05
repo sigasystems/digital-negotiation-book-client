@@ -85,7 +85,7 @@ export default function Layout({ children }) {
         <main
           className={cn(
             "flex-1",
-            shouldHavePadding && "px-4 pt-20 pb-6 lg:pt-20 lg:pl-10 lg:pb-10"
+            shouldHavePadding && "px-4 pt-20 pb-6 lg:pt-20 lg:pl-4 lg:pb-10"
           )}
         >
           {children}
