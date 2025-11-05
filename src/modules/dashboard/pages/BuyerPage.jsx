@@ -75,7 +75,7 @@ const BuyerPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="hover:bg-slate-100"
+              className="hover:bg-slate-100 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Back</span>
@@ -162,7 +162,7 @@ const BuyerPage = () => {
               variant="outline"
               onClick={() => navigate(-1)}
               disabled={saving}
-              className="w-full sm:w-auto hover:bg-slate-100"
+              className="w-full sm:w-auto hover:bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4 mr-2" />
               Cancel
@@ -170,7 +170,7 @@ const BuyerPage = () => {
             <Button
               onClick={handleSaveClick}
               disabled={saving || !hasChanges}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer"
             >
               {saving ? (
                 <>

@@ -219,7 +219,7 @@ const UserPage = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleCancel}>
+          <Button variant="ghost" size="icon" onClick={handleCancel} className={`cursor-pointer`}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
@@ -234,8 +234,8 @@ const UserPage = () => {
           {Object.keys(FIELD_SECTIONS).map(renderSection)}
 
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-            <Button variant="outline" onClick={handleCancel} disabled={saving}>Cancel</Button>
-            <Button onClick={handleSubmit} disabled={saving}>
+            <Button variant="outline" className={`cursor-pointer`} onClick={handleCancel} disabled={saving}>Cancel</Button>
+            <Button className={`cursor-pointer`} onClick={handleSubmit} disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>

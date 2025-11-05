@@ -11,7 +11,7 @@ export const Modal = ({ isOpen, onClose, title, children }) => {
         <div className="space-y-2">{children}</div>
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 cursor-pointer"
         >
           ✕
         </button>

@@ -183,7 +183,7 @@ const ProductSection = ({
             <button
               onClick={() => removeBreakupRow(idx)}
               type="button"
-              className="text-red-600 mt-3 text-sm hover:underline"
+              className="text-red-600 mt-3 text-sm hover:underline cursor-pointer"
             >
               Remove Row
             </button>

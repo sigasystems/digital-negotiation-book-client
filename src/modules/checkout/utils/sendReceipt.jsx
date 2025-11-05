@@ -175,6 +175,7 @@ export const generateReceiptHTML = (orderData, formatPrice) => {
           }
           .print-button:hover {
             background: #1d4ed8;
+            cursor: pointer;
           }
           .status-badge {
             display: inline-flex;

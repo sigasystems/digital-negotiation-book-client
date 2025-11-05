@@ -99,7 +99,7 @@ export default function PlansPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <p className="text-red-600 mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
+        <Button className={`cursor-pointer`} onClick={() => window.location.reload()}>Retry</Button>
       </div>
     );
   }
@@ -133,7 +133,7 @@ export default function PlansPage() {
                   billingCycle === "monthly" ? "yearly" : "monthly",
                 )
               }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition cursor-pointer ${
                 billingCycle === "yearly" ? "bg-blue-600" : "bg-gray-300"
               }`}
             >
@@ -200,6 +200,7 @@ export default function PlansPage() {
               {currentSubscription.invoicePdf && (
                 <Button
                   variant="outline"
+                  className={`cursor-pointer`}
                   size="sm"
                   onClick={() =>
                     window.open(currentSubscription.invoicePdf, "_blank")
@@ -295,7 +296,7 @@ export default function PlansPage() {
                   <Button
                     onClick={() => handlePlanSelect(plan)}
                     disabled={isActive}
-                    className={`w-full ${
+                    className={`w-full cursor-pointer ${
                       isActive
                         ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
