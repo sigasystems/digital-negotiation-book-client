@@ -138,7 +138,7 @@ export default function CheckoutPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="first_name">First Name *</Label>
+                    <Label className="m-1" htmlFor="first_name">First Name *</Label>
                     <Input
                       id="first_name"
                       name="first_name"
@@ -153,7 +153,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="last_name">Last Name *</Label>
+                    <Label className="m-1" htmlFor="last_name">Last Name *</Label>
                     <Input
                       id="last_name"
                       name="last_name"
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label className="m-1" htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       name="email"
@@ -186,7 +186,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="phoneNumber">Phone Number *</Label>
+                    <Label className="m-1" htmlFor="phoneNumber">Phone Number *</Label>
                     <Input
                       id="phoneNumber"
                       name="phoneNumber"
@@ -202,7 +202,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="password">Password *</Label>
+                  <Label className="m-1" htmlFor="password">Password *</Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -247,9 +247,9 @@ export default function CheckoutPage() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
                   <div>
-                    <Label htmlFor="businessName">Business Name *</Label>
+                    <Label className="m-1" htmlFor="businessName"  >Business Name *</Label>
                     <Input
                       id="businessName"
                       name="businessName"
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="registrationNumber">Registration Number *</Label>
+                    <Label className="m-1" htmlFor="registrationNumber" >Registration Number *</Label>
                     <Input
                       id="registrationNumber"
                       name="registrationNumber"
@@ -281,7 +281,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="taxId">Tax ID</Label>
+                    <Label className="m-1" htmlFor="taxId">Tax ID</Label>
                     <Input
                       id="taxId"
                       name="taxId"
@@ -291,7 +291,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="website">Website</Label>
+                    <Label className="m-1" htmlFor="website">Website</Label>
                     <Input
                       id="website"
                       name="website"
@@ -320,7 +320,7 @@ export default function CheckoutPage() {
 
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="address">Address *</Label>
+                  <Label className="m-1" htmlFor="address">Address *</Label>
                   <Input
                     id="address"
                     name="address"
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="city">City *</Label>
+                    <Label className="m-1" htmlFor="city">City *</Label>
                     <Input
                       id="city"
                       name="city"
@@ -350,7 +350,7 @@ export default function CheckoutPage() {
                     )}
                   </div>
                   <div>
-                    <Label htmlFor="state">State *</Label>
+                    <Label className="m-1" htmlFor="state">State *</Label>
                     <Input
                       id="state"
                       name="state"
@@ -367,7 +367,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="country">Country *</Label>
+                    <Label className="m-1" htmlFor="country">Country *</Label>
                     <Input
                       id="country"
                       name="country"
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="postalCode">Postal Code *</Label>
+                    <Label className="m-1" htmlFor="postalCode">Postal Code *</Label>
                     <Input
                       id="postalCode"
                       name="postalCode"
