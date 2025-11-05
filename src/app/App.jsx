@@ -13,7 +13,6 @@ import LandingPage from "@/modules/landing/pages/LandingPage";
 import CheckoutPage from "@/modules/checkout/pages/Checkout";
 import Users from "@/modules/dashboard/pages/Users";
 import ResponsiveDashboard from "@/modules/dashboard/components/DashboardContent";
-import SuccessPage from "@/modules/checkout/components/PaymentSuccess";
 // import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 import AddBuyerForm from "@/modules/businessOwner/pages/AddBuyer";
 import AddBusinessOwner from "@/modules/superAdmin/AddBusinessOwner";
@@ -28,6 +27,7 @@ import PaymentList from "@/modules/dashboard/pages/PaymentList";
 import OfferDrafts from "@/modules/offerDraft/pages/OfferDrafts";
 import ViewOfferDraft from "@/modules/offerDraft/pages/ViewOfferDraft";
 import NotFound from "@/modules/landing/pages/NotFound";
+import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ useEffect(() => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/success" element={<SuccessPage />} />
+        <Route path="/success" element={<PaymentSuccess />} />
         {/* <Route path="/paymentsuccess" element={<PaymentSuccess />} /> */}
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="*" element={<NotFound />} />

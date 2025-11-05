@@ -53,21 +53,10 @@ export default function OrderSummary({
     setSubmitting(true);
 
     try {
-      // :one: Register user
-      const registerRes = await apiClient.post("/auth/login", {
-        first_name: formData.first_name,
+      // :One: we only register here user automatically
+      const data = await login({      
+         first_name: formData.first_name,
         last_name: formData.last_name,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (!registerRes.data?.success) {
-        showError(registerRes.data?.message || "Registration failed");
-        return;
-      }
-
-      // :two: Login user automatically
-      const data = await login({
         email: formData.email,
         password: formData.password,
       });
@@ -89,7 +78,7 @@ export default function OrderSummary({
 
       const user = tokenPayload;
       if (!user) throw new Error("Auto login failed");
-      // :three: Create Stripe checkout session
+      // :two: Create Stripe checkout session
       const paymentPayload = {
         userId: user.id,
         planId: selectedPlan.id,

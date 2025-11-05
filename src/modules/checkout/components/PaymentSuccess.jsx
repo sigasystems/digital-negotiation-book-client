@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -8,13 +7,10 @@ import { PaymentStatusView } from "../utils/statusPayment";
 import { setPaymentId, setPaymentStatus } from "@/app/store/slices/paymentSlice";
 import { getAllPlans } from "@/modules/landing/services/planService";
 import { generateReceiptHTML } from "../utils/sendReceipt";
-// IMPORT THE RECEIPT GENERATOR
+import { login } from "@/modules/auth/services/authService";
+import toast from "react-hot-toast";
 
-const CURRENCY_SYMBOL = {
-  INR: "₹",
-  USD: "$",
-  EUR: "€",
-};
+const CURRENCY_SYMBOL = { INR: "₹", USD: "$", EUR: "€" };
 
 const getNextBillingDate = (cycle) => {
   const now = new Date();
@@ -40,10 +36,12 @@ export default function PaymentSuccess() {
   const [availablePlans, setAvailablePlans] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [setupError, setSetupError] = useState(null);
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
   const hasRun = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // 🧭 Fetch available plans
   useEffect(() => {
     const loadPlans = async () => {
       try {
@@ -65,48 +63,33 @@ export default function PaymentSuccess() {
     loadPlans();
   }, []);
 
-  const handleGoToDashboard = useCallback(() => {
-    sessionStorage.removeItem("pendingBusinessData");
-    sessionStorage.setItem("businessSetupComplete", "true");
-    navigate("/dashboard", { replace: true });
-  }, [navigate]);
-
-  const handleReturnToPricing = useCallback(() => {
-    sessionStorage.removeItem("pendingBusinessData");
-    navigate("/");
-  }, [navigate]);
-
-  const formatPrice = (price, symbol) =>
-    `${symbol}${parseFloat(price || "0").toFixed(2)}`;
-
-  // UPDATED: Use the separate receipt component
+  // 🧾 Print receipt handler
   const handlePrintReceipt = () => {
     const receiptWindow = window.open("", "_blank");
-    const htmlContent = generateReceiptHTML(orderData, formatPrice);
+    const htmlContent = generateReceiptHTML(orderData);
     receiptWindow.document.write(htmlContent);
     receiptWindow.document.close();
     setTimeout(() => receiptWindow.print(), 250);
   };
 
+  // 🚀 Step 1: Create Business (simulate progress + backend call)
   useEffect(() => {
     const handleBusinessCreation = async () => {
       if (hasRun.current) return;
       hasRun.current = true;
 
       const sessionData = getInitialOrderData();
-      const planId =
-        sessionData.planId ||
-        Object.keys(availablePlans)[0] ||
-        "default-plan-id";
+      const planId = sessionData.planId;
       const billingCycle = sessionData.billingCycle || "monthly";
       const planInfo = availablePlans[planId];
 
-      if (!planInfo) return;
+      if (!planInfo) {
+        console.warn("Plan info missing for ID:", planId);
+        return;
+      }
 
       const now = new Date();
       const nextBillingDate = getNextBillingDate(billingCycle);
-      const currencyCode = planInfo.currency || "INR";
-
       const formattedData = {
         ...sessionData,
         planId,
@@ -116,67 +99,86 @@ export default function PaymentSuccess() {
           billingCycle === "yearly"
             ? planInfo.priceYearly
             : planInfo.priceMonthly,
-        currencyCode,
-        currencySymbol: CURRENCY_SYMBOL[currencyCode] || "₹",
+        currencyCode: planInfo.currency,
+        currencySymbol: CURRENCY_SYMBOL[planInfo.currency] || "₹",
         date: formatDate(now),
         time: formatTime(now),
         planStartDate: formatDate(now),
         planEndDate: formatDate(nextBillingDate),
-        nextBilling: formatDate(nextBillingDate),
       };
 
       setOrderData(formattedData);
 
       try {
+        // Fake progress animation
         for (let i = 1; i <= 4; i++) {
           setCurrentStep(i);
           await new Promise((r) => setTimeout(r, 600));
         }
 
         const res = await becomeBusinessOwner(formattedData);
-        console.log("response from payment success ....",res)
-        const paymentId = res?.data?.paymentId || null;
-        localStorage.setItem("paymentId", paymentId);
 
         if (res?.success && res.data) {
           dispatch(setPaymentId(res.data.paymentId || null));
           dispatch(setPaymentStatus("success"));
-
-          const existingUser = sessionStorage.getItem("user");
-          if (existingUser) {
-            try {
-              const userObj = JSON.parse(existingUser);
-              userObj.userRole = "business_owner";
-              if (res.data.userId) userObj.id = res.data.userId;
-              sessionStorage.setItem("user", JSON.stringify(userObj));
-            } catch (e) {
-              console.warn("Failed to update user role:", e);
-            }
-          }
-
-          sessionStorage.setItem("businessSetupComplete", "true");
-
-          setOrderData((prev) => ({
-            ...prev,
-            planPrice: res.data.plan?.price || prev.planPrice,
-            transactionId: res.data.transactionId || prev.transactionId,
-          }));
-
           setStatus("success");
+          setIsSetupComplete(true);
+          toast.success("Payment verified successfully!");
         } else {
           setSetupError(res?.message || "Account creation failed.");
           dispatch(setPaymentStatus("error"));
           setStatus("error");
         }
-      } catch {
+      } catch (err) {
+        console.error(err);
         setSetupError("Network error. Payment is safe, setup pending.");
         dispatch(setPaymentStatus("error"));
         setStatus("error");
+      } finally {
+        sessionStorage.setItem("orderData", JSON.stringify(formattedData));
       }
     };
 
     if (Object.keys(availablePlans).length) handleBusinessCreation();
   }, [dispatch, availablePlans]);
+
+  // 🧭 Step 2: When user clicks “Go to Dashboard” → login + navigate
+  const handleGoToDashboard = useCallback(async () => {
+    try {
+      const savedOrder = JSON.parse(sessionStorage.getItem("orderData") || "{}");
+
+      if (!savedOrder?.email || !savedOrder?.password) {
+        toast.error("Session expired, please log in manually.");
+        navigate("/login");
+        return;
+      }
+
+      const stored = await login({
+        businessName: savedOrder.businessName,
+        email: savedOrder.email,
+        password: savedOrder.password,
+      });
+
+      const { accessToken, tokenPayload } = stored?.data || {};
+      if (!accessToken || !tokenPayload) throw new Error("Invalid login response");
+
+      sessionStorage.setItem("authToken", accessToken);
+      sessionStorage.setItem("user", JSON.stringify(tokenPayload));
+      sessionStorage.removeItem("pendingBusinessData");
+
+      toast.success(`Welcome, ${tokenPayload.name || "User"}!`);
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      console.error("Login failed:", err);
+      toast.error("Login failed, please try again.");
+    }
+  }, [navigate]);
+
+  // 🧭 Step 3: Return to Pricing
+  const handleReturnToPricing = useCallback(() => {
+    sessionStorage.removeItem("pendingBusinessData");
+    navigate("/");
+  }, [navigate]);
 
   return (
     <PaymentStatusView
@@ -187,10 +189,10 @@ export default function PaymentSuccess() {
       handleGoToDashboard={handleGoToDashboard}
       handleReturnToPricing={handleReturnToPricing}
       handlePrintReceipt={handlePrintReceipt}
-      formatPrice={(price) =>
-        formatPrice(price, orderData.currencySymbol || "₹")
+      isSetupComplete={isSetupComplete}
+      formatPrice={(p) =>
+        `${orderData.currencySymbol || "₹"}${parseFloat(p || "0").toFixed(2)}`
       }
     />
-
   );
 }
