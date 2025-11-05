@@ -122,7 +122,7 @@ export default function ResponsiveDashboard() {
           <div
             key={stat.label}
             className={`bg-white shadow-sm rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center w-full
-              ${i === 2 ? 'col-span-2 md:col-span-1 justify-self-center max-w-[calc(50%-0.75rem)] sm:max-w-[calc(50%-1rem)]' : ''}`}
+              ${i === 2 ? 'col-span-2 md:col-span-1 justify-self-center sm:justify-self-stretch' : ''}`}
           >
             <p className="text-gray-800 text-xs sm:text-sm font-medium">{stat.label}</p>
             <h2 className={`text-xl sm:text-2xl lg:text-3xl font-bold mt-1 sm:mt-2 ${stat.color}`}
