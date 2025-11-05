@@ -358,17 +358,10 @@ export const PaymentStatusView = ({
                           </span>
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
-<<<<<<< Updated upstream
                       ) : (                   
                         <Button>
                           Click for Download Invoice
-                        </Button>              
-=======
-                      ) : (
-                        <button disabled className="w-full bg-gray-100 py-3 px-4 rounded-lg text-gray-400 text-sm cursor-pointer">
-                          Invoice processing...
-                        </button>
->>>>>>> Stashed changes
+                        </Button>   
                       )}
                       <button
                         onClick={handlePrintReceipt}
