@@ -1,65 +1,58 @@
 import React from "react";
-import {
-  Bolt,
-  Layout,
-  Server,
-  Users,
-  BarChart3,
-  ShieldCheck,
-} from "lucide-react";
+import { Handshake, LayoutDashboard, Workflow, ShieldCheck, BarChart3, Users } from "lucide-react";
 
 // The main App component will contain the features section
 export default function App() {
-  const features = [
-    {
-      title: "Rapid Deployment",
-      description:
-        "Get your projects live in record time with a streamlined, zero-config setup process.",
-      icon: <Bolt className="h-6 w-6" />,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
-    },
-    {
-      title: "Modular Design System",
-      description:
-        "Utilize flexible, reusable components and the power of Tailwind for effortless, beautiful design.",
-      icon: <Layout className="h-6 w-6" />,
-      color: "text-rose-600",
-      bg: "bg-rose-50",
-    },
-    {
-      title: "Elastic Scalability",
-      description:
-        "Built on an organized, scalable architecture ready to handle enterprise-level growth and traffic.",
-      icon: <Server className="h-6 w-6" />,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-    },
-    {
-      title: "Seamless Collaboration",
-      description:
-        "Work together in real-time with integrated tools designed to boost team productivity and communication.",
-      icon: <Users className="h-6 w-6" />,
-      color: "text-yellow-600",
-      bg: "bg-yellow-50",
-    },
-    {
-      title: "Advanced Analytics",
-      description:
-        "Gain deep, actionable insights into performance with comprehensive, real-time data visualization.",
-      icon: <BarChart3 className="h-6 w-6" />,
-      color: "text-sky-600",
-      bg: "bg-sky-50",
-    },
-    {
-      title: "A-Grade Security",
-      description:
-        "Protect your data with enterprise-level security protocols and continuous reliability monitoring.",
-      icon: <ShieldCheck className="h-6 w-6" />,
-      color: "text-fuchsia-600",
-      bg: "bg-fuchsia-50",
-    },
-  ];
+ const features = [
+  {
+    title: "Smart Deal Management",
+    description:
+      "Handle negotiations, offers, and counteroffers seamlessly through one unified platform.",
+    icon: <Handshake className="h-6 w-6" />,
+    color: "text-indigo-600",
+    bg: "bg-indigo-50",
+  },
+  {
+    title: "Centralized Dashboard",
+    description:
+      "Monitor all your business deals, clients, and payments in a single intuitive dashboard.",
+    icon: <LayoutDashboard className="h-6 w-6" />,
+    color: "text-rose-600",
+    bg: "bg-rose-50",
+  },
+  {
+    title: "Automated Workflows",
+    description:
+      "Save hours of manual effort with automated processes for offers, approvals, and notifications.",
+    icon: <Workflow className="h-6 w-6" />,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+  },
+  {
+    title: "Secure Business Platform",
+    description:
+      "Built with enterprise-grade authentication and encryption to keep your negotiations private and protected.",
+    icon: <ShieldCheck className="h-6 w-6" />,
+    color: "text-yellow-600",
+    bg: "bg-yellow-50",
+  },
+  {
+    title: "Real-Time Insights",
+    description:
+      "Access detailed analytics on deals, buyer activity, and performance to make data-driven decisions.",
+    icon: <BarChart3 className="h-6 w-6" />,
+    color: "text-sky-600",
+    bg: "bg-sky-50",
+  },
+  {
+    title: "Multi-Role Access",
+    description:
+      "Empower your team with role-based access for admins, business owners, and buyers — all under one roof.",
+    icon: <Users className="h-6 w-6" />,
+    color: "text-fuchsia-600",
+    bg: "bg-fuchsia-50",
+  },
+];
 
   return (
     <section className="py-24 md:py-32">

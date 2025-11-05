@@ -1,5 +1,5 @@
+import { useState, useCallback, useRef } from "react";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
-import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
 export default function useUniqueBusinessField() {
@@ -8,28 +8,39 @@ export default function useUniqueBusinessField() {
     businessName: false,
     registrationNumber: false,
   });
-  const [errors, setErrors] = useState({});
-
-  const debounce = (fn, delay = 600) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => fn(...args), delay);
-    };
-  };
-
-  const checkUniqueField = useCallback(
-    debounce(async (field, value) => {
-      if (!value?.trim()) return;
+  const [errors, setErrors] = useState({
+    email: "",
+    businessName: "",
+    registrationNumber: "",
+  });
+  // store previous checked values to prevent redundant API calls
+  const lastCheckedValues = useRef({
+    email: "",
+    businessName: "",
+    registrationNumber: "",
+  });
+  // store timeout IDs for debounce
+  const timeoutRefs = useRef({});
+  const checkUniqueField = useCallback(async (field, value) => {
+    // cancel old debounce
+    if (timeoutRefs.current[field]) clearTimeout(timeoutRefs.current[field]);
+    // if empty, reset error
+    if (!value?.trim()) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+      return;
+    }
+    // skip if value same as last checked (avoid repeating)
+    if (lastCheckedValues.current[field] === value) return;
+    timeoutRefs.current[field] = setTimeout(async () => {
       setChecking((prev) => ({ ...prev, [field]: true }));
 
       try {
         const res = await businessOwnerService.checkUnique({ [field]: value });
         const { data } = res;
+        lastCheckedValues.current[field] = value;
 
         if (!data?.success) {
-          const msg = data?.message || "Validation failed";
-          toast.error(msg);
+          const msg = data?.message || "Validation failed.";
           setErrors((prev) => ({ ...prev, [field]: msg }));
           return;
         }
@@ -42,21 +53,19 @@ export default function useUniqueBusinessField() {
               ? "Business name already exists"
               : "Registration number already exists";
           setErrors((prev) => ({ ...prev, [field]: msg }));
-          toast.error(msg);
         } else {
           setErrors((prev) => ({ ...prev, [field]: "" }));
         }
       } catch (err) {
         const msg =
           err.response?.data?.message ||
-          "Unable to check uniqueness at the moment.";
-        toast.error(msg);
+          "Unable to verify this field right now.";
+        setErrors((prev) => ({ ...prev, [field]: msg }));
       } finally {
         setChecking((prev) => ({ ...prev, [field]: false }));
       }
-    }, 600),
-    []
-  );
+    }, 600); // debounce: 600ms
+  }, []);
 
   return { checking, errors, setErrors, checkUniqueField };
 }

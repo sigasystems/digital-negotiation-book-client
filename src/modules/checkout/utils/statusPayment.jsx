@@ -1,7 +1,9 @@
+import { Button } from "@headlessui/react";
 import {
   CheckCircle, Mail, Building2, ArrowRight, XCircle,
   Shield, Download, Calendar, CreditCard, Loader2,
   Printer, Sparkles, UserCheck, Clock, Receipt, FileCheck,
+  ArrowDown,
 } from "lucide-react";
 
 export const PaymentStatusView = ({
@@ -206,7 +208,7 @@ export const PaymentStatusView = ({
 
   if (status === "success") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="min-h-screen bg-gradient-to-br mt-19 mb-10 m-4 from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center sm:p-6">
         <div className="w-full max-w-7xl">
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 sm:px-8 py-6">
@@ -356,10 +358,10 @@ export const PaymentStatusView = ({
                           </span>
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
-                      ) : (
-                        <button disabled className="w-full bg-gray-100 py-3 px-4 rounded-lg text-gray-400 text-sm">
-                          Invoice processing...
-                        </button>
+                      ) : (                   
+                        <Button>
+                          Click for Download Invoice
+                        </Button>              
                       )}
                       <button
                         onClick={handlePrintReceipt}
@@ -396,7 +398,7 @@ export const PaymentStatusView = ({
 
   if (status === "error") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 mt-14 mb-10 m-4  via-orange-50 to-yellow-50 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-7xl">
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <div className="bg-gradient-to-r from-red-600 to-orange-600 px-6 sm:px-8 py-6">
