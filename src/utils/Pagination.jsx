@@ -1,5 +1,17 @@
-import { Circle } from "lucide-react"
-export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPageSizeChange}) => {
+// src/utils/Pagination.jsx
+import React from "react";
+import { Circle } from "lucide-react";
+
+/**
+ * Pagination (named export)
+ */
+export const Pagination = ({
+  pageIndex,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}) => {
   const getPageNumbers = (current, total) => {
     if (total <= 1) return [0];
     const delta = 1;
@@ -19,83 +31,89 @@ export const Pagination = ({ pageIndex, totalPages, pageSize, onPageChange, onPa
 
   const pages = getPageNumbers(pageIndex, totalPages || 1);
 
- return (
-  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3">
-    <div className="flex items-center gap-2">
-      <span className="text-xs sm:text-sm text-gray-600 font-medium">Rows per page:</span>
-      <select
-        value={pageSize}
-        onChange={(e) => onPageSizeChange(Number(e.target.value))}
-        className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
-      >
-        {[10, 20, 50].map((size) => (
-          <option key={size} value={size}>{size}</option>
-        ))}
-      </select>
-    </div>
-
-      <div className="hidden md:block text-sm text-gray-600">
-      Page <span className="font-semibold text-gray-900">{pageIndex + 1}</span> of{" "}
-      <span className="font-semibold text-gray-900">{totalPages}</span>
-    </div>
-
-    <div className="flex items-center gap-1">
-      <button
-        disabled={pageIndex <= 0 || totalPages <= 1}
-        onClick={() => onPageChange(pageIndex - 1)}
-        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-          pageIndex <= 0 || totalPages <= 1 
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
-          }
-        `}
-      >
-        Prev
-      </button>
-
-      <div className="hidden sm:flex items-center gap-1 mx-1">
-        {pages.map((p, idx) =>
-          p === "..." ? (
-            <span key={idx} className="px-2 py-2 text-gray-400 text-sm">...</span>
-          ) : (
-            <button
-              key={idx}
-              onClick={() => onPageChange(p)}
-              className={`
-                min-w-[36px] sm:min-w-[40px] h-9 sm:h-10 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-                p === pageIndex 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
-                }
-              `}
-            >
-              {p + 1}
-            </button>
-          )
-        )}
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4">
+      <div className="flex items-center gap-2">
+        <span className="text-xs sm:text-sm text-gray-600 font-medium">
+          Rows per page:
+        </span>
+        <select
+          value={pageSize}
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
+        >
+          {[10, 20, 50].map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
       </div>
 
-        <div className="sm:hidden px-3 py-2 bg-gray-100 rounded-lg text-xs font-medium text-gray-700">
-        {pageIndex + 1} / {totalPages}
+      <div className="text-xs sm:text-sm text-gray-600">
+        Page{" "}
+        <span className="font-semibold text-gray-900">{pageIndex + 1}</span> of{" "}
+        <span className="font-semibold text-gray-900">{totalPages}</span>
       </div>
 
-      <button
-        disabled={pageIndex >= totalPages - 1 || totalPages <= 1}
-        onClick={() => onPageChange(pageIndex + 1)}
-        className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-          pageIndex >= totalPages - 1 || totalPages <= 1
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
-          }
-        `}
-      >
-        Next
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          disabled={pageIndex <= 0 || totalPages <= 1}
+          onClick={() => onPageChange(pageIndex - 1)}
+          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+            pageIndex <= 0 || totalPages <= 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
+          }`}
+        >
+          Prev
+        </button>
+
+        <div className="hidden sm:flex items-center gap-1 mx-1">
+          {pages.map((p, idx) =>
+            p === "..." ? (
+              <span key={idx} className="px-2 text-gray-400 text-sm">
+                ...
+              </span>
+            ) : (
+              <button
+                key={idx}
+                onClick={() => onPageChange(p)}
+                className={`min-w-[36px] sm:min-w-[40px] h-8 sm:h-9 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                  p === pageIndex
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
+                }`}
+              >
+                {p + 1}
+              </button>
+            )
+          )}
+        </div>
+
+        <div className="sm:hidden px-3 py-1.5 bg-gray-100 rounded-lg text-xs font-medium text-gray-700">
+          {pageIndex + 1}/{totalPages}
+        </div>
+
+        <button
+          disabled={pageIndex >= totalPages - 1 || totalPages <= 1}
+          onClick={() => onPageChange(pageIndex + 1)}
+          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+            pageIndex >= totalPages - 1 || totalPages <= 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
+/**
+ * MobileCard (named export)
+ */
 export const MobileCard = ({ item, isSelected, onSelect, actions }) => {
   return (
     <div
@@ -150,7 +168,6 @@ export const MobileCard = ({ item, isSelected, onSelect, actions }) => {
         </div>
       </div>
 
-      {/* Action buttons */}
       <div className="mt-3">{actions}</div>
     </div>
   );
