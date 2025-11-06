@@ -106,7 +106,6 @@ export default function OrderSummary({
         userId: user.id,
         ...formData,
       };
-        console.log("All done ....!!!")
       } else {
         showError("Checkout URL not received from server.");
       }

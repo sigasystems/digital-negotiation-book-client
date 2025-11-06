@@ -176,7 +176,6 @@ const CreateOfferDraft = () => {
     try {
       const payload = formatPayload(formData, total);
       const res = await offerDraftService.createDraft(payload);
-      console.log("res",res)
       if (res?.data?.data?.error) {
         toast.error(res.data.data?.error);
         return;
