@@ -75,7 +75,6 @@ export default function PaymentSuccess() {
   const handlePrintReceipt = () => {
     const receiptWindow = window.open("", "_blank");
     const htmlContent = generateReceiptHTML(orderData , formatPrice);
-    console.log("receipt log from payment success page...",htmlContent)
     receiptWindow.document.write(htmlContent);
     receiptWindow.document.close();
     setTimeout(() => receiptWindow.print(), 250);

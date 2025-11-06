@@ -66,8 +66,8 @@ export default function CTA() {
           <div
             key={feature.title}
             className="p-8 border border-gray-100 rounded-2xl shadow-lg
-                         transform transition-all duration-500 ease-in-out hover:scale-[1.02]
-                         hover:shadow-blue-500/20 hover:border-blue-500 group bg-white"
+                         transform transition-all duration-500 
+                         hover:shadow-blue-500/20 group bg-white"
           >
             <div
               className={`w-14 h-14 flex items-center justify-center ${feature.bg} ${feature.color} rounded-xl mb-6 mx-auto transition-colors duration-300 group-hover:bg-opacity-80`}
