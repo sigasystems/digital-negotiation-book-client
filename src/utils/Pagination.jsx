@@ -34,7 +34,7 @@ export const Pagination = ({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4">
       <div className="flex items-center gap-2">
-        <span className="text-xs sm:text-sm text-gray-600 font-medium">
+        <span className="text-xs sm:text-sm text-gray-700 font-medium">
           Rows per page:
         </span>
         <select
@@ -50,7 +50,7 @@ export const Pagination = ({
         </select>
       </div>
 
-      <div className="text-xs sm:text-sm text-gray-600">
+      <div className="text-xs sm:text-sm text-gray-700">
         Page{" "}
         <span className="font-semibold text-gray-900">{pageIndex + 1}</span> of{" "}
         <span className="font-semibold text-gray-900">{totalPages}</span>
@@ -123,7 +123,7 @@ export const MobileCard = ({ item, isSelected, onSelect, actions }) => {
           <h3 className="font-semibold text-gray-900 text-sm">
             {item.first_name} {item.last_name}
           </h3>
-          <p className="text-xs text-gray-600 mt-1">{item.email}</p>
+          <p className="text-xs text-gray-700 mt-1">{item.email}</p>
         </div>
         <input
           type="checkbox"

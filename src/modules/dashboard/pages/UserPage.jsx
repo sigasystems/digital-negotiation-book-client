@@ -140,7 +140,7 @@ const UserPage = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 text-lg">Loading buyer details...</p>
+          <p className="text-gray-700 text-lg">Loading buyer details...</p>
         </div>
       </div>
     );
@@ -187,7 +187,7 @@ const UserPage = () => {
             placeholder={`Enter ${FIELD_LABELS[key]}`}
           />
         ) : (
-          <p className="text-gray-600">{value}</p>
+          <p className="text-gray-700">{value}</p>
         )}
       </div>
     );

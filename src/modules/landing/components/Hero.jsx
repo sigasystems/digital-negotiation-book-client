@@ -37,10 +37,10 @@ export default function Hero() {
     <section className="relative w-full min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
       {/* Animated background elements */}
 
-      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 lg:py-32 w-full">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-0 py-20 lg:py-32 w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Column - Content */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Trust Badge */}
             <div 
               className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full border border-indigo-200 shadow-sm hover:shadow-md transition-all duration-300"
@@ -69,7 +69,7 @@ export default function Hero() {
             >
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none">
                 <span className="block text-slate-900 mb-2">Digital</span>
-                <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 pb-3 to-purple-600 bg-clip-text text-transparent">
                   Negotiation Book
                 </span>
               </h1>

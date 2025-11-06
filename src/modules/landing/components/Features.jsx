@@ -65,7 +65,7 @@ export default function App() {
           <h2 className="text-4xl md:text-5xl  font-bold text-black leading-tight">
             Designed for Modern Digital Teams
           </h2>
-          <p className="mt-4 text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-gray-700 max-w-3xl mx-auto">
             Everything you need to build, deploy, and scale world-class
             applications, all in one place.
           </p>
@@ -93,7 +93,7 @@ export default function App() {
               </h3>
 
               {/* Description */}
-              <p className="text-base text-gray-400">{feature.description}</p>
+              <p className="text-base text-gray-700">{feature.description}</p>
             </div>
           ))}
         </div>

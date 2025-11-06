@@ -105,7 +105,7 @@ export const PaymentStatusView = ({
                               {label}
                             </p>
                             <p className={`text-sm transition-colors duration-300 ${
-                              isComplete || isActive ? "text-gray-600" : "text-gray-400"
+                              isComplete || isActive ? "text-gray-700" : "text-gray-400"
                             }`}>
                               {desc}
                             </p>
@@ -179,7 +179,7 @@ export const PaymentStatusView = ({
 
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-sm text-gray-600">Amount Charged</span>
+                        <span className="text-sm text-gray-700">Amount Charged</span>
                         <span className="text-2xl text-gray-900">{formatPrice(orderData.planPrice)}</span>
                       </div>
                       <p className="text-xs text-gray-500 text-right">Including all applicable taxes</p>
@@ -192,7 +192,7 @@ export const PaymentStatusView = ({
                         </div>
                         <div>
                           <p className="text-sm text-gray-900 mb-1">Processing Payment</p>
-                          <p className="text-xs text-gray-600">Your payment was successful. We're setting up your account now.</p>
+                          <p className="text-xs text-gray-700">Your payment was successful. We're setting up your account now.</p>
                         </div>
                       </div>
                     </div>
@@ -269,7 +269,7 @@ export const PaymentStatusView = ({
                         </div>
                         <div className="flex-1 pt-2">
                           <p className="text-base text-gray-900 mb-1">{label}</p>
-                          <p className="text-sm text-gray-600">{desc}</p>
+                          <p className="text-sm text-gray-700">{desc}</p>
                         </div>
                       </div>
                     </div>
@@ -337,7 +337,7 @@ export const PaymentStatusView = ({
 
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-sm text-gray-600">Total Paid</span>
+                        <span className="text-sm text-gray-700">Total Paid</span>
                         <span className="text-2xl text-gray-900">{formatPrice(orderData.planPrice)}</span>
                       </div>
                       <p className="text-xs text-gray-500 text-right">Receipt sent to your email</p>
@@ -359,9 +359,9 @@ export const PaymentStatusView = ({
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
                       ) : (                   
-                        <Button>
-                          Click for Download Invoice
-                        </Button>   
+                        <>
+                        
+                        </>   
                       )}
                       <button
                         onClick={handlePrintReceipt}
@@ -383,7 +383,7 @@ export const PaymentStatusView = ({
                       </div>
                       <div>
                         <p className="text-sm text-gray-900 mb-1">Email Confirmation Sent</p>
-                        <p className="text-xs text-gray-600">Check {orderData.email} for your access details and receipt</p>
+                        <p className="text-xs text-gray-700">Check {orderData.email} for your access details and receipt</p>
                       </div>
                     </div>
                   </div>
@@ -484,7 +484,7 @@ export const PaymentStatusView = ({
                           }`}>
                             {label}
                           </p>
-                          <p className="text-sm text-gray-600">{desc}</p>
+                          <p className="text-sm text-gray-700">{desc}</p>
                         </div>
                       </div>
                     </div>
@@ -553,7 +553,7 @@ export const PaymentStatusView = ({
 
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-sm text-gray-600">Amount Charged</span>
+                        <span className="text-sm text-gray-700">Amount Charged</span>
                         <span className="text-2xl text-gray-900">{formatPrice(orderData.planPrice)}</span>
                       </div>
                       <p className="text-xs text-gray-500 text-right">Payment secured</p>
@@ -567,7 +567,7 @@ export const PaymentStatusView = ({
                       </div>
                       <div>
                         <p className="text-sm text-gray-900 mb-1">Payment Secured</p>
-                        <p className="text-xs text-gray-600">Your payment was processed successfully. No additional charges will be made.</p>
+                        <p className="text-xs text-gray-700">Your payment was processed successfully. No additional charges will be made.</p>
                       </div>
                     </div>
                   </div>
@@ -579,7 +579,7 @@ export const PaymentStatusView = ({
                       </div>
                       <div>
                         <p className="text-sm text-gray-900 mb-1">Support Team Notified</p>
-                        <p className="text-xs text-gray-600">Our technical team is resolving the issue. You'll receive access at {orderData.email} shortly.</p>
+                        <p className="text-xs text-gray-700">Our technical team is resolving the issue. You'll receive access at {orderData.email} shortly.</p>
                       </div>
                     </div>
                   </div>

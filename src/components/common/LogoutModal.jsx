@@ -17,7 +17,7 @@ export default function LogoutDialog({ isOpen, onClose, onLogout }) {
           <DialogTitle className="text-xl font-bold text-gray-900">
             Confirm Logout
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-gray-700">
             Are you sure you want to logout? You’ll need to log in again to continue using the app.
           </DialogDescription>
         </DialogHeader>

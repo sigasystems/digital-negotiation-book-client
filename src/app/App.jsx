@@ -70,7 +70,7 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-gray-600 text-lg">
+      <div className="flex h-screen items-center justify-center text-gray-700 text-lg">
         Loading...
       </div>
     );

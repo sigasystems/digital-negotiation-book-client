@@ -36,7 +36,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50 active:scale-[0.98] transition cursor-pointer"
         >
-          <Filter className="w-4 h-4 text-gray-600" />
+          <Filter className="w-4 h-4 text-gray-700" />
           {isMobileOpen ? "Hide Filters" : "Show Filters"}
         </button>
       </div>

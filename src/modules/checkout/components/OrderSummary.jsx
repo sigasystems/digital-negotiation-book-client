@@ -53,7 +53,7 @@ export default function OrderSummary({
     setSubmitting(true);
 
     try {
-      // :One: we only register here user automatically
+      // 1️⃣: we only register here user automatically
       const data = await login({      
          first_name: formData.first_name,
         last_name: formData.last_name,
@@ -78,7 +78,7 @@ export default function OrderSummary({
 
       const user = tokenPayload;
       if (!user) throw new Error("Auto login failed");
-      // :two: Create Stripe checkout session
+      //2️⃣ :two: Create Stripe checkout session
       const paymentPayload = {
         userId: user.id,
         planId: selectedPlan.id,
@@ -136,9 +136,9 @@ export default function OrderSummary({
             <div className="flex justify-between">
               <div>
                 <h3 className="font-semibold text-slate-900">{selectedPlan.name}</h3>
-                <p className="text-sm text-slate-600">{selectedPlan.description}</p>
+                <p className="text- text-slate-600">{selectedPlan.description}</p>
               </div>
-              <Badge variant="outline" className="capitalize">
+              <Badge variant="outline" className="capitalize  bg-amber-300">
                 {billingCycle} Billing
               </Badge>
             </div>
@@ -204,7 +204,7 @@ export default function OrderSummary({
               <Shield className="w-5 h-5 text-green-600 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-slate-900 mb-1">
-                  Secure Payment
+                  Secure Payment 🔐
                 </h4>
                 <p className="text-xs text-slate-600">
                   Your payment info is encrypted and never stored.

@@ -62,7 +62,7 @@ export default function Login() {
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-800 text-center">
             Welcome 👋
           </h1>
-          <p className="text-gray-600 mb-8 text-center text-base sm:text-lg">
+          <p className="text-gray-700 mb-8 text-center text-base sm:text-lg">
             Please login to your account
           </p>
 

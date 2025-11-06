@@ -106,27 +106,6 @@ export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly
           </div>
         </div>
 
-        <Separator />
-
-        {/* Usage Limits */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm text-slate-700">
-          <div>
-            <p className="font-medium">Users</p>
-            <p>{maxUsers || "—"}</p>
-          </div>
-          <div>
-            <p className="font-medium">Products</p>
-            <p>{maxProducts || "—"}</p>
-          </div>
-          <div>
-            <p className="font-medium">Offers</p>
-            <p>{maxOffers || "—"}</p>
-          </div>
-          <div>
-            <p className="font-medium">Buyers</p>
-            <p>{maxBuyers || "—"}</p>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

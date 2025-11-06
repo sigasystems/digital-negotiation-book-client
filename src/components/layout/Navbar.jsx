@@ -177,7 +177,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                 <div className="border-t border-gray-200 my-3 pt-3">
                 {userName && (
                   <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
-                    <User className="w-4 h-4 text-gray-600" />
+                    <User className="w-4 h-4 text-gray-700" />
                     <span className="text-sm font-medium text-gray-700 truncate">
                       {userName}
                     </span>
