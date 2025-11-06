@@ -81,7 +81,7 @@ const PaymentList = () => {
             { key: "planName", label: "Plan Name", placeholder: "Enter plan name" },
           ].map((field) => (
             <div key={field.key}>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 {field.label}
               </label>
               <input

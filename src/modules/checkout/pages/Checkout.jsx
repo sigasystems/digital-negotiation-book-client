@@ -1,6 +1,6 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import SelectedPlanCard from "../components/SelectedPlanCard";
 import OrderSummary from "../components/OrderSummary";
 import {
@@ -61,6 +61,9 @@ export default function CheckoutPage() {
     website: "",
   });
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   if (!selectedPlan) {
     navigate("/plans");
     return null;

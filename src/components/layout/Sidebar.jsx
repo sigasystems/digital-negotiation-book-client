@@ -91,7 +91,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               <div className="flex flex-col">
                 <h2 className="text-xl font-bold text-indigo-600">DNB</h2>
                 {businessName && (
-                  <span className="text-sm font-medium text-gray-600 truncate max-w-[180px]">
+                  <span className="text-sm font-medium text-gray-700 truncate max-w-[180px]">
                     {businessName}
                   </span>
                 )}

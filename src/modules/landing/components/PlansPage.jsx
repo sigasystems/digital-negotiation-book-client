@@ -112,7 +112,7 @@ export default function PlansPage() {
           <h1 className="text-5xl font-bold text-gray-900 mb-2">
             Choose Your Plan
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Simple pricing for businesses of all sizes
           </p>
 
@@ -237,7 +237,7 @@ export default function PlansPage() {
 
                 <CardHeader className="text-center pb-4">
                   <h2 className="text-xl font-semibold mb-1">{plan.name}</h2>
-                  <p className="text-sm text-gray-600">{plan.description}</p>
+                  <p className="text-sm text-gray-700">{plan.description}</p>
                 </CardHeader>
 
                 <CardContent className="text-center pb-4">
@@ -245,7 +245,7 @@ export default function PlansPage() {
                     <span className="text-4xl font-semibold">
                       {formateCurrency(price, plan.currency)}
                     </span>
-                    <span className="text-gray-600 ml-1">
+                    <span className="text-gray-700 ml-1">
                       /{billingCycle === "monthly" ? "mo" : "yr"}
                     </span>
                   </div>
@@ -253,19 +253,19 @@ export default function PlansPage() {
                   <div className="space-y-4 text-left">
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-600">Users: </span>
+                        <span className="text-gray-700">Users: </span>
                         <span className="font-medium">{plan.maxUsers}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Products: </span>
+                        <span className="text-gray-700">Products: </span>
                         <span className="font-medium">{plan.maxProducts}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Offers: </span>
+                        <span className="text-gray-700">Offers: </span>
                         <span className="font-medium">{plan.maxOffers}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Buyers: </span>
+                        <span className="text-gray-700">Buyers: </span>
                         <span className="font-medium">{plan.maxBuyers}</span>
                       </div>
                     </div>
@@ -298,7 +298,7 @@ export default function PlansPage() {
                     disabled={isActive}
                     className={`w-full cursor-pointer ${
                       isActive
-                        ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                        ? "bg-gray-300 text-gray-700 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     }`}
                   >

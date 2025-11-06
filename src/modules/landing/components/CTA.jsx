@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart3, Building2, Network } from "lucide-react";
 import { Users, BarChart, Plug } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function CTA() {
+  const navigate = useNavigate();
   const features = [
     {
       title: "Launch Your Business Profile",
@@ -45,7 +47,7 @@ export default function CTA() {
 
       {/* Buttons */}
       <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-        <Button className="cursor-pointer bg-blue-600 text-white px-8 py-3 text-lg font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-200 flex items-center justify-center">
+        <Button  onClick={() => window.location.href = '/' } className="cursor-pointer bg-blue-600 text-white px-8 py-3 text-lg font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-200 flex items-center justify-center">
           Get Started
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
@@ -77,7 +79,7 @@ export default function CTA() {
               {feature.title}
             </h3>
 
-            <p className="text-base text-gray-500">{feature.description}</p>
+            <p className="text-base text-gray-700">{feature.description}</p>
           </div>
         ))}
       </div>

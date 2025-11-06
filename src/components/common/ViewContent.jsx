@@ -190,7 +190,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
             isPositive
               ? "bg-emerald-50 text-emerald-700"
-              : "bg-gray-100 text-gray-600"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           {isPositive ? (
@@ -266,7 +266,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
             >
               <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                <div className="text-gray-600">{section.icon}</div>
+                <div className="text-gray-700">{section.icon}</div>
                 <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">
                   {section.title}
                 </h3>
@@ -281,7 +281,7 @@ const ViewContent = ({ isOpen, onClose, owner }) => {
                       {field.icon && (
                         <span className="text-gray-400">{field.icon}</span>
                       )}
-                      <span className="text-sm font-medium text-gray-600">
+                      <span className="text-sm font-medium text-gray-700">
                         {field.label}
                       </span>
                     </div>

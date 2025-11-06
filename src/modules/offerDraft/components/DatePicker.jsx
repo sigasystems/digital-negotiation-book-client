@@ -44,7 +44,7 @@ const DatePicker = ({ label, value, onSelect, open, setOpen, editable = true }) 
             className="border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           />
         ) : (
-          <div className="border border-gray-200 bg-gray-100 rounded-lg px-3 py-2 text-gray-600 min-w-[160px]">
+          <div className="border border-gray-200 bg-gray-100 rounded-lg px-3 py-2 text-gray-700 min-w-[160px]">
             {formattedDisplay}
           </div>
         )}
