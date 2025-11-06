@@ -1,32 +1,32 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BarChart3, Building2, Network } from "lucide-react";
 import { Users, BarChart, Plug } from "lucide-react";
 
 export default function CTA() {
   const features = [
     {
-      title: "Collaborate Seamlessly",
+      title: "Launch Your Business Profile",
       description:
-        "Real-time updates and intuitive workflows keep your team aligned and productive.",
-      icon: <Users className="h-6 w-6" />,
-      bg: "bg-blue-100",
-      color: "text-blue-600",
+        "Set up your verified business page in minutes and start reaching customers instantly.",
+      icon: <Building2 className="h-6 w-6" />,
+      bg: "bg-indigo-100",
+      color: "text-indigo-600",
     },
     {
-      title: "Track Progress",
+      title: "Track Growth & Performance",
       description:
-        "Monitor every project with clear dashboards and detailed analytics to make informed decisions.",
-      icon: <BarChart className="h-6 w-6" />,
-      bg: "bg-green-100",
-      color: "text-green-600",
+        "Access smart dashboards and analytics to monitor leads, engagement, and conversions in real time.",
+      icon: <BarChart3 className="h-6 w-6" />,
+      bg: "bg-emerald-100",
+      color: "text-emerald-600",
     },
     {
-      title: "Integrate Easily",
+      title: "Connect & Expand Network",
       description:
-        "Connect with the tools your team already uses—simplifying workflows and saving time.",
-      icon: <Plug className="h-6 w-6" />,
-      bg: "bg-purple-100",
-      color: "text-purple-600",
+        "Collaborate with verified businesses, discover new partners, and grow your presence in the DNB network.",
+      icon: <Network className="h-6 w-6" />,
+      bg: "bg-sky-100",
+      color: "text-sky-600",
     },
   ];
 
@@ -34,13 +34,13 @@ export default function CTA() {
     <section className=" py-20 text-gray-900 w-full text-center   rounded-lg">
       {/* Heading */}
       <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-        Take Your Team to the Next Level
+        Grow Your Business with DNB
       </h2>
 
       {/* Subheading */}
       <p className="text-lg sm:text-xl mb-12 text-gray-700">
-        Join thousands of teams worldwide who are managing projects efficiently
-        and collaborating seamlessly.
+         Create, manage, and promote your business — all from one powerful
+        platform built for growth.
       </p>
 
       {/* Buttons */}
@@ -84,7 +84,8 @@ export default function CTA() {
 
       {/* Note */}
       <p className="mt-16 text-gray-500 text-sm">
-        Start your free trial today. No credit card required.
+         Build. Manage. Connect. Everything your business needs — all in one
+        place with DNB.
       </p>
     </section>
   );

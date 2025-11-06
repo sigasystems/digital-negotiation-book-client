@@ -1,25 +1,25 @@
 export default function Testimonials() {
-  const testimonials = [
+ const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Product Manager",
+      name: " Eric Sugru",
+      role: "Atlas Resturants, US",
       feedback:
-        "This platform completely transformed the way our team works. Highly recommended!",
-      avatar: "https://i.pravatar.cc/100?img=32",
+        "DNB helped me get my business online within a day. Now customers can find and contact us directly — it’s made a huge difference.",
+      avatar: "https://i.pravatar.cc/100?img=15",
     },
     {
-      name: "Michael Lee",
-      role: "Developer",
+      name: "Priya Nair",
+      role: "San Pedro Fish Market, US",
       feedback:
-        "Clean, intuitive, and scalable. Everything a modern web app should be.",
-      avatar: "https://i.pravatar.cc/100?img=12",
+        "The dashboard is super easy to use. Managing my listings, payments, and analytics all in one place saves me hours every week.",
+      avatar: "https://i.pravatar.cc/100?img=47",
     },
     {
-      name: "Emma Watson",
-      role: "Designer",
+      name: "Larry Plotnick",
+      role: "Nordstrom, US",
       feedback:
-        "I love how flexible the components are. Saved us weeks of design time.",
-      avatar: "https://i.pravatar.cc/100?img=45",
+        "We started with the basic plan and quickly upgraded. DNB’s support team and platform quality are top-notch — highly recommended!",
+      avatar: "https://i.pravatar.cc/100?img=23",
     },
   ];
 

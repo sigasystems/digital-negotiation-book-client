@@ -1,9 +1,7 @@
 // Users.jsx
 import React, { useState, useEffect } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
-import { MobileCard } from "@/utils/Pagination";
 import DashboardTable from "../components/DashboardTable";
-import { ActionsCell } from "@/utils/ActionsCell";
 
 export default function Users({ userRole }) {
   const [data, setData] = useState([]);
