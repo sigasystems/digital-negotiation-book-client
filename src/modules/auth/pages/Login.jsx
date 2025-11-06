@@ -31,22 +31,22 @@ export default function Login() {
   setLoading(true);
   try {
      const resData = await login(values);
-    const { accessToken, tokenPayload } = resData?.data || {};
+    const { accessToken, refreshToken, tokenPayload } = resData?.data || {};
 
-    if (!accessToken || !tokenPayload) {
-      throw new Error("Malformed server response — missing token or user data");
+    if (!accessToken || !refreshToken) {
+      throw new Error("Missing tokens from server");
     }
 
     sessionStorage.setItem("authToken", accessToken);
+    sessionStorage.setItem("refreshToken", refreshToken);
     sessionStorage.setItem("user", JSON.stringify(tokenPayload));
 
     toast.success(`Welcome back, ${tokenPayload.name || "User"}!`);
     navigate("/dashboard");
   } catch (err) {
-    const errorMsg =
-      err.response?.data?.message || err.message || err.response?.data?.error || err || "Login failed";
-    console.error("Login error:", err);
-    toast.error(errorMsg);
+    const msg =
+      err.response?.data?.message || err.message || "Login failed";
+    toast.error(msg);
   } finally {
     setLoading(false);
   }

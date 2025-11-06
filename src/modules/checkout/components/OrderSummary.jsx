@@ -61,8 +61,8 @@ export default function OrderSummary({
         password: formData.password,
       });
 
-      const tokenPayload = data?.data?.tokenPayload;
-      const token = data?.data?.accessToken;
+      const tokenPayload = data?.data?.tokenPayload
+      const token = data?.data
 
       if (data?.statusCode === 200 && data?.success === true && token) {
         sessionStorage.removeItem("user");

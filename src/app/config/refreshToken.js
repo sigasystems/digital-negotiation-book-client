@@ -1,14 +1,11 @@
 import { apiClient } from "@/utils/apiClient";
 
 export const refreshToken = async () => {
-  try {
-    const response = await apiClient.get("/auth/refresh-token", {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.message || "Failed to refresh token";
-  }
-};
+  const refreshToken = sessionStorage.getItem("refreshToken");
 
-export default apiClient;
+  const response = await apiClient.post("/auth/refresh-token", {
+    refreshToken,
+  });
+
+    return response.data;
+};

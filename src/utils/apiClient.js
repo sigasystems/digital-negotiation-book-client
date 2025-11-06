@@ -2,33 +2,28 @@ import axios from "axios";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
 });
 
 let isRefreshing = false;
 let refreshPromise = null;
 
-// Attach auth token automatically to every request
+// Attach Authorization header
 apiClient.interceptors.request.use((config) => {
   const token = sessionStorage.getItem("authToken");
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
+  if (token) config.headers["Authorization"] = `Bearer ${token}`;
   return config;
 });
 
 apiClient.interceptors.response.use(
-  response => response,
+  (res) => res,
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip if no response or already retried
     if (!error.response || originalRequest._retry) {
       return Promise.reject(error);
     }
-    // Handle expired token
     if (
-      error.response.data.statusCode === 403 &&
+      error.response.status === 403 &&
       error.response.data?.message === "Invalid or expired access token"
     ) {
       originalRequest._retry = true;
@@ -36,28 +31,35 @@ apiClient.interceptors.response.use(
       try {
         if (!isRefreshing) {
           isRefreshing = true;
-          refreshPromise = apiClient.post("/auth/refresh-token", {}, { withCredentials: true });
+
+          const refreshToken = sessionStorage.getItem("refreshToken");
+
+          if (!refreshToken) throw new Error("Missing refresh token");
+
+          refreshPromise = apiClient.post("/auth/refresh-token", {
+            refreshToken,
+          });
         }
 
         const refreshResponse = await refreshPromise;
 
-        const newAccessToken = refreshResponse.data?.data?.accessToken?.accessToken;
-        const safeUserInfo = refreshResponse.data?.data?.accessToken?.safeUserInfo;
+        const newAccessToken = refreshResponse.data?.data?.accessToken;
+        const newRefreshToken = refreshResponse.data?.data?.refreshToken;
 
         if (newAccessToken) {
           sessionStorage.setItem("authToken", newAccessToken);
-          apiClient.defaults.headers["Authorization"] = `Bearer ${newAccessToken}`;
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          apiClient.defaults.headers["Authorization"] = `Bearer ${newAccessToken}`;
         }
 
-        if (safeUserInfo) {
-          sessionStorage.setItem("user", JSON.stringify(safeUserInfo));
+        if (newRefreshToken) {
+          sessionStorage.setItem("refreshToken", newRefreshToken);
         }
 
         return apiClient(originalRequest);
-      } catch (refreshError) {
-        console.error("Refresh token failed", refreshError);
-        return Promise.reject(refreshError);
+      } catch (err) {
+        console.error("Refresh failed", err);
+        return Promise.reject(err);
       } finally {
         isRefreshing = false;
         refreshPromise = null;
