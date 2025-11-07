@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { businessOwnerService } from "../services/businessOwner";
 import { Building2, UserCircle2, MapPin } from "lucide-react";
+import { businessOwnerService } from "../services/businessOwner";
+import { useToast } from "@/app/hooks/useToast";
+import { validateBuyer } from "@/app/config/buyerValidation";
+import { BUYER_FORM_FIELDS } from "@/app/config/buyerFormConfig";
+import {InputField} from "@/components/common/InputField";
+import FormSection from "@/components/common/FormSection";
 
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const ownerId = user?.businessOwnerId || "";
 
-  const initialFormData = {
-    ownerId,
+  const initialData = {
+    ownerId: user?.businessOwnerId || "",
     buyersCompanyName: "",
     registrationNumber: "",
     taxId: "",
@@ -23,332 +27,141 @@ export default function AddBuyerForm() {
     postalCode: "",
   };
 
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(initialData);
   const [loading, setLoading] = useState(false);
-  const [toasts, setToasts] = useState([]);
 
-  const navigate = useNavigate()
+  const { toasts, showToast } = useToast();
+  const navigate = useNavigate();
 
-  const showToast = (message, type = "success") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = () => {
-    if (!formData.buyersCompanyName.trim()) return "Company name is required";
-    if (!formData.contactName.trim()) return "Contact name is required";
-    if (!formData.contactEmail.trim()) return "Contact email is required";
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.contactEmail)) return "Enter a valid email";
-
-    if (!formData.country.trim()) return "Country is required";
-    if (!formData.countryCode.trim()) return "Country code is required";
-
-    return null;
-  };
+  const updateField = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  const validationError = validateForm();
-  if (validationError) {
-    showToast(`✕ ${validationError}`, "error");
-    return;
-  }
+  const error = validateBuyer(formData);
+  if (error) return showToast(error, "error");
 
     setLoading(true);
 
   try {
-    const response = await businessOwnerService.addBuyer(formData);
+    const res = await businessOwnerService.addBuyer(formData);
 
-    if (response?.status === 201) {
-      showToast("Buyer added successfully!", "success");
-      setFormData(initialFormData);
+    if (res?.status === 201) {
+      showToast("Buyer added successfully");
+      setFormData(initialData);
     } else {
-      const message =
-        response?.data?.message ||
-        response?.message ||
-        "Failed to add buyer.";
-      showToast(message, "error");
+        showToast(res?.message || "Failed to add buyer", "error");
     }
-  } catch (error) {
-    console.error("Add Buyer Error:", error);
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Failed to add buyer. Please try again.";
-    showToast(message, "error");
+  } catch (err) {
+      showToast(err?.response?.data?.message || "Error adding buyer", "error");
   } finally {
       setLoading(false);
     }
-};
-
-  const handleBack = () => {
-    navigate(-1)
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
-      {/* Toast Notifications */}
+    <div className="min-h-screen bg-gray-50 px-4 py-8">
+      {/* Toasts */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
+        {toasts.map((t) => (
           <div
-            key={toast.id}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white animate-bounce ${
-              toast.type === "success"
-                ? "bg-emerald-500"
-                : toast.type === "error"
-                ? "bg-red-500"
-                : "bg-blue-500"
+            key={t.id}
+            className={`px-4 py-3 rounded-lg text-white shadow-lg ${
+              t.type === "success" ? "bg-emerald-500" : "bg-red-500"
             }`}
           >
-            <span className="text-lg font-bold">
-              {toast.type === "success" ? "✓" : "✕"}
-            </span>
-            <span className="font-medium text-sm">{toast.message}</span>
+            {t.message}
           </div>
         ))}
       </div>
 
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col gap-4 mb-8">
           <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-200 w-fit hover:translate-x-1 cursor-pointer"
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
           >
-            <span className="text-lg">←</span>
-            <span className="font-medium">Back</span>
+            ← Back
           </button>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Add New Buyer
-          </h1>
-          <p className="text-gray-700 text-sm">
+          <h1 className="text-3xl font-bold mt-6 mb-1">Add New Buyer</h1>
+          <p className="text-gray-600 mb-8">
             Register a new buyer to your business network
           </p>
-        </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl overflow-hidden space-y-0">
-          {/* Company Information */}
-          <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-indigo-100 rounded-lg">
-                <Building2 className="w-6 h-6 text-indigo-600" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Company Information</h2>
-            </div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-2xl rounded-2xl overflow-hidden"
+        >
+          {/* Company */}
+          <FormSection icon={Building2} title="Company Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="buyersCompanyName"
-                  value={formData.buyersCompanyName}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter company name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
+              {BUYER_FORM_FIELDS.company.map((field) => (
+                <InputField
+                  key={field.name}
+                  {...field}
+                  value={formData[field.name]}
+                  onChange={updateField}
+                  placeholder={field.placeholder || field.label}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Registration Number</label>
-                <input
-                  type="text"
-                  name="registrationNumber"
-                  value={formData.registrationNumber}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Tax ID</label>
-                <input
-                  type="text"
-                  name="taxId"
-                  value={formData.taxId}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Country <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter country"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
+              ))}
             </div>
-          </div>
+          </FormSection>
 
-          {/* Contact Information */}
-          <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <UserCircle2 className="w-6 h-6 text-blue-600" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Contact Information</h2>
-            </div>
+          {/* Contact */}
+          <FormSection icon={UserCircle2} title="Contact Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Contact Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="contactName"
-                  value={formData.contactName}
-                  onChange={handleChange}
-                  required
-                  placeholder="Full name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
+              {BUYER_FORM_FIELDS.contact.map((field) => (
+                <InputField
+                  key={field.name}
+                  {...field}
+                  value={formData[field.name]}
+                  onChange={updateField}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="contactEmail"
-                  value={formData.contactEmail}
-                  onChange={handleChange}
-                  required
-                  placeholder="email@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Country Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="countryCode"
-                  value={formData.countryCode}
-                  onChange={handleChange}
-                  required
-                  placeholder="+1"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="text"
-                  name="contactPhone"
-                  value={formData.contactPhone}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
+              ))}
             </div>
-          </div>
+          </FormSection>
 
           {/* Address */}
-          <div className="px-6 sm:px-8 py-8 border-b border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <MapPin className="w-6 h-6 text-purple-600" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Address</h2>
-            </div>
+          <FormSection icon={MapPin} title="Address">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">State/Province</label>
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
+              {BUYER_FORM_FIELDS.address.map((field) => (
+                <InputField
+                  key={field.name}
+                  {...field}
+                  value={formData[field.name]}
+                  onChange={updateField}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">City</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Postal Code</label>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white"
-                />
-              </div>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Street Address</label>
+
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Street Address
+            </label>
               <textarea
                 name="address"
                 value={formData.address}
-                onChange={handleChange}
-                placeholder="Enter full street address"
+                onChange={updateField}
                 rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-gray-50 hover:bg-white resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
               />
-            </div>
-          </div>
+            </FormSection>
 
           {/* Footer */}
-          <div className="px-6 sm:px-8 py-6 bg-gray-50 flex flex-col-reverse sm:flex-row gap-3">
+          <div className="px-6 sm:px-8 py-6 bg-gray-50 flex justify-end gap-4">
             <button
               type="button"
-              onClick={handleBack}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer"
+              onClick={() => navigate(-1)}
+              className="px-6 py-3 border border-gray-300 rounded-lg"
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-70 flex gap-2 items-center"
             >
-              {loading ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  <span>Adding...</span>
-                </>
-              ) : (
-                <>
-                  <span>✓</span>
-                  <span>Add Buyer</span>
-                </>
-              )}
+              {loading ? "Adding..." : "Add Buyer"}
             </button>
           </div>
         </form>

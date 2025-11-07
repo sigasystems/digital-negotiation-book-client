@@ -7,7 +7,7 @@ import { PaymentStatusView } from "../utils/statusPayment";
 import { setPaymentId, setPaymentStatus } from "@/app/store/slices/paymentSlice";
 import { getAllPlans } from "@/modules/landing/services/planService";
 import { generateReceiptHTML } from "../utils/sendReceipt";
-import { login } from "@/modules/auth/services/authService";
+import {login} from "../../auth/authServices"
 import toast from "react-hot-toast";
 
 const CURRENCY_SYMBOL = { INR: "₹", USD: "$", EUR: "€" };

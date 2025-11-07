@@ -15,7 +15,7 @@ import {
   TableCell,
 } from "../../../components/ui/table";
 import { Checkbox } from "../../../components/ui/checkbox";
-import { ActionsCell } from "@/utils/ActionsCell";
+import { ActionsCell } from "@/utils/actionsUtil/ActionsCell";
 import { Circle } from "lucide-react";
 import { Pagination } from "@/utils/Pagination";
 import { SearchFilters } from "@/components/common/SearchFilters";
