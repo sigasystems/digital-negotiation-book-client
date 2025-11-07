@@ -8,14 +8,15 @@ const ProductSection = ({
   addBreakupRow,
   removeBreakupRow,
   total,
-}) => (
+}) => {
+  return (
   <>
     {/* --- Product Info Section --- */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <InputField
         label="Product Name"
         name="productName"
-        value={formData.productName}
+        value={formData.productName || ""}
         onChange={handleChange}
         placeholder="e.g. Atlantic Salmon Fillet"
         required
@@ -23,7 +24,7 @@ const ProductSection = ({
       <InputField
         label="Species Name"
         name="speciesName"
-        value={formData.speciesName}
+        value={formData.speciesName || ""}
         onChange={handleChange}
         placeholder="e.g. Salmo salar"
         required
@@ -31,49 +32,50 @@ const ProductSection = ({
       <InputField
         label="Packing"
         name="packing"
-        value={formData.packing}
+        value={formData.packing || ""}
         onChange={handleChange}
         placeholder="e.g. 10kg box, vacuum packed"
       />
       <InputField
         label="Draft Name"
         name="draftName"
-        value={formData.draftName}
+        value={formData.draftName || ""}
         onChange={handleChange}
         placeholder="e.g. Summer Salmon Offer 2025"
       />
       <InputField
         label="Quantity (MT)"
         name="quantity"
-        value={formData.quantity}
+        value={formData.quantity || ""}
         onChange={handleChange}
         placeholder="e.g. 2000"
       />
       <InputField
         label="Tolerance (%)"
         name="tolerance"
-        value={formData.tolerance}
+        value={formData.tolerance || ""}
         onChange={handleChange}
         placeholder="e.g. ±5%"
       />
       <InputField
         label="Payment Terms"
         name="paymentTerms"
-        value={formData.paymentTerms}
+        value={formData.paymentTerms || ""}
         onChange={handleChange}
         placeholder="e.g. 30% advance, 70% before shipment"
       />
       <InputField
         label="Remarks"
         name="remark"
-        value={formData.remark}
+        value={formData.remark || ""}
         onChange={handleChange}
         placeholder="e.g. Subject to final quality check"
       />
       <InputField
         label="Grand Total (USD)"
         name="grandTotal"
-        value={formData.grandTotal}
+          type="number"
+        value={formData.grandTotal || ""}
         onChange={handleChange}
         placeholder="e.g. 50000"
       />
@@ -106,27 +108,45 @@ const ProductSection = ({
             </tr>
           </thead>
           <tbody>
-            {formData.sizeBreakups.map((sb, idx) => (
+            {formData.sizeBreakups?.map((row, idx) => (
               <tr key={idx} className="border-t hover:bg-gray-50">
-                {["size", "breakup", "price"].map((field) => (
-                  <td key={field} className="px-3 py-2">
+                
+                  <td className="px-3 py-2">
                     <input
-                      type={field === "size" ? "text" : "number"}
-                      value={sb[field]}
+                      type="text"
+                      value={row.size}
                       onChange={(e) =>
-                        handleBreakupChange(idx, field, e.target.value)
+                        handleBreakupChange(idx, "size", e.target.value)
                       }
-                      placeholder={
-                        field === "size"
-                          ? "e.g. 2–3 kg"
-                          : field === "breakup"
-                          ? "e.g. 10"
-                          : "e.g. 6.5"
-                      }
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      placeholder="e.g. 2–3 kg"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                   </td>
-                ))}
+
+                  {/* Breakup */}
+                  <td className="px-3 py-2">
+                    <input
+                      type="number"
+                      value={row.breakup}
+                      onChange={(e) =>
+                        handleBreakupChange(idx, "breakup", e.target.value)
+                      }
+                      placeholder="e.g. 10"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    />
+                  </td>
+
+                  <td className="px-3 py-2">
+                    <input
+                      type="number"
+                      value={row.price}
+                      onChange={(e) =>
+                        handleBreakupChange(idx, "price", e.target.value)
+                      }
+                      placeholder="e.g. 6.5"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    />
+                  </td>
                 <td className="px-3 py-2 text-right">
                   <button
                     onClick={() => removeBreakupRow(idx)}
@@ -146,9 +166,9 @@ const ProductSection = ({
         </div>
       </div>
 
-      {/* --- Mobile Card Layout --- */}
+      {/* --- Mobile Layout --- */}
       <div className="block sm:hidden mt-6 space-y-4">
-        {formData.sizeBreakups.map((sb, idx) => (
+        {formData.sizeBreakups?.map((row, idx) => (
           <div
             key={`mobile-${idx}`}
             className="border rounded-xl p-4 bg-white shadow-sm"
@@ -156,28 +176,28 @@ const ProductSection = ({
             <div className="grid grid-cols-1 gap-3">
               <input
                 type="text"
-                value={sb.size}
+                value={row.size}
                 onChange={(e) => handleBreakupChange(idx, "size", e.target.value)}
-                placeholder="Size (e.g. 2–3 kg)"
-                className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm"
+                placeholder="Size"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               />
               <input
                 type="number"
-                value={sb.breakup}
+                value={row.breakup}
                 onChange={(e) =>
                   handleBreakupChange(idx, "breakup", e.target.value)
                 }
-                placeholder="Breakup (e.g. 10)"
-                className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm"
+                placeholder="Breakup"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               />
               <input
                 type="number"
-                value={sb.price}
+                value={row.price}
                 onChange={(e) =>
                   handleBreakupChange(idx, "price", e.target.value)
                 }
-                placeholder="Price (e.g. 6.5)"
-                className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm"
+                placeholder="Price"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               />
             </div>
             <button
@@ -190,7 +210,6 @@ const ProductSection = ({
           </div>
         ))}
 
-        {/* ✅ Total visible in mobile view */}
         <div className="text-right mt-4 font-semibold text-sm">
           Total: <span className="text-indigo-600">{total.toFixed(2)}</span>
         </div>
@@ -198,5 +217,6 @@ const ProductSection = ({
     </div>
   </>
 );
+};
 
 export default ProductSection;
