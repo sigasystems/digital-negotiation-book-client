@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from "react";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
-import toast from "react-hot-toast";
 
 export default function useUniqueBusinessField() {
   const [checking, setChecking] = useState({
@@ -13,53 +12,38 @@ export default function useUniqueBusinessField() {
     businessName: "",
     registrationNumber: "",
   });
-  // store previous checked values to prevent redundant API calls
   const lastCheckedValues = useRef({
     email: "",
     businessName: "",
     registrationNumber: "",
   });
-  // store timeout IDs for debounce
   const timeoutRefs = useRef({});
   const checkUniqueField = useCallback(async (field, value) => {
-    // cancel old debounce
     if (timeoutRefs.current[field]) clearTimeout(timeoutRefs.current[field]);
-    // if empty, reset error
-    if (!value?.trim()) {
+    const trimmedValue = value?.trim();
+    if (!trimmedValue) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
       return;
     }
-    // skip if value same as last checked (avoid repeating)
-    if (lastCheckedValues.current[field] === value) return;
+    // skip duplicate checks
+    if (lastCheckedValues.current[field] === trimmedValue) return;
     timeoutRefs.current[field] = setTimeout(async () => {
       setChecking((prev) => ({ ...prev, [field]: true }));
 
       try {
-        const res = await businessOwnerService.checkUnique({ [field]: value });
+        const res = await businessOwnerService.checkUnique({ [field]: trimmedValue });
         const { data } = res;
-        lastCheckedValues.current[field] = value;
-
-        if (!data?.success) {
-          const msg = data?.message || "Validation failed.";
-          setErrors((prev) => ({ ...prev, [field]: msg }));
-          return;
-        }
+        lastCheckedValues.current[field] = trimmedValue;
 
         if (data?.data?.exists) {
-          const msg =
-            field === "email"
-              ? "Email already exists"
-              : field === "businessName"
-              ? "Business name already exists"
-              : "Registration number already exists";
-          setErrors((prev) => ({ ...prev, [field]: msg }));
+          setErrors((prev) => ({ ...prev, [field]: "Already exists. Please use another.", }));
         } else {
           setErrors((prev) => ({ ...prev, [field]: "" }));
         }
       } catch (err) {
         const msg =
           err.response?.data?.message ||
-          "Unable to verify this field right now.";
+          "Server error while checking. Please try again.";
         setErrors((prev) => ({ ...prev, [field]: msg }));
       } finally {
         setChecking((prev) => ({ ...prev, [field]: false }));

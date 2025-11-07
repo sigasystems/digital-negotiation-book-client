@@ -34,7 +34,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
+    <section className="relative w-full min-h-screen flex items-center bg-gradient-to-br p-4 from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
       {/* Animated background elements */}
 
       <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-0 py-20 lg:py-32 w-full">
