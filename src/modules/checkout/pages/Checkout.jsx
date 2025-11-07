@@ -20,10 +20,6 @@ import {
   MapPin,
   EyeOff,
   Eye,
-  Globe,
-  Hash,
-  Landmark,
-  Home,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -64,6 +60,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
   if (!selectedPlan) {
     navigate("/plans");
     return null;
@@ -154,7 +151,6 @@ export default function CheckoutPage() {
                       <p className="text-xs text-red-500">{errors.first_name}</p>
                     )}
                   </div>
-
                   <div>
                     <Label className="m-1" htmlFor="last_name">Last Name *</Label>
                     <Input
@@ -181,13 +177,14 @@ export default function CheckoutPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@company.com"
-                      className={errors.email ? "border-red-500" : ""}
+                      className={(errors.email || uniqueErrors.email) ? "border-red-500" : ""}
                     />
-                    {errors.email && (
-                      <p className="text-xs text-red-500">{errors.email}</p>
+                    {(errors.email || uniqueErrors.email) && (
+                      <p className="text-xs text-red-500">
+                        {errors.email || uniqueErrors.email}
+                      </p>
                     )}
                   </div>
-
                   <div>
                     <Label className="m-1" htmlFor="phoneNumber">Phone Number *</Label>
                     <Input
@@ -221,11 +218,7 @@ export default function CheckoutPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                     >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                   {errors.password && (
@@ -259,25 +252,28 @@ export default function CheckoutPage() {
                       value={formData.businessName}
                       onChange={handleChange}
                       placeholder="Your Business Name"
-                      className={errors.businessName ? "border-red-500" : ""}
+                      className={(errors.businessName || uniqueErrors.businessName) ? "border-red-500" : ""}
                     />
-                    {errors.businessName && (
-                      <p className="text-xs text-red-500">{errors.businessName}</p>
+                    {(errors.businessName || uniqueErrors.businessName) && (
+                      <p className="text-xs text-red-500">
+                        {errors.businessName || uniqueErrors.businessName}
+                      </p>
                     )}
                   </div>
-
                   <div>
-                    <Label className="m-1" htmlFor="registrationNumber" >Registration Number *</Label>
+                    <Label htmlFor="registrationNumber" className="m-1">Registration Number *</Label>
                     <Input
                       id="registrationNumber"
                       name="registrationNumber"
                       value={formData.registrationNumber}
                       onChange={handleChange}
                       placeholder="REG12345"
-                      className={errors.registrationNumber ? "border-red-500" : ""}
+                      className={(errors.registrationNumber || uniqueErrors.registrationNumber) ? "border-red-500" : ""}
                     />
-                    {errors.registrationNumber && (
-                      <p className="text-xs text-red-500">{errors.registrationNumber}</p>
+                    {(errors.registrationNumber || uniqueErrors.registrationNumber) && (
+                      <p className="text-xs text-red-500">
+                        {errors.registrationNumber || uniqueErrors.registrationNumber}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -323,7 +319,7 @@ export default function CheckoutPage() {
 
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="m-1" htmlFor="address">Address *</Label>
+                  <Label htmlFor="address" className="m-1">Address *</Label>
                   <Input
                     id="address"
                     name="address"
@@ -383,7 +379,6 @@ export default function CheckoutPage() {
                       <p className="text-xs text-red-500">{errors.country}</p>
                     )}
                   </div>
-
                   <div>
                     <Label className="m-1" htmlFor="postalCode">Postal Code *</Label>
                     <Input
