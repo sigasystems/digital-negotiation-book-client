@@ -15,6 +15,7 @@ export const getRecordDisplayName = (record) => {
 export const getEntityType = (record) => {
   if (!record) return null;
 
+  if (record.offerName) return "offer";
   if (record.draftNo || record.type === "offer_draft") return "offer_draft";
   if (record.productName || record.type === "product") return "product";
   if (record.businessName) return "business_owner";
@@ -25,10 +26,14 @@ export const getEntityType = (record) => {
 
 // Resolve final route (role + entity)
 export const resolveEntityRoute = (role, record) => {
-  const id = record?.id || record?._id;
+  const id = record?.id || record?._id || record.draftNo;
   if (!id) return null;
 
   const entity = getEntityType(record);
+
+  if (entity === "offer") {
+    return `/view-offer/${record.id || id}`;
+  }
 
   if (entity === "offer_draft") {
     return `/offer-draft/${record.draftNo || id}`;

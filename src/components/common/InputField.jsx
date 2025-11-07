@@ -1,17 +1,25 @@
 export const InputField = ({
   label,
   required,
-  field,
+  name,
+  value,
+  onChange,
   type = "text",
   placeholder,
   error,
-}) => (
+  field,
+}) => {
+  const mergedProps = field
+    ? field                       
+    : { name, value, onChange }; 
+
+  return (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <input
-      {...field}
+      {...mergedProps}
       type={type}
       placeholder={placeholder}
       className="w-full px-4 py-3 border border-gray-300 rounded-lg 
@@ -19,8 +27,7 @@ export const InputField = ({
                  bg-gray-50 hover:bg-white transition-all"
     />
 
-    {error && (
-      <p className="text-red-600 text-sm mt-1">{error.message}</p>
-    )}
+    {error && <p className="text-red-600 text-sm mt-1">{error.message}</p>}
   </div>
 );
+};

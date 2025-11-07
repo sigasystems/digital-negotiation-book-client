@@ -107,6 +107,20 @@ const ViewOfferDraft = () => {
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <form className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-3 p-6 border-b bg-gray-50">
+          <button
+            type="button"
+            onClick={() =>
+              navigate(`/offer/${formData.draftNo}`, {
+                state: { draftId: id },
+              })
+            }
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
+          >
+            Create Offer
+          </button>
+        </div>
+
           {/* BUSINESS INFO */}
           <Section title="🏢 Business Information">
             <div className="grid sm:grid-cols-2 gap-6">

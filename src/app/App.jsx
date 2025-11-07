@@ -28,6 +28,9 @@ import OfferDrafts from "@/modules/offerDraft/pages/OfferDrafts";
 import ViewOfferDraft from "@/modules/offerDraft/pages/ViewOfferDraft";
 import NotFound from "@/modules/landing/pages/NotFound";
 import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
+import CreateOffer from "@/modules/offers/pages/CreateOffer";
+import Offers from "@/modules/offers/pages/Offers";
+import OfferPage from "@/modules/offers/pages/OfferPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -198,6 +201,30 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <ViewOfferDraft />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/offer/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <CreateOffer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/offers"
+          element={
+            <ProtectedRoute user={user}>
+              <Offers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/view-offer/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <OfferPage />
             </ProtectedRoute>
           }
         />
