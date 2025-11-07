@@ -6,7 +6,7 @@ import LoginBG from "@/assets/loginimage.webp";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
-import { login } from "../services/authService";
+import {login} from "../authServices"
 import { InputField } from "@/components/common/InputField";
 import { PasswordField } from "../components/PasswordField";
 
@@ -106,7 +106,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Logging in..." : "Login"}

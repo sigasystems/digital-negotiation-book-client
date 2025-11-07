@@ -5,8 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {  createPayment } from "../services/paymentService";
-import { apiClient } from "@/utils/apiClient";
-import { login } from "@/modules/auth/services/authService";
+import {login} from "../../auth/authServices"
 import { showError, showSuccess } from "@/utils/toastService";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
