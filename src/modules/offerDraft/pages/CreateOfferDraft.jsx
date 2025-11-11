@@ -17,6 +17,9 @@ const EMPTY_PRODUCT = {
   productId: "",
   species: "",
   sizeBreakups: [{ size: "", breakup: "", price: "", condition: "" }],
+  sizeDetails: "",
+  breakupDetails: "",
+  priceDetails: "",
 };
 
 const CreateOfferDraft = () => {
@@ -86,7 +89,6 @@ const CreateOfferDraft = () => {
 
  const validateForm = () => {
   const required = [
-    "packing",
     "quantity",
     "tolerance",
     "paymentTerms",
@@ -137,6 +139,9 @@ const CreateOfferDraft = () => {
     productId: p.productId,
     productName: productInfo?.productName || "",
     species: p.species,
+    sizeDetails: p.sizeDetails || "",
+    breakupDetails: p.breakupDetails || "",
+    priceDetails: p.priceDetails || "",
     sizeBreakups: p.sizeBreakups.map(s => ({
       size: s.size,
       breakup: +s.breakup,
@@ -215,7 +220,6 @@ const CreateOfferDraft = () => {
              <Section title="Draft Details">
             <div className="grid sm:grid-cols-2 gap-6">
               <ReadOnlyField label="Draft Name" value={formData.draftName} />
-              <InputField required={true} label="Packing" name="packing" value={formData.packing} onChange={handleChange} />
               <InputField required={true} label="Quantity (MT)" name="quantity" value={formData.quantity} onChange={handleChange} />
               <InputField required={true} label="Tolerance (%)" name="tolerance" value={formData.tolerance} onChange={handleChange} />
               <InputField required={true} label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} />
@@ -248,7 +252,6 @@ const CreateOfferDraft = () => {
               productsList={productsList}
               speciesMap={speciesMap}
               onProductSelect={handleProductSelect}
-              readOnly={false}
             />
           </Section>
 

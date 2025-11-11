@@ -2,7 +2,16 @@ import React from "react";
 import { X } from "lucide-react";
 
 const EMPTY_BREAKUP = { size: "", breakup: "", price: "", condition: "" };
-const EMPTY_PRODUCT = { productId: "", productName: "", species: "", sizeBreakups: [{ ...EMPTY_BREAKUP }] };
+const EMPTY_PRODUCT = {
+  productId: "",
+  productName: "",
+  species: "",
+  packing: "",
+  sizeBreakups: [{ ...EMPTY_BREAKUP }],
+  sizeDetails: "",
+  breakupDetails: "",
+  priceDetails: "",
+};
 
 const ProductSection = ({
   productsData= [],
@@ -79,15 +88,13 @@ const ProductSection = ({
 
         return (
           <div key={pIndex} className="border p-6 rounded-xl bg-gray-50 shadow relative">
-            {/* Remove Product Button */}
             <X
               className="absolute top-4 right-4 w-5 h-5 text-red-600 cursor-pointer hover:text-red-800"
-                  onClick={() => removeProduct(pIndex)}
+              onClick={() => removeProduct(pIndex)}
             />
             <h3 className="text-lg font-semibold mb-4">Product #{pIndex + 1}</h3>
 
-            {/* Product & Species */}
-            <div className="grid sm:grid-cols-2 gap-6 mb-6">
+            <div className="grid sm:grid-cols-3 gap-6 mb-6">
               <div>
                 <label className="text-sm font-semibold">Product Name</label>
                 <select
@@ -116,6 +123,17 @@ const ProductSection = ({
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="text-sm font-semibold">Packing</label>
+                <input
+                  type="text"
+                  value={product.packing || ""}
+                  onChange={(e) => updateProductField(pIndex, "packing", e.target.value)}
+                  placeholder="Enter packing info"
+                  className="border rounded px-3 py-2 w-full"
+                />
+              </div>
             </div>
             <div className="mt-6">
               <div className="flex justify-between items-center mb-3">
@@ -129,7 +147,6 @@ const ProductSection = ({
                   </button>
       </div>
 
-      {/* Desktop Table */}
           <table className="min-w-full border border-gray-200 text-sm hidden sm:table">
           <thead className="bg-gray-100">
             <tr>
@@ -139,7 +156,40 @@ const ProductSection = ({
               <th className="px-3 py-2 text-left">Price</th>
               <th />
             </tr>
+              {/* First row for product-level extra inputs */}
+              <tr className="bg-gray-50">
+                <td className="px-3 py-2">
+                  <input
+                    type="text"
+                    value={product.sizeDetails || ""}
+                    onChange={(e) => updateProductField(pIndex, "sizeDetails", e.target.value)}
+                    placeholder="Units / Remarks"
+                    className="border rounded px-2 py-1 w-full font-semibold text-sm"
+                  />
+                </td>
+                <td />
+                <td className="px-3 py-2">
+                  <input
+                    type="text"
+                    value={product.breakupDetails || ""}
+                    onChange={(e) => updateProductField(pIndex, "breakupDetails", e.target.value)}
+                    placeholder="Breakup details"
+                    className="border rounded px-2 py-1 w-full font-semibold text-sm"
+                  />
+                </td>
+                <td className="px-3 py-2">
+                  <input
+                    type="text"
+                    value={product.priceDetails || ""}
+                    onChange={(e) => updateProductField(pIndex, "priceDetails", e.target.value)}
+                    placeholder="₹, $, £"
+                    className="border rounded px-2 py-1 w-full font-semibold text-sm"
+                  />
+                </td>
+                <td />
+            </tr>
           </thead>
+
           <tbody>
             {product.sizeBreakups.map((row, rIndex) => (
               <tr key={rIndex} className="border-t">
@@ -176,50 +226,20 @@ const ProductSection = ({
                     />
                   </td>
                 <td className="px-3 py-2 text-right">
-                  <button
-                    type="button"
+                    <X
                 onClick={() => removeBreakupRow(pIndex, rIndex)}
-                className="text-red-600 text-sm cursor-pointer"
-                  >
-                    Remove
-                  </button>
+                          size={16}
+                className="text-red-600 cursor-pointer"
+                        />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-  <div className="space-y-3 sm:hidden">
-    {product.sizeBreakups.map((row, rIndex) => (
-      <div key={rIndex} className="border rounded-lg p-3 bg-white shadow">
-            {["size", "condition", "breakup", "price"].map((field) => (
-        <div key={field} className="grid grid-cols-2 gap-2 mb-2">
-          <label className="text-xs font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-          <input
-            type={field === "breakup" || field === "price" ? "number" : "text"}
-            value={row[field]}
-                        onChange={(e) => updateBreakup(pIndex, rIndex, field, e.target.value)}
-            className="border rounded px-2 py-1 w-full"
-          />
-        </div>
-                    ))}
-          <div className="text-right">
-            <button
-              type="button"
-              onClick={() => removeBreakupRow(pIndex, rIndex)}
-              className="text-red-600 text-sm cursor-pointer"
-            >
-              Remove
-            </button>
-          </div>
-          </div>
-        ))}
-
         </div>
 
       <div className="text-right mt-3 font-semibold">
-        Total Breakup:{" "} {product.sizeBreakups.reduce((sum, s) => sum + (parseFloat(s.breakup) || 0), 0)}
-      </div>
+        Total Breakup: {product.sizeBreakups.reduce((sum, s) => sum + (parseFloat(s.breakup) || 0), 0)}
     </div>
 
           </div>
