@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { format } from "date-fns";
+import { format, isBefore, startOfDay, parseISO } from "date-fns";
 import { offerDraftService } from "../services";
+import { productService } from "@/modules/product/services";
 
 import Header from "../components/Header";
 import Section from "../components/Section";
@@ -11,70 +12,11 @@ import DatePicker from "../components/DatePicker";
 import ProductSection from "../components/ProductSection";
 import Footer from "../components/Footer";
 
-const REQUIRED_FIELDS = [
-  "fromParty",
-  "origin",
-  "plantApprovalNumber",
-  "brand",
-  "productName",
-  "speciesName",
-];
-
-const EMPTY_BREAKUP = { size: "", breakup: "", price: "" };
-
-  const validateForm = (formData, total) => {
-    for (const field of REQUIRED_FIELDS) {
-      if (!formData[field]?.trim())
-        return `${field.replace(/([A-Z])/g, " $1")} is required`;
-    }
-
-    for (const [i, s] of formData.sizeBreakups.entries()) {
-      if (!s.size || !s.breakup || !s.price)
-        return `All fields required in size breakup row ${i + 1}`;
-      if (isNaN(+s.breakup) || isNaN(+s.price))
-        return `Breakup/Price must be numeric in row ${i + 1}`;
-    }
-
-    const grand = +formData.grandTotal;
-    if (isNaN(grand)) return "Grand total must be numeric.";
-    if (grand !== total)
-      return `Grand Total (${grand}) must equal Total (${total}).`;
-
-    return null;
-  };
-
-  const validateDates = (offerValidityDate, shipmentDate) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (offerValidityDate && offerValidityDate < today)
-      return "Offer validity date cannot be earlier than today.";
-
-    if (shipmentDate && shipmentDate < today)
-      return "Shipment date cannot be earlier than today.";
-
-    if (shipmentDate && offerValidityDate && shipmentDate < offerValidityDate)
-      return "Shipment date cannot be earlier than the offer validity date.";
-
-    return null;
-  };
-
-  const formatPayload = (formData, total) => ({
-    ...formData,
-    total,
-    grandTotal: +formData.grandTotal,
-    offerValidityDate: formData.offerValidityDate
-      ? format(new Date(formData.offerValidityDate), "yyyy-MM-dd")
-      : null,
-    shipmentDate: formData.shipmentDate
-      ? format(new Date(formData.shipmentDate), "yyyy-MM-dd")
-      : null,
-    sizeBreakups: formData.sizeBreakups.map((s) => ({
-      size: s.size,
-      breakup: +s.breakup,
-      price: +s.price,
-    })),
-  });
+const EMPTY_PRODUCT = {
+  productId: "",
+  species: "",
+  sizeBreakups: [{ size: "", breakup: "", price: "", condition: "" }],
+};
 
 const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -87,18 +29,16 @@ const CreateOfferDraft = () => {
       processor: "",
       plantApprovalNumber: "",
       brand: "",
-      draftName: "",
       offerValidityDate: "",
       shipmentDate: "",
-      grandTotal: "",
+      packing: "",
+      draftName: "",
       quantity: "",
       tolerance: "",
       paymentTerms: "",
       remark: "",
-      productName: "",
-      speciesName: "",
-      packing: "",
-      sizeBreakups: [EMPTY_BREAKUP],
+      grandTotal: "",
+      products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
     }),
     [user]
   );
@@ -107,94 +47,169 @@ const CreateOfferDraft = () => {
   const [loading, setLoading] = useState(false);
   const [openPicker, setOpenPicker] = useState({ validity: false, shipment: false });
 
-  const total = useMemo(
-    () =>
-      formData.sizeBreakups.reduce(
-        (sum, s) => sum + (parseFloat(s.breakup) || 0),
-        0
-      ),
-    [formData.sizeBreakups]
-  );
+  const [productsList, setProductsList] = useState([]);
+  const [speciesMap, setSpeciesMap] = useState({});
 
-  /* ---------------- HANDLERS ---------------- */
-  const handleChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }, []);
+  const fetchProductDetails = async (productId) => {
+    try {
+      const res = await productService.searchProducts({ productId }, 0, 50);
+      const product = res.data?.data?.products?.[0];
 
-  const handleBreakupChange = useCallback((index, field, value) => {
-    setFormData((prev) => {
-      const updated = [...prev.sizeBreakups];
-      updated[index] = { ...updated[index], [field]: value };
-      return { ...prev, sizeBreakups: updated };
-    });
-  }, []);
-
-  const handleAddRow = useCallback(() => {
-    setFormData((prev) => ({
+      if (product) {
+        setSpeciesMap(prev => ({
       ...prev,
-      sizeBreakups: [...prev.sizeBreakups, { ...EMPTY_BREAKUP }],
-    }));
-  }, []);
+          [productId]: product.species || [],
+        }));
+      }
+    } catch {
+      toast.error("Unable to load product details");
+    }
+  };
 
-  const handleRemoveRow = useCallback((index) => {
-    setFormData((prev) => {
-      const updated = prev.sizeBreakups.filter((_, i) => i !== index);
-      return {
-        ...prev,
-        sizeBreakups: updated.length ? updated : [{ ...EMPTY_BREAKUP }],
-      };
+  const handleProductSelect = async (pIndex, productId) => {
+    setFormData(prev => {
+      const copy = [...prev.products];
+      copy[pIndex].productId = productId;
+      copy[pIndex].species = "";
+      return { ...prev, products: copy };
     });
-  }, []);
 
-  const handleDateSelect = useCallback((key, date) => {
+    if (productId) fetchProductDetails(productId);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateSelect = (key, date) => {
     if (!date) return;
-    setFormData((prev) => ({ ...prev, [key]: format(date, "yyyy-MM-dd") }));
-    setOpenPicker((prev) => ({
+    setFormData(prev => ({ ...prev, [key]: format(date, "yyyy-MM-dd") }));
+
+    setOpenPicker(prev => ({
       ...prev,
       [key === "offerValidityDate" ? "validity" : "shipment"]: false,
     }));
-  }, []);
+  };
+
+ const validateForm = () => {
+  const required = [
+    "packing",
+    "quantity",
+    "tolerance",
+    "paymentTerms",
+    "remark",
+    "grandTotal",
+    "origin",
+    "processor",
+    "plantApprovalNumber",
+    "brand",
+  ];
+
+  for (const f of required) {
+    if (!formData[f]?.trim()) return `Please fill in all mandatory fields!`;
+  }
+
+  for (const [i, p] of formData.products.entries()) {
+    if (!p.productId) return `Product #${i + 1}: Product is required`;
+    if (!p.species) return `Product #${i + 1}: Species is required`;
+
+    for (const [r, s] of p.sizeBreakups.entries()) {
+      if (!s.size || !s.breakup || !s.price)
+        return `Product #${i + 1}: Row ${r + 1} incomplete`;
+    }
+  }
+
+  // Date validations
+  const today = startOfDay(new Date());
+  const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
+  const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
+
+  if (validityDate && isBefore(validityDate, today)) {
+    return "Offer Validity Date cannot be earlier than today";
+  }
+
+  if (shipmentDate && validityDate && isBefore(shipmentDate, validityDate)) {
+    return "Shipment Date cannot be earlier than Offer Validity Date";
+  }
+
+  return null;
+};
+  const formatPayload = () => ({
+    ...formData,
+    grandTotal: +formData.grandTotal,
+   products: formData.products.map(p => {
+  const productInfo = productsList.find(x => x.id === p.productId);
+
+  return {
+    productId: p.productId,
+    productName: productInfo?.productName || "",
+    species: p.species,
+    sizeBreakups: p.sizeBreakups.map(s => ({
+      size: s.size,
+      breakup: +s.breakup,
+      condition: s.condition || "",
+      price: +s.price,
+    })),
+  };
+}),
+
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formError = validateForm(formData, total);
-    if (formError) return toast.error(formError);
-
-    const offerDate = formData.offerValidityDate
-      ? new Date(formData.offerValidityDate)
-      : null;
-    const shipDate = formData.shipmentDate
-      ? new Date(formData.shipmentDate)
-      : null;
-
-    const dateError = validateDates(offerDate, shipDate);
-    if (dateError) return toast.error(dateError);
+    const error = validateForm();
+    if (error) return toast.error(error);
 
     setLoading(true);
     try {
-      const payload = formatPayload(formData, total);
+      const payload = formatPayload();
       const res = await offerDraftService.createDraft(payload);
-      if (res?.data?.data?.error) {
-        toast.error(res.data.data?.error);
-        return;
-      }
 
       if (res?.status === 201 || res?.data?.success) {
-        toast.success("Offer draft created successfully!");
+        toast.success("Draft created successfully");
         setFormData(initialForm);
+        window.location.reload()
       } else {
-        toast.error(res?.data?.message || "Failed to create draft.");
+        toast.error("Failed to create draft");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Error creating draft.");
+      toast.error(err?.response?.data?.message || "Error creating draft");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- RENDER ---------------- */
+  useEffect(() => {
+  const loadAllProducts = async () => {
+    try {
+      const res = await productService.getAllProducts(0, 500);
+      setProductsList(res.data?.data?.products || []);
+    } catch (err) {
+      toast.error("Unable to load products");
+    }
+  };
+
+  loadAllProducts();
+
+  const loadLatestDraftNo = async () => {
+    try {
+      const res = await offerDraftService.getLatestDraftNo();
+      const lastDraftNo = res.data?.lastDraftNo || 0;
+      setFormData(prev => ({
+        ...prev,
+        draftName: `Offer Draft ${lastDraftNo + 1}`,
+      }));
+    } catch (err) {
+      console.error(err);
+      toast.error("Unable to fetch latest draft number");
+    }
+  };
+
+  loadLatestDraftNo();
+}, []);
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-5xl mx-auto">
@@ -204,84 +219,47 @@ const CreateOfferDraft = () => {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
         >
-          {/* BUSINESS INFORMATION */}
-          <Section title="🏢 Business Information">
+
+             <Section title="Draft Details">
             <div className="grid sm:grid-cols-2 gap-6">
-              <ReadOnlyField
-                label="From Party"
-                value={formData.fromParty}
-                placeholder="e.g. Arctic Seafood Ltd (auto-filled)"
-              />
-              <InputField
-                label="Origin"
-                name="origin"
-                value={formData.origin}
-                onChange={handleChange}
-                placeholder="e.g. Norway"
-                required
-              />
-              <InputField
-                label="Processor"
-                name="processor"
-                value={formData.processor}
-                onChange={handleChange}
-                placeholder="e.g. Oceanic Foods Pvt. Ltd."
-              />
-              <InputField
-                label="Plant Approval Number"
-                name="plantApprovalNumber"
-                value={formData.plantApprovalNumber}
-                onChange={handleChange}
-                placeholder="e.g. PL-10234"
-                required
-              />
-              <InputField
-                label="Brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                placeholder="e.g. ArcticFresh"
-                required
-              />
+              <ReadOnlyField label="Draft Name" value={formData.draftName} />
+              <InputField required={true} label="Packing" name="packing" value={formData.packing} onChange={handleChange} />
+              <InputField required={true} label="Quantity (MT)" name="quantity" value={formData.quantity} onChange={handleChange} />
+              <InputField required={true} label="Tolerance (%)" name="tolerance" value={formData.tolerance} onChange={handleChange} />
+              <InputField required={true} label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} />
+              <InputField required={true} label="Remarks" name="remark" value={formData.remark} onChange={handleChange} />
+              <InputField required={true} label="Grand Total (USD)" name="grandTotal" value={formData.grandTotal} onChange={handleChange} />
             </div>
           </Section>
 
-          <Section title="📅 Dates">
+           <Section title="Dates">
             <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker
-                label="Offer Validity Date"
-                value={formData.offerValidityDate}
-                onSelect={(date) => handleDateSelect("offerValidityDate", date)}
-                open={openPicker.validity}
-                setOpen={(val) =>
-                  setOpenPicker((p) => ({ ...p, validity: val }))
-                }
-              />
-              <DatePicker
-                label="Shipment Date"
-                value={formData.shipmentDate}
-                onSelect={(date) => handleDateSelect("shipmentDate", date)}
-                open={openPicker.shipment}
-                setOpen={(val) =>
-                  setOpenPicker((p) => ({ ...p, shipment: val }))
-                }
-              />
+              <DatePicker label="Offer Validity Date" value={formData.offerValidityDate} onSelect={(d) => handleDateSelect("offerValidityDate", d)} open={openPicker.validity} setOpen={(v) => setOpenPicker(prev => ({ ...prev, validity: v }))} />
+              <DatePicker label="Shipment Date" value={formData.shipmentDate} onSelect={(d) => handleDateSelect("shipmentDate", d)} open={openPicker.shipment} setOpen={(v) => setOpenPicker(prev => ({ ...prev, shipment: v }))} />
             </div>
           </Section>
 
-          <Section title="📝 Draft Details">
+          <Section title="Business Information">
+            <div className="grid sm:grid-cols-2 gap-6">
+              <ReadOnlyField label="From Party" value={formData.fromParty} />
+              <InputField required={true} label="Origin" name="origin" value={formData.origin} onChange={handleChange}/>
+              <InputField required={true} label="Processor" name="processor" value={formData.processor} onChange={handleChange} />
+              <InputField required={true} label="Plant Approval Number" name="plantApprovalNumber" value={formData.plantApprovalNumber} onChange={handleChange}/>
+              <InputField required={true} label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
+            </div>
+          </Section>
+
+          <Section title="Products">
             <ProductSection
-              formData={formData}
-              handleChange={handleChange}
-              handleBreakupChange={handleBreakupChange}
-              addBreakupRow={handleAddRow}
-              removeBreakupRow={handleRemoveRow}
-              total={total}
+              productsData={formData.products || []}
+              setFormData={setFormData}
+              productsList={productsList}
+              speciesMap={speciesMap}
+              onProductSelect={handleProductSelect}
               readOnly={false}
             />
           </Section>
 
-          {/* FOOTER */}
           <Footer loading={loading} />
         </form>
       </div>

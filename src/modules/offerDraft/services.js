@@ -27,6 +27,8 @@ export const offerDraftService = {
   // ✅ Delete a draft by ID
   deleteDraft: (id) => api.delete(`/offer-draft/delete/${id}`),
 
+  getLatestDraftNo: () => api.get("/offer-draft/latest"),
+
  searchOfferDrafts: async (query) => {
   return api.get("/offer-draft/search", query);
 },
