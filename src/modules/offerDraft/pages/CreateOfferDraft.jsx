@@ -11,6 +11,7 @@ import { InputField } from "@/components/common/InputField";
 import DatePicker from "../components/DatePicker";
 import ProductSection from "../components/ProductSection";
 import Footer from "../components/Footer";
+import { createHandleProductSelect } from "@/utils/getAllProducts";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -66,21 +67,12 @@ const CreateOfferDraft = () => {
     }
   };
 
-  const handleProductSelect = async (pIndex, productId) => {
-    setFormData(prev => {
-      const copy = [...prev.products];
-      copy[pIndex].productId = productId;
-      copy[pIndex].species = "";
-      return { ...prev, products: copy };
-    });
-
-    if (productId) fetchProductDetails(productId);
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
@@ -249,7 +241,7 @@ const CreateOfferDraft = () => {
             </div>
           </Section>
 
-          <Section title="Products">
+          <Section title="Products & Size Details">
             <ProductSection
               productsData={formData.products || []}
               setFormData={setFormData}
