@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { offerDraftService } from "../services";
-import { useOfferDraftForm } from "@/app/hooks/useOfferDraftForm";
+import { productService } from "@/modules/product/services";
+import { createHandleProductSelect } from "@/utils/getAllProducts";
 import { validateOfferDates } from "@/utils/formateDate";
 import { InputField } from "@/components/common/InputField";
 import Section from "../components/Section";
@@ -14,92 +15,135 @@ import FormActions from "../components/FormActions";
 const ViewOfferDraft = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const {
-    formData,
-    setFormData,
-    originalData,
-    setOriginalData,
-    loading,
-    total,
-    isChanged,
-    buildChangedFields,
-  } = useOfferDraftForm(id);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [originalData, setOriginalData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [productsList, setProductsList] = useState([]);
+  const [speciesMap, setSpeciesMap] = useState({});
   const [openPicker, setOpenPicker] = useState({
     validity: false,
     shipment: false,
   });
 
-  const handleDateSelect = (key, date) => {
-    if (!date) return;
-    const iso = typeof date === "string" ? new Date(date).toISOString() : date.toISOString();
-    setFormData((prev) => ({ ...prev, [key]: iso }));
+  useEffect(() => {
+  const fetchDraft = async () => {
+    try {
+      const res = await offerDraftService.getDraftById(id);
+      const draft = res?.data?.data?.draft;
+      if (!draft) return toast.error("Draft not found");
+
+      const normalized = {
+        ...draft,
+        products: (draft.draftProducts || []).map((p) => ({
+          productId: p.productId,
+          productName: p.productName,
+          species: p.species, // string
+          sizeBreakups: p.sizeBreakups.map(sb => ({
+            size: sb.size,
+            condition: sb.condition,
+            breakup: sb.breakup,
+            price: sb.price,
+          })),
+        })),
+      };
+
+      setFormData(normalized);
+      setOriginalData(JSON.parse(JSON.stringify(normalized)));
+
+      draft.draftProducts?.forEach(async (p) => {
+        if (!p.productId) return;
+
+        const res = await productService.searchProducts({ productId: p.productId }, 0, 50);
+        const product = res.data?.data?.products?.[0];
+        if (product) {
+          let speciesArr = product.species || [];
+          if (p.species && !speciesArr.includes(p.species)) {
+            speciesArr = [p.species, ...speciesArr];
+          }
+          setSpeciesMap(prev => ({ ...prev, [p.productId]: speciesArr }));
+        }
+      });
+
+    } catch (err) {
+      toast.error("Failed to load draft");
+    } finally {
+      setLoading(false);
+    }
   };
+  fetchDraft();
+}, [id]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const res = await productService.getAllProducts(0, 500);
+        setProductsList(res.data?.data?.products || []);
+      } catch {
+        toast.error("Unable to load product list");
+      }
+    };
+    loadProducts();
+  }, []);
+
+  const fetchProductDetails = async (productId) => {
+    try {
+      const res = await productService.searchProducts({ productId }, 0, 50);
+      const product = res.data?.data?.products?.[0];
+      if (product) {
+        setSpeciesMap((prev) => ({
+          ...prev,
+          [productId]: product.species || [],
+        }));
+      }
+    } catch {
+      toast.error("Failed to load species");
+    }
+  };
+
+  const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    if (!isChanged) {
-      toast.error("No changes detected.");
-      return;
-    }
+  const handleDateSelect = (key, date) => {
+    if (!date) return;
 
-    const validationError = validateOfferDates(
+    const iso = new Date(date).toISOString();
+
+    setFormData((prev) => ({ ...prev, [key]: iso }));
+  };
+
+  const handleSave = async () => {
+    const validation = validateOfferDates(
       formData.offerValidityDate,
       formData.shipmentDate
     );
-    if (validationError) return toast.error(validationError);
 
-    setSubmitting(true);
+    if (validation) return toast.error(validation);
+
     try {
-      const changedFields = buildChangedFields(formData, originalData);
+      const res = await offerDraftService.updateDraft(id, formData);
 
-      if (changedFields.sizeBreakups) {
-        changedFields.sizeBreakups = changedFields.sizeBreakups.map((i) => ({
-          ...i,
-          breakup: Number(i.breakup) || 0,
-          price: Number(i.price) || 0,
-        }));
-      }
-
-      if (changedFields.sizeBreakups || changedFields.grandTotal)
-        changedFields.total = total;
-
-      const res = await offerDraftService.updateDraft(id, changedFields);
-      const err = res?.data?.data?.error || res?.data?.message;
-
-      if (res?.data?.success === false || err) {
-        toast.error(err || "Failed to update draft.");
+      if (!res?.data?.success) {
+        toast.error("Failed to update");
         return;
       }
 
-      toast.success("Offer draft updated successfully.");
-      setOriginalData(formData);
-      setIsEditing(false);
-    } catch (err) {
-      console.error("Update error:", err);
-      toast.error("Error updating draft.");
-    } finally {
-      setSubmitting(false);
+      toast.success("Updated successfully");
+      setOriginalData(JSON.parse(JSON.stringify(formData)));
+    } catch {
+      toast.error("Error updating draft");
     }
   };
 
-  if (loading)
+  if (loading || !formData)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-500">
-        Loading offer draft...
-      </div>
-    );
-
-  if (!formData)
-    return (
-      <div className="flex justify-center items-center min-h-screen text-gray-500">
-        Draft not found.
+        Loading...
       </div>
     );
 
@@ -107,7 +151,7 @@ const ViewOfferDraft = () => {
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <form className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-3 p-6 border-b bg-gray-50">
+          <div className="flex justify-end p-6 border-b bg-gray-50">
           <button
             type="button"
             onClick={() =>
@@ -115,74 +159,63 @@ const ViewOfferDraft = () => {
                 state: { draftId: id },
               })
             }
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
           >
             Create Offer
           </button>
         </div>
 
           {/* BUSINESS INFO */}
-          <Section title="🏢 Business Information">
+          <Section title="Business Information">
             <div className="grid sm:grid-cols-2 gap-6">
               <ReadOnlyField label="Draft Number" value={formData.draftNo} />
-              {isEditing ? (
-                <>
                   <InputField label="From Party" name="fromParty" value={formData.fromParty} onChange={handleChange} />
                   <InputField label="Origin" name="origin" value={formData.origin} onChange={handleChange} />
                   <InputField label="Processor" name="processor" value={formData.processor} onChange={handleChange} />
                   <InputField label="Plant Approval Number" name="plantApprovalNumber" value={formData.plantApprovalNumber} onChange={handleChange} />
                   <InputField label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
-                </>
-              ) : (
-                <>
-                  <ReadOnlyField label="From Party" value={formData.fromParty} />
-                  <ReadOnlyField label="Origin" value={formData.origin} />
-                  <ReadOnlyField label="Processor" value={formData.processor} />
-                  <ReadOnlyField label="Plant Approval Number" value={formData.plantApprovalNumber} />
-                  <ReadOnlyField label="Brand" value={formData.brand} />
-                </>
-              )}
+                </div>
+          </Section>
+
+          <Section title="Draft Details">
+            <div className="grid sm:grid-cols-2 gap-6">
+
+              <InputField label="Draft Name" name="draftName" value={formData.draftName} onChange={handleChange} />
+
+              <InputField label="Packing" name="packing" value={formData.packing} onChange={handleChange} />
+              <InputField label="Quantity" name="quantity" value={formData.quantity} onChange={handleChange} />
+              <InputField label="Tolerance" name="tolerance" value={formData.tolerance} onChange={handleChange} />
+                  <InputField label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} />
+                  <InputField label="Remark" name="remark" value={formData.remark} onChange={handleChange} />
+              <InputField label="Grand Total" name="grandTotal" value={formData.grandTotal} onChange={handleChange} />
             </div>
           </Section>
 
           {/* DATES */}
-          <Section title="📅 Dates">
+          <Section title="Dates">
             <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker
-                label="Offer Validity Date"
-                value={formData.offerValidityDate}
-                onSelect={(date) => handleDateSelect("offerValidityDate", date)}
-                open={openPicker.validity}
-                setOpen={(v) => setOpenPicker((p) => ({ ...p, validity: v }))}
-                editable={true}
-              />
-              <DatePicker
-                label="Shipment Date"
-                value={formData.shipmentDate}
-                onSelect={(date) => handleDateSelect("shipmentDate", date)}
-                open={openPicker.shipment}
-                setOpen={(v) => setOpenPicker((p) => ({ ...p, shipment: v }))}
-                editable={true}
-              />
+              <DatePicker label="Offer Validity Date" value={formData.offerValidityDate} onSelect={(d) => handleDateSelect("offerValidityDate", d)} open={openPicker.validity} setOpen={(v) => setOpenPicker((p) => ({ ...p, validity: v }))} />
+
+              <DatePicker label="Shipment Date" value={formData.shipmentDate} onSelect={(d) => handleDateSelect("shipmentDate", d)} open={openPicker.shipment} setOpen={(v) => setOpenPicker((p) => ({ ...p, shipment: v }))} />
             </div>
           </Section>
 
-          {/* PRODUCT SECTION */}
-          <Section title="📝 Product & Draft Details">
+          {/* PRODUCTS */}
+          <Section title="Product & Size Details">
             <ProductSection
-              formData={formData}
-              handleChange={handleChange}
-              total={total}
-              readOnly={!isEditing}
+              productsData={formData.products}
+              setFormData={setFormData}
+              productsList={productsList}
+              speciesMap={speciesMap}
+              onProductSelect={handleProductSelect}
             />
           </Section>
 
-          {/* FOOTER */}
           <FormActions
-            isEditing={isEditing}
-            isChanged={isChanged}
-            submitting={submitting}
-            onCancel={() => setIsEditing(false)}
+            isEditing={true}
+            isChanged={JSON.stringify(formData) !== JSON.stringify(originalData)}
+            submitting={false}
+            onCancel={() => navigate(-1)}
             onSave={handleSave}
             onBack={() => navigate(-1)}
           />

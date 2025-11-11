@@ -26,7 +26,13 @@ export default function OfferDrafts() {
       }
 
       const { drafts, totalItems } = response?.data?.data || {};
-      setDrafts(drafts || []);
+
+      const normalized = (drafts || []).map(d => ({
+        ...d,
+        id: d.draftNo,
+      }));
+
+      setDrafts(normalized);
       setTotalItems(totalItems || 0);
     } catch (err) {
       console.error("Failed to fetch offer drafts:", err);

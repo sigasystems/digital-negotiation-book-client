@@ -38,7 +38,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand"];
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand", "offerDraftId"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -110,8 +110,13 @@ export default function DashboardTable({
           header: formatHeader(key),
           cell: ({ row }) => {
             const value = row.getValue(key);
-            if (typeof value === "object" && value !== null)
-              return JSON.stringify(value);
+            if (Array.isArray(value)) {
+              return <span>{value.length} item(s)</span>;
+            }
+
+            if (typeof value === "object" && value !== null) {
+              return <span>{JSON.stringify(value)}</span>;
+            }
             return <span>{String(value ?? "")}</span>;
           },
         };
