@@ -34,19 +34,27 @@ const ViewOfferDraft = () => {
       const draft = res?.data?.data?.draft;
       if (!draft) return toast.error("Draft not found");
 
-      const normalized = {
-        ...draft,
-        products: (draft.draftProducts || []).map((p) => ({
+      const normalizedProducts = (draft.draftProducts || []).map((p) => ({
           productId: p.productId,
           productName: p.productName,
-          species: p.species, // string
-          sizeBreakups: p.sizeBreakups.map(sb => ({
+          species: p.species,
+          sizeDetails: p.sizeDetails || "",
+          breakupDetails: p.breakupDetails || "",
+          priceDetails: p.priceDetails || "",
+          sizeBreakups: (p.sizeBreakups || []).map((sb) => ({
             size: sb.size,
-            condition: sb.condition,
             breakup: sb.breakup,
             price: sb.price,
+            condition: sb.condition || "",
+            sizeDetails: sb.sizeDetails || "",       // optional per-size override
+            breakupDetails: sb.breakupDetails || "",
+            priceDetails: sb.priceDetails || "",
           })),
-        })),
+        }));
+
+        const normalized = {
+          ...draft,
+          products: normalizedProducts,
       };
 
       setFormData(normalized);
@@ -62,7 +70,7 @@ const ViewOfferDraft = () => {
           if (p.species && !speciesArr.includes(p.species)) {
             speciesArr = [p.species, ...speciesArr];
           }
-          setSpeciesMap(prev => ({ ...prev, [p.productId]: speciesArr }));
+          setSpeciesMap((prev) => ({ ...prev, [p.productId]: speciesArr }));
         }
       });
 
