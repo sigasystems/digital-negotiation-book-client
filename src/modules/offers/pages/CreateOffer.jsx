@@ -11,6 +11,9 @@ import { offerDraftService } from "@/modules/offerDraft/services";
 import { productService } from "@/modules/product/services";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
+import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
+import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { offerService } from "../services";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -29,6 +32,8 @@ const CreateOffer = () => {
   const initialForm = useMemo(() => ({
     businessOwnerId: user?.businessOwnerId || "",
     fromParty: user?.businessName || "",
+    buyerId: "",
+    toParty: "",
     origin: "",
     processor: "",
     plantApprovalNumber: "",
@@ -53,13 +58,14 @@ const CreateOffer = () => {
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
   const [offerName, setOfferName] = useState("");
+  const [buyers, setBuyers] = useState([]);
 
   const fetchProductDetails = async (productId) => {
     try {
       const res = await productService.searchProducts({ productId }, 0, 50);
       const product = res.data?.data?.products?.[0];
       if (product) {
-        setSpeciesMap(prev => ({ ...prev, [productId]: product.species || [] }));
+        setSpeciesMap((prev) => ({ ...prev, [productId]: product.species || [] }));
       }
     } catch {
       toast.error("Unable to load product details");
@@ -67,29 +73,29 @@ const CreateOffer = () => {
   };
 
   const handleChange = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
-    setFormData(prev => ({ ...prev, [key]: date }));
-    setOpenPicker(prev => ({
+    setFormData((prev) => ({ ...prev, [key]: date }));
+    setOpenPicker((prev) => ({
       ...prev,
       [key === "offerValidityDate" ? "validity" : "shipment"]: false,
     }));
   };
 
   const addProduct = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       products: [...prev.products, JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
     }));
   };
 
   const removeProduct = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       products: prev.products.filter((_, i) => i !== index),
     }));
@@ -102,21 +108,22 @@ const CreateOffer = () => {
         const res = await offerDraftService.getDraftById(draftId);
         const data = res?.data?.data?.draft;
         if (data) {
-          const mappedProducts = (data.draftProducts || []).map(p => ({
+          const mappedProducts = (data.draftProducts || []).map((p) => ({
             productId: p.productId,
             species: p.species,
             packing: p.packing,
             priceDetails: p.priceDetails,
             breakupDetails: p.breakupDetails,
             sizeDetails: p.sizeDetails,
-            sizeBreakups: (p.sizeBreakups || []).map(sb => ({
+            sizeBreakups: (p.sizeBreakups || []).map((sb) => ({
               size: sb.size,
               breakup: sb.breakup,
               price: sb.price,
               condition: sb.condition || "",
             })),
           }));
-          setFormData(prev => ({
+
+          setFormData((prev) => ({
           ...prev,
           ...data,
             products: mappedProducts.length ? mappedProducts : [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
@@ -138,12 +145,23 @@ const CreateOffer = () => {
       }
     };
 
+    const loadBuyers = async () => {
+      try {
+        const res = await businessOwnerService.getBuyersList();
+        setBuyers(res.data?.data || []);
+      } catch {
+        toast.error("Unable to load buyers");
+      }
+    };
+
     loadDraft();
     loadProducts();
+    loadBuyers();
   }, [draftId]);
 
   const handleCreateOffer = () => {
     if (!offerName.trim()) return toast.error("Offer name is required");
+    if (!formData.buyerId) return toast.error("Please select a to party!");
     setConfirmOpen(true);
   };
 
@@ -152,17 +170,16 @@ const CreateOffer = () => {
     setCreating(true);
     try {
       const payload = { ...formData, offerName };
-      await offerDraftService.createDraft(payload);
-      toast.success("Offer created successfully");
-      navigate("/offers");
+      const res = await offerService.createOffer(draftId, payload);
     } catch (err) {
+      console.error("createOffer error:", err);
       toast.error(err?.response?.data?.message || "Failed to create offer");
     } finally {
       setCreating(false);
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return (<div className="min-h-screen flex items-center justify-center">Loading...</div>);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
@@ -204,6 +221,40 @@ const CreateOffer = () => {
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow p-6">
+          <label className="text-sm font-medium text-slate-700">
+            To Party <span className="text-red-500">*</span>
+          </label>
+          <Select
+            onValueChange={(val) => {
+              const buyer = buyers.find((b) => b.id === val);
+              setFormData((prev) => ({
+                ...prev,
+                buyerId: val,
+                toParty: buyer?.buyersCompanyName || "",
+              }));
+            }}
+            value={formData.buyerId || ""}
+          >
+            <SelectTrigger className="mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500">
+              <SelectValue placeholder="Select To Party" />
+            </SelectTrigger>
+            <SelectContent>
+              {buyers.length > 0 ? (
+                buyers.map((buyer) => (
+                  <SelectItem key={buyer.id} value={buyer.id}>
+                    {buyer.buyersCompanyName}
+                  </SelectItem>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-slate-500 text-sm">
+                  No buyers found
+                </div>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 shadow p-6">
           <h2 className="font-semibold text-lg text-slate-800 mb-4">Basic Draft Details</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -230,7 +281,7 @@ const CreateOffer = () => {
                     value={formData[key]}
                     onSelect={(d) => handleDateSelect(key, d)}
                     open={openPicker[key === "offerValidityDate" ? "validity" : "shipment"]}
-                    setOpen={(v) => setOpenPicker(prev => ({ ...prev, [key === "offerValidityDate" ? "validity" : "shipment"]: v }))}
+                    setOpen={(v) => setOpenPicker((prev) => ({ ...prev, [key === "offerValidityDate" ? "validity" : "shipment"]:v, }))}
                   />
                 ) : (
                 <Input

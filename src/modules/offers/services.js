@@ -10,8 +10,7 @@ const api = {
 };
 
 export const offerService = {
-  createOffer: (draftId, offerName) =>
-    api.post(`/offer/create-offer/${draftId}`, { offerName }),
+  createOffer: (draftId, data) =>{return api.post(`/offer/create-offer/${draftId}`, data)},
 
   getOfferById: (id) => api.get(`/offer/get/${id}`),
 

@@ -152,7 +152,7 @@ export default function AddBuyerForm() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-6 py-3 border border-gray-300 rounded-lg"
+              className="px-6 py-3 border border-gray-300 rounded-lg cursor-pointer"
             >
               Cancel
             </button>
@@ -160,7 +160,7 @@ export default function AddBuyerForm() {
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-70 flex gap-2 items-center"
+              className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-70 flex gap-2 items-center cursor-pointer"
             >
               {loading ? "Adding..." : "Add Buyer"}
             </button>

@@ -25,6 +25,10 @@ export const businessOwnerService = {
       ...filters,
     }),
 
+    getBuyersList: () => {
+      return api.get("/business-owner/get-buyers-list");
+    },
+
   getBuyerById: (id) => {
     if (!id) throw new Error("Buyer ID is required");
     return api.get(`/business-owner/get-buyer/${id}`);
