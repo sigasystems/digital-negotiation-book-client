@@ -75,7 +75,7 @@ export default function UpgradePlanPage() {
     const fetchPlans = async () => {
       try {
         const data = await getAllPlans();
-        const order = ["basic", "pro", "advance"];
+        const order = ["basic", "pro", "advanced"];
         const sortedPlans = data.sort(
           (a, b) => order.indexOf(a.key) - order.indexOf(b.key)
         );

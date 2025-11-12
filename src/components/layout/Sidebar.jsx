@@ -16,7 +16,8 @@ import {
   ClipboardList,
   ShoppingCart,
   CreditCard,
-  Tag
+  Tag,
+  ArrowUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -67,6 +68,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
           { name: "Offers", icon: Tag, path: "/offers" },
           { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
+          { name: "Upgrade-Plan", icon:ArrowUp , path: "/upgrade-plan" }
         ]
       : []),
     ...(userRole === "super_admin"

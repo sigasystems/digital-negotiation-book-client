@@ -97,6 +97,16 @@ const AddProduct = () => {
       await productService.createProducts(payload);
       showToast("success", "Products added successfully!");
       setProducts([{ code: "", productName: "", species: [""], size: [""] }]);
+      // If backend sends limit info
+  if (err?.response?.status === 403 && err.response.data?.type) {
+    const { type, used, max } = err.response.data;
+    showToast(
+      "error",
+      `You have reached your ${type} limit: ${used}/${max}. Please upgrade your plan.`
+    );
+  } else {
+    showToast("error", msg);
+  }
     } catch (err) {
       showToast("error", err?.response?.data?.message || "Failed to add products.");
     } finally {
@@ -164,14 +174,22 @@ const AddProduct = () => {
 
           {/* Footer */}
           <div className="px-6 py-6 bg-gray-50 flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <button
+              {/* <button
                 type="button"
                 onClick={addProduct}
                 disabled={products.length >= 5}
                 className="px-5 py-2 text-indigo-600 font-medium hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-all cursor-pointer"
               >
                 <Plus size={16} /> Add Another Product ({products.length}/5)
-              </button>
+              </button> */}
+              <button
+  type="button"
+  onClick={addProduct}
+  disabled={products.length >= 5}
+  className="px-5 py-2 text-indigo-600 font-medium hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-all cursor-pointer"
+>
+  <Plus size={16} /> Add Another Product ({products.length}/5)
+</button>
               <button
                 type="submit"
                 disabled={loading}
