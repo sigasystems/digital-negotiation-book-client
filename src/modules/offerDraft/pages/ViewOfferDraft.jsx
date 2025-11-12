@@ -41,12 +41,13 @@ const ViewOfferDraft = () => {
           sizeDetails: p.sizeDetails || "",
           breakupDetails: p.breakupDetails || "",
           priceDetails: p.priceDetails || "",
+          packing: p.packing || "",
           sizeBreakups: (p.sizeBreakups || []).map((sb) => ({
             size: sb.size,
             breakup: sb.breakup,
             price: sb.price,
             condition: sb.condition || "",
-            sizeDetails: sb.sizeDetails || "",       // optional per-size override
+            sizeDetails: sb.sizeDetails || "",
             breakupDetails: sb.breakupDetails || "",
             priceDetails: sb.priceDetails || "",
           })),
@@ -190,7 +191,6 @@ const ViewOfferDraft = () => {
 
               <InputField label="Draft Name" name="draftName" value={formData.draftName} onChange={handleChange} />
 
-              <InputField label="Packing" name="packing" value={formData.packing} onChange={handleChange} />
               <InputField label="Quantity" name="quantity" value={formData.quantity} onChange={handleChange} />
               <InputField label="Tolerance" name="tolerance" value={formData.tolerance} onChange={handleChange} />
                   <InputField label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} />
