@@ -31,6 +31,7 @@ import PaymentSuccess from "@/modules/checkout/components/PaymentSuccess";
 import CreateOffer from "@/modules/offers/pages/CreateOffer";
 import Offers from "@/modules/offers/pages/Offers";
 import OfferPage from "@/modules/offers/pages/OfferPage";
+import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -113,6 +114,17 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <BusinessOwnerPage />
+            </ProtectedRoute>
+          }
+        />
+
+        
+
+        <Route
+          path="/upgrade-plan"
+          element={
+            <ProtectedRoute user={user}>
+              <UpgradePlanPage />
             </ProtectedRoute>
           }
         />

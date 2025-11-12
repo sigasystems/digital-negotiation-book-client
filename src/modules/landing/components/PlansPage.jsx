@@ -1,224 +1,159 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { CheckCircle2, Loader2, Check } from "lucide-react";
-import { formateCurrency } from "@/lib/utils";
-import { getAllPlans } from "../services/planService";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { getPaymentById } from "@/modules/checkout/services/paymentService";
+import { getAllPlans, upgradePlan } from "../services/planService";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2 } from "lucide-react";
 
-export default function PlansPage() {
+export default function Plans() {
   const [plans, setPlans] = useState([]);
-  const [billingCycle, setBillingCycle] = useState("monthly");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentSubscription, setCurrentSubscription] = useState(null);
-
+  const [billingCycle, setBillingCycle] = useState("monthly");
+  const [currentPlanId, setCurrentPlanId] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch user and current payment subscription
-  useEffect(() => {
-    const userStr = sessionStorage.getItem("user");
-    if (userStr) {
-      setIsLoggedIn(true);
-      try {
-        const parsedUser = JSON.parse(userStr);
-        if (parsedUser?.paymentId) {
-          fetchCurrentSubscription(parsedUser.paymentId);
-        }
-      } catch (err) {
-        console.error("Error parsing user data:", err);
-      }
-    }
-  }, []);
-
-  const parsedUser = sessionStorage.getItem("user");
-  const paymentId = parsedUser ? JSON.parse(parsedUser) : null;
-
-  const fetchCurrentSubscription = async (paymentId) => {
-    try {
-      const response = await getPaymentById(paymentId);
-      // ✅ Correctly extract data from backend response
-      if (response?.data?.success && response.data.data) {
-        setCurrentSubscription(response.data.data);
-      }
-    } catch (err) {
-      console.error("Error fetching subscription:", err);
-    }
-  };
-
-  // Fetch all available plans
   useEffect(() => {
     const fetchPlans = async () => {
-      try {
-        const data = await getAllPlans();
-        const order = ["basic", "pro", "advance"];
+      try { 
+         const data = await getAllPlans();
+        const order = ["basic", "advanced"  , "pro"];
         const sortedPlans = data.sort(
           (a, b) => order.indexOf(a.key) - order.indexOf(b.key),
         );
-        setPlans(sortedPlans);
+        setPlans(data || []);
       } catch (err) {
-        setError("Failed to load plans");
-        toast.error("Could not load plans");
+        console.error("Error fetching plans:", err);
+        toast.error("Unable to load plans.");
       } finally {
         setLoading(false);
       }
     };
+    const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+    if (storedUser?.planId) {
+      setCurrentPlanId(storedUser.planId);
+    }
     fetchPlans();
   }, []);
 
-  const handlePlanSelect = (plan) => {
-    if (currentSubscription?.Plan?.id === plan.id) {
-      toast.info("This is your current plan");
-      return;
+  const formateCurrency = (amount, currency = "INR") =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+    }).format(amount);
+  const handlePlanSelect = async (plan) => {
+  const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const userId = storedUser?.id;
+  const userRole = storedUser?.userRole;
+  const billingCycle = "monthly"; // or get from your toggle if you have one
+  // 🧾 Not logged in → go to register
+  if (!userId) {
+    navigate("/checkout", { state: { selectedPlan: plan } });
+    return;
+  }
+
+  // 💼 Already business owner → upgrade flow
+  if (userRole === "business_owner") {
+    try {
+      toast.loading("Creating payment session...");
+      // ✅ Save plan info to session for payment success page
+      sessionStorage.setItem(
+        "pendingBusinessData",
+        JSON.stringify({
+          planId: plan.id,
+          billingCycle,
+          isUpgrade: true,
+        })
+      );
+
+      const res = await upgradePlan({ userId, planId: plan.id });
+      toast.dismiss();
+
+      if (res?.success && res?.message?.checkoutUrl) {
+        window.location.href = res.message.checkoutUrl; // redirect to Stripe
+      } else {
+        toast.error(res?.message || "Failed to create payment session.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.dismiss();
+      toast.error("Upgrade failed. Please try again.");
     }
-
-    navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
-  };
-
-  const isActivePlan = (planId) => {
-    return currentSubscription?.Plan?.id === planId;
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-6 h-6 text-blue-600" />
-      </div>
-    );
+    return;
   }
 
-  if (error) {
+  // 🧩 Normal user → registration + checkout flow
+  sessionStorage.setItem(
+    "pendingBusinessData",
+    JSON.stringify({
+      planId: plan.id,
+      planName: plan.name,
+      billingCycle,
+      isUpgrade: false,
+    })
+  );
+
+  navigate("/register");
+};
+
+
+  const isActivePlan = (planId) => planId === currentPlanId;
+
+  if (loading)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-red-600 mb-4">{error}</p>
-        <Button className={`cursor-pointer`} onClick={() => window.location.reload()}>Retry</Button>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-gray-500 text-lg">Loading plans...</p>
       </div>
     );
-  }
 
   return (
     <div className="">
       <div className="space-y-10">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">
-            Choose Your Plan
-          </h1>
-          <p className="text-gray-700">
-            Simple pricing for businesses of all sizes
-          </p>
+         <div className="text-center">
+        <h2 className="text-5xl font-bold text-center mb-2 text-gray-800">
+          Choose Your Plan
+        </h2>
+        <p className="text-gray-700">
+             Simple pricing for businesses of all sizes
+      </p>
 
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <span
-              className={
-                billingCycle === "monthly"
-                  ? "text-blue-600 font-medium"
-                  : "text-gray-500"
-              }
-            >
-              Monthly
-            </span>
+
+        {/* Billing cycle toggle */}
+        <div className="flex justify-center mb-10 mt-4">
+          <div className="bg-gray-100  border border-gray-200 rounded-full p-1 flex">
             <button
-              onClick={() =>
-                setBillingCycle(
-                  billingCycle === "monthly" ? "yearly" : "monthly",
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition cursor-pointer ${
-                billingCycle === "yearly" ? "bg-blue-600" : "bg-gray-300"
+              onClick={() => setBillingCycle("monthly")}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                billingCycle === "monthly"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:text-blue-600"
               }`}
             >
-              <span
-                className={`inline-block h-4 w-4 bg-white rounded-full transition ${
-                  billingCycle === "yearly" ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
+              Monthly
             </button>
-            <span
-              className={
+            <button
+              onClick={() => setBillingCycle("yearly")}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
                 billingCycle === "yearly"
-                  ? "text-blue-600 font-medium"
-                  : "text-gray-500"
-              }
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:text-blue-600"
+              }`}
             >
               Yearly
-            </span>
+            </button>
           </div>
         </div>
-
-        {/* Active Plan Banner */}
-        {currentSubscription && (
-          <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-5 shadow-sm">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  Active Plan: {currentSubscription.Plan?.name}
-                </h2>
-                <p className="text-sm text-gray-700 mt-1">
-                  {currentSubscription.Plan?.description}
-                </p>
-                <div className="flex gap-6 mt-3 text-sm">
-                  <div>
-                    <span className="text-gray-500">Amount: </span>
-                    <span className="font-medium">
-                      {formateCurrency(
-                        currentSubscription.amount,
-                        currentSubscription.currency,
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Billing: </span>
-                    <span className="font-medium capitalize">
-                      {currentSubscription.Plan?.billingCycle}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Status: </span>
-                    <span
-                      className={`font-medium capitalize ${
-                        currentSubscription.status === "success"
-                          ? "text-green-600"
-                          : "text-yellow-600"
-                      }`}
-                    >
-                      {currentSubscription.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              {currentSubscription.invoicePdf && (
-                <Button
-                  variant="outline"
-                  className={`cursor-pointer`}
-                  size="sm"
-                  onClick={() =>
-                    window.open(currentSubscription.invoicePdf, "_blank")
-                  }
-                >
-                  View Invoice
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
             const isActive = isActivePlan(plan.id);
             const price =
-              billingCycle === "monthly" ? plan.priceMonthly : plan.priceYearly;
+              billingCycle === "monthly"
+                ? plan.priceMonthly
+                : plan.priceYearly;
 
             return (
               <Card
@@ -227,6 +162,7 @@ export default function PlansPage() {
                   isActive ? "ring-2 ring-green-500" : "border"
                 }`}
               >
+                {/* Active Plan Badge */}
                 {isActive && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className="bg-green-600 text-white text-xs px-3 py-1 rounded-full">
@@ -237,13 +173,15 @@ export default function PlansPage() {
 
                 <CardHeader className="text-center pb-4">
                   <h2 className="text-xl font-semibold mb-1">{plan.name}</h2>
-                  <p className="text-sm text-gray-700">{plan.description}</p>
+                  <p className="text-sm text-gray-700">
+                    {plan.description || "Ideal for scaling your business."}
+                  </p>
                 </CardHeader>
 
                 <CardContent className="text-center pb-4">
                   <div className="mb-6">
                     <span className="text-4xl font-semibold">
-                      {formateCurrency(price, plan.currency)}
+                      {formateCurrency(price, plan.currency || "INR")}
                     </span>
                     <span className="text-gray-700 ml-1">
                       /{billingCycle === "monthly" ? "mo" : "yr"}
@@ -272,23 +210,23 @@ export default function PlansPage() {
 
                     <div className="pt-4 border-t">
                       <ul className="space-y-2">
-                        {plan.features.map((feature, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-start gap-2 text-sm"
-                          >
-                            <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{feature}</span>
+                        {plan.features?.length > 0 ? (
+                          plan.features.map((feature, idx) => (
+                            <li
+                              key={idx}
+                              className="flex items-start gap-2 text-sm"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-700">{feature}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="text-gray-400 text-sm">
+                            No features listed.
                           </li>
-                        ))}
+                        )}
                       </ul>
                     </div>
-
-                    {/* {plan.trialDays > 0 && !isActive && (
-                      <p className="text-sm text-blue-600 pt-2">
-                        {plan.trialDays} days free trial
-                      </p>
-                    )} */}
                   </div>
                 </CardContent>
 
@@ -310,6 +248,8 @@ export default function PlansPage() {
           })}
         </div>
       </div>
+      </div>
+    
     </div>
   );
 }

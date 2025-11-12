@@ -7,6 +7,7 @@ import { validateBuyer } from "@/app/config/buyerValidation";
 import { BUYER_FORM_FIELDS } from "@/app/config/buyerFormConfig";
 import {InputField} from "@/components/common/InputField";
 import FormSection from "@/components/common/FormSection";
+import toast from "react-hot-toast";
 
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -48,13 +49,13 @@ export default function AddBuyerForm() {
     const res = await businessOwnerService.addBuyer(formData);
 
     if (res?.status === 201) {
-      showToast("Buyer added successfully");
+      toast("Buyer added successfully");
       setFormData(initialData);
     } else {
-        showToast(res?.message || "Failed to add buyer", "error");
+        toast(res?.message || "Failed to add buyer", "error");
     }
   } catch (err) {
-      showToast(err?.response?.data?.message || "Error adding buyer", "error");
+      toast(`❌ ${err?.response?.data?.message}`);
   } finally {
       setLoading(false);
     }
