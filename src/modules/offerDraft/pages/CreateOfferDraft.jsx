@@ -20,6 +20,7 @@ const EMPTY_PRODUCT = {
   sizeDetails: "",
   breakupDetails: "",
   priceDetails: "",
+  packing: "",
 };
 
 const CreateOfferDraft = () => {
@@ -35,7 +36,6 @@ const CreateOfferDraft = () => {
       brand: "",
       offerValidityDate: "",
       shipmentDate: "",
-      packing: "",
       draftName: "",
       quantity: "",
       tolerance: "",
@@ -142,6 +142,7 @@ const CreateOfferDraft = () => {
     sizeDetails: p.sizeDetails || "",
     breakupDetails: p.breakupDetails || "",
     priceDetails: p.priceDetails || "",
+    packing: p.packing || "",
     sizeBreakups: p.sizeBreakups.map(s => ({
       size: s.size,
       breakup: +s.breakup,

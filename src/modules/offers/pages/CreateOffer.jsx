@@ -105,6 +105,10 @@ const CreateOffer = () => {
           const mappedProducts = (data.draftProducts || []).map(p => ({
             productId: p.productId,
             species: p.species,
+            packing: p.packing,
+            priceDetails: p.priceDetails,
+            breakupDetails: p.breakupDetails,
+            sizeDetails: p.sizeDetails,
             sizeBreakups: (p.sizeBreakups || []).map(sb => ({
               size: sb.size,
               breakup: sb.breakup,
@@ -205,7 +209,6 @@ const CreateOffer = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
               ["draftNo", "Draft Number"],
-              ["businessOwnerId", "Business Owner ID"],
               ["fromParty", "From Party"],
               ["origin", "Origin"],
               ["processor", "Processor"],
@@ -218,8 +221,7 @@ const CreateOffer = () => {
               ["quantity", "Quantity"],
               ["tolerance", "Tolerance"],
               ["paymentTerms", "Payment Terms"],
-              ["remark", "Remark"],
-              ["packing", "Packing"]
+              ["remark", "Remark"]
             ].map(([key, label]) => (
               <div key={key}>
                 <label className="text-sm font-medium text-slate-700">{label}</label>
