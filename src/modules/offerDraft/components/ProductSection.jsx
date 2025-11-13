@@ -22,35 +22,46 @@ const ProductSection = ({
 }) => {
   const updateProductField = (pIndex, field, value) => {
     setFormData(prev => {
-      const copy = { ...prev };
-      copy.products[pIndex][field] = value;
-      return copy;
+      const products = prev.products.map((p, i) =>
+        i === pIndex ? { ...p, [field]: value } : p
+      );
+      return { ...prev, products };
     });
   };
 
   const updateBreakup = (pIndex, rIndex, field, value) => {
     setFormData(prev => {
-      const copy = { ...prev };
-      copy.products[pIndex].sizeBreakups[rIndex][field] = value;
-      return copy;
+      const products = prev.products.map((p, i) => {
+        if (i !== pIndex) return p;
+        const sizeBreakups = p.sizeBreakups.map((sb, j) =>
+          j === rIndex ? { ...sb, [field]: value } : sb
+        );
+        return { ...p, sizeBreakups };
+      });
+      return { ...prev, products };
     });
   };
 
   const addBreakupRow = (pIndex) => {
     setFormData(prev => {
-      const copy = { ...prev };
-      copy.products[pIndex].sizeBreakups.push({ ...EMPTY_BREAKUP });
-      return copy;
+      const products = prev.products.map((p, i) =>
+        i === pIndex
+          ? { ...p, sizeBreakups: [...p.sizeBreakups, { ...EMPTY_BREAKUP }] }
+          : p
+      );
+      return { ...prev, products };
     });
   };
 
   const removeBreakupRow = (pIndex, rIndex) => {
     setFormData(prev => {
-      const copy = { ...prev };
-      let rows = copy.products[pIndex].sizeBreakups.filter((_, i) => i !== rIndex);
-      if (rows.length === 0) rows = [{ ...EMPTY_BREAKUP }];
-      copy.products[pIndex].sizeBreakups = rows;
-      return copy;
+      const products = prev.products.map((p, i) => {
+        if (i !== pIndex) return p;
+        let rows = p.sizeBreakups.filter((_, j) => j !== rIndex);
+        if (rows.length === 0) rows = [{ ...EMPTY_BREAKUP }];
+        return { ...p, sizeBreakups: rows };
+      });
+      return { ...prev, products };
     });
   };
 
@@ -99,7 +110,12 @@ const ProductSection = ({
                 <label className="text-sm font-semibold">Product Name</label>
                 <select
                   value={product.productId}
-                  onChange={(e) => onProductSelect(pIndex, e.target.value)}
+                  onChange={(e) => {
+                     const selected = productsList.find(p => p.id === e.target.value);
+                     updateProductField(pIndex, "productId", e.target.value);
+                     updateProductField(pIndex, "productName", selected?.productName || "");
+                     onProductSelect(pIndex, e.target.value);
+                   }}
                   className="border rounded px-3 py-2 w-full cursor-pointer"
                 >
                   <option value="">-- Select Product --</option>

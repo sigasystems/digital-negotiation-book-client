@@ -113,6 +113,7 @@ const CreateOffer = () => {
             species: p.species,
             packing: p.packing,
             priceDetails: p.priceDetails,
+            productName: p.productName,
             breakupDetails: p.breakupDetails,
             sizeDetails: p.sizeDetails,
             sizeBreakups: (p.sizeBreakups || []).map((sb) => ({
