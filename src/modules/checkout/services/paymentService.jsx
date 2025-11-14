@@ -5,7 +5,8 @@ export const createPayment = async (payload) => {
     const response = await apiClient.post("/subscription/create-checkout-session", payload, {
       withCredentials: true,
     });
-    return response.data; // <-- returns { checkoutUrl, payment }
+    console.log('response....',response.data?.url);
+    return response.data?.url; // <-- returns { checkoutUrl, payment }
   } catch (err) {
     console.error("Payment Error:", err);
     throw err.response?.data?.message || "Failed to create payment";
