@@ -32,7 +32,7 @@ export const resolveEntityRoute = (role, record) => {
   const entity = getEntityType(record);
 
   if (entity === "offer") {
-    return `/view-offer/${record.id || id}`;
+    return `/negotiation/${record.id || id}`;
   }
 
   if (entity === "offer_draft") {

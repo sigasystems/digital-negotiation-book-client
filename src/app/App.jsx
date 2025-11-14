@@ -32,6 +32,7 @@ import CreateOffer from "@/modules/offers/pages/CreateOffer";
 import Offers from "@/modules/offers/pages/Offers";
 import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
+import Negotiation from "@/modules/negotiation/pages/Negotiation";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -221,6 +222,14 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <CreateOffer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/negotiation/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <Negotiation />
             </ProtectedRoute>
           }
         />
