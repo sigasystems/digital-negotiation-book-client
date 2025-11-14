@@ -76,7 +76,7 @@ export default function Offers() {
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
         fetchOwners={fetchOffers}
-        userActions={["view", "edit", "delete"]}
+        userActions={["view", "delete"]}
         onView={(row) => handleView(row.id)}
         onSearch={handleSearch}
         pageIndex={pageIndex}

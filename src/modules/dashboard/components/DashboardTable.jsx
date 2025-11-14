@@ -38,7 +38,7 @@ export default function DashboardTable({
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand", "offerDraftId"];
+  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand", "offerDraftId", "buyerId"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
