@@ -1,4 +1,11 @@
 import axios from "axios";
+import {
+  clearSession,
+  getAccessToken,
+  getRefreshToken,
+  getStoredSession,
+  persistSession,
+} from "@/utils/auth";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -9,7 +16,7 @@ let refreshPromise = null;
 
 // Attach Authorization header
 apiClient.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("authToken");
+  const token = getAccessToken();
   if (token) config.headers["Authorization"] = `Bearer ${token}`;
   return config;
 });
@@ -32,7 +39,7 @@ apiClient.interceptors.response.use(
         if (!isRefreshing) {
           isRefreshing = true;
 
-          const refreshToken = sessionStorage.getItem("refreshToken");
+          const refreshToken = getRefreshToken();
 
           if (!refreshToken) throw new Error("Missing refresh token");
 
@@ -43,22 +50,30 @@ apiClient.interceptors.response.use(
 
         const refreshResponse = await refreshPromise;
 
-        const newAccessToken = refreshResponse.data?.data?.accessToken;
-        const newRefreshToken = refreshResponse.data?.data?.refreshToken;
+        const refreshedData = refreshResponse?.data?.data ?? {};
+        const newAccessToken = refreshedData?.accessToken;
+        const newRefreshToken = refreshedData?.refreshToken;
+        const existingSession = getStoredSession();
 
-        if (newAccessToken) {
-          sessionStorage.setItem("authToken", newAccessToken);
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          apiClient.defaults.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        if (existingSession) {
+          const nextSession = {
+            accessToken: newAccessToken ?? existingSession.accessToken,
+            refreshToken: newRefreshToken ?? existingSession.refreshToken,
+            user: existingSession.user,
+            remember: existingSession.remember,
+          };
+          persistSession(nextSession, { remember: existingSession.remember });
         }
 
-        if (newRefreshToken) {
-          sessionStorage.setItem("refreshToken", newRefreshToken);
+        if (newAccessToken) {
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          apiClient.defaults.headers["Authorization"] = `Bearer ${newAccessToken}`;
         }
 
         return apiClient(originalRequest);
       } catch (err) {
         console.error("Refresh failed", err);
+        clearSession();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

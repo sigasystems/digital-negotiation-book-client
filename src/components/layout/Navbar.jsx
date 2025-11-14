@@ -1,55 +1,66 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Menu, LogOut, X, ChevronDown, User } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
-import { getSession } from "@/utils/auth";
+import useAuth from "@/app/hooks/useAuth";
 
 export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [sessionUser, setSessionUser] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const user = getSession();
-    setSessionUser(user);
-  }, []);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("user");
+    logout();
     setLogoutOpen(false);
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
-    setSessionUser(null);
-    navigate("/");
+    navigate("/login");
   };
 
-  let navLinks = [];
+  const navLinks = useMemo(() => {
+    if (!isAuthenticated) {
+      return [
+        { label: "Home", path: "/" },
+        { label: "Plans", path: "/#plans" },
+      ];
+    }
 
-  if (sessionUser?.userRole === "super_admin") {
-    navLinks = [
-      { label: "Dashboard", path: "/dashboard" },
-      { label: "Business Owners", path: "/users" },
-      { label: "Payment List", path: "/payments-list" },
-    ];
-  } else if (sessionUser?.userRole === "business_owner") {
-  navLinks = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Buyers", path: "/users" },
-    { label: "Products", path: "/products" },
-  ];
-  } else {
-    navLinks = [{ label: "Dashboard", path: "/dashboard" }];
-  }
+    if (user?.userRole === "super_admin") {
+      return [
+        { label: "Dashboard", path: "/dashboard" },
+        { label: "Business Owners", path: "/users" },
+        { label: "Payment List", path: "/payments-list" },
+      ];
+    }
+
+    if (user?.userRole === "business_owner") {
+      return [
+        { label: "Dashboard", path: "/dashboard" },
+        { label: "Buyers", path: "/users" },
+        { label: "Products", path: "/products" },
+      ];
+    }
+
+    return [{ label: "Dashboard", path: "/dashboard" }];
+  }, [isAuthenticated, user]);
+
+  const handleDashboardCTA = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+    setMobileMenuOpen(false);
+  };
 
   const userName =
-    sessionUser?.first_name
-      ? `${sessionUser.first_name} ${sessionUser.last_name || ""}`.trim()
-      : sessionUser?.name || "";
+    user?.first_name
+      ? `${user.first_name} ${user.last_name || ""}`.trim()
+      : user?.name || "";
 
-  const businessName = sessionUser?.businessName || "";
+  const businessName = user?.businessName || "";
 
   return (
     <header className="fixed top-0 left-0 w-full z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -90,7 +101,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             </Link>
           ))}
 
-          {sessionUser ? (
+          {isAuthenticated ? (
             userName ? (
             <div className="relative">
               <button
@@ -139,12 +150,12 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               </button>
             )
           ) : (
-            <Link
-              to="/login"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+            <button
+              onClick={handleDashboardCTA}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
             >
-              Login
-            </Link>
+              Access Dashboard
+            </button>
           )}
         </div>
 
@@ -173,7 +184,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               </Link>
             ))}
 
-            {sessionUser ? (
+            {isAuthenticated ? (
                 <div className="border-t border-gray-200 my-3 pt-3">
                 {userName && (
                   <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
@@ -196,13 +207,12 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                 </div>
             ) : (
               <div className="border-t border-gray-200 my-3 pt-3">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition text-center"
+                <button
+                  onClick={handleDashboardCTA}
+                  className="block w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition text-center cursor-pointer"
                 >
-                  Login
-                </Link>
+                  Access Dashboard
+                </button>
               </div>
             )}
           </nav>

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
 // 🔹 Core layout and route protection
 import Layout from "@/components/layout/Layout";
 import ProtectedRoute from "@/app/routes/ProtectedRoute";
+import useAuth from "@/app/hooks/useAuth";
 
 // 🔹 Pages
 import Login from "@/modules/auth/pages/Login";
@@ -37,42 +38,23 @@ import AddCountry from "@/modules/country/pages/AddCountry";
 
 function AppContent() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const { user, isAuthenticated, loading } = useAuth();
 
-useEffect(() => {
-  const sessionUser = sessionStorage.getItem("user");
-  const currentPath = window.location.pathname;
+  useEffect(() => {
+    if (loading) return;
+    const publicPaths = new Set([
+      "/",
+      "/login",
+      "/forgot-password",
+      "/checkout",
+      "/subscription/success",
+    ]);
 
-  const publicPaths = [
-    "/",
-    "/login",
-    "/forgot-password",
-    "/checkout",
-    "/success",
-    // "/paymentsuccess",
-  ];
-
-  if (!sessionUser) {
-    // Only redirect if not already on a public route
-    if (!publicPaths.includes(currentPath)) {
+    if (!isAuthenticated && !publicPaths.has(location.pathname)) {
       navigate("/login", { replace: true });
     }
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const parsedUser = JSON.parse(sessionUser);
-    setUser(parsedUser);
-  } catch (err) {
-    console.error("Failed to parse user session:", err);
-    sessionStorage.removeItem("user");
-    navigate("/login", { replace: true });
-  } finally {
-    setLoading(false);
-  }
-}, [navigate]);
+  }, [loading, isAuthenticated, location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -98,7 +80,7 @@ useEffect(() => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <ResponsiveDashboard />
             </ProtectedRoute>
           }
@@ -106,7 +88,7 @@ useEffect(() => {
         <Route
           path="/users"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <Users userRole={user?.userRole} />
             </ProtectedRoute>
           }
@@ -114,7 +96,7 @@ useEffect(() => {
         <Route
           path="/business-owner/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <BusinessOwnerPage />
             </ProtectedRoute>
           }
@@ -125,7 +107,7 @@ useEffect(() => {
         <Route
           path="/upgrade-plan"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <UpgradePlanPage />
             </ProtectedRoute>
           }
@@ -133,7 +115,7 @@ useEffect(() => {
         <Route
           path="/buyer/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <BuyerPage />
             </ProtectedRoute>
           }
@@ -141,7 +123,7 @@ useEffect(() => {
         <Route
           path="/add-buyer"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <AddBuyerForm />
             </ProtectedRoute>
           }
@@ -149,7 +131,7 @@ useEffect(() => {
         <Route
           path="/plan-purchase"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <PlanPurchase />
             </ProtectedRoute>
           }
@@ -157,7 +139,7 @@ useEffect(() => {
         <Route
           path="/add-business-owner"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <AddBusinessOwner />
             </ProtectedRoute>
           }
@@ -165,7 +147,7 @@ useEffect(() => {
         <Route
           path="/payments-list"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <PaymentList />
             </ProtectedRoute>
           }
@@ -173,7 +155,7 @@ useEffect(() => {
         <Route
           path="/add-product"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <AddProduct />
             </ProtectedRoute>
           }
@@ -181,7 +163,7 @@ useEffect(() => {
         <Route
           path="/products"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <Products />
             </ProtectedRoute>
           }
@@ -189,7 +171,7 @@ useEffect(() => {
         <Route
           path="/product/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <ViewProduct />
             </ProtectedRoute>
           }
@@ -197,7 +179,7 @@ useEffect(() => {
         <Route
           path="/create-offer-draft"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <CreateOfferDraft />
             </ProtectedRoute>
           }
@@ -205,7 +187,7 @@ useEffect(() => {
         <Route
           path="/offer-draft"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <OfferDrafts />
             </ProtectedRoute>
           }
@@ -213,7 +195,7 @@ useEffect(() => {
         <Route
           path="/offer-draft/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <ViewOfferDraft />
             </ProtectedRoute>
           }
@@ -221,7 +203,7 @@ useEffect(() => {
         <Route
           path="/offer/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <CreateOffer />
             </ProtectedRoute>
           }
@@ -237,7 +219,7 @@ useEffect(() => {
         <Route
           path="/offers"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <Offers />
             </ProtectedRoute>
           }
@@ -245,7 +227,7 @@ useEffect(() => {
         <Route
           path="/view-offer/:id"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute>
               <OfferPage />
             </ProtectedRoute>
           }
@@ -273,3 +255,4 @@ export default function App() {
     </>
   );
 }
+

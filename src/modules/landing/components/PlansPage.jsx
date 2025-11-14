@@ -70,12 +70,17 @@ export default function Plans() {
 
       const res = await upgradePlan({ userId, planId: plan.id });
       toast.dismiss();
+console.log('response.....',res)
+      // ✅ FIX: Access checkoutUrl from res.data, not res.message
+const checkoutUrl = res?.message?.url;
+console.log("Checkout url...", checkoutUrl);
 
-      if (res?.success && res?.message?.checkoutUrl) {
-        window.location.href = res.message.checkoutUrl; // redirect to Stripe
-      } else {
-        toast.error(res?.message || "Failed to create payment session.");
-      }
+if (res?.success && checkoutUrl) {
+  window.location.href = checkoutUrl; // redirect to Stripe
+} else {
+  toast.error("Unable to start payment. Please try again.");
+}
+
     } catch (err) {
       console.error(err);
       toast.dismiss();

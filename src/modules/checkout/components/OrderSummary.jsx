@@ -9,6 +9,7 @@ import {login} from "../../auth/authServices"
 import { showError, showSuccess } from "@/utils/toastService";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import useAuth from "@/app/hooks/useAuth";
 
 export default function OrderSummary({
   selectedPlan,
@@ -19,6 +20,7 @@ export default function OrderSummary({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { login: setSession } = useAuth();
 
   if (!selectedPlan) {
     return (
@@ -53,24 +55,30 @@ export default function OrderSummary({
 
     try {
       // 1️⃣: we only register here user automatically
-      const data = await login({      
+      const loginResponse = await login({      
          first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
       });
 
-      const tokenPayload = data?.data?.tokenPayload
-      const token = data?.data
+      const authData = loginResponse?.data;
+      const tokenPayload = authData?.tokenPayload;
+      const accessToken = authData?.accessToken;
+      const refreshToken = authData?.refreshToken ?? null;
 
-      if (data?.statusCode === 200 && data?.success === true && token) {
-        sessionStorage.removeItem("user");
-        sessionStorage.setItem("authToken", token);
-        sessionStorage.setItem("user", JSON.stringify(tokenPayload));
-        // toast.success("Logged in successfully!");
+      if (loginResponse?.statusCode === 200 && loginResponse?.success === true && accessToken && tokenPayload) {
+        setSession(
+          {
+            accessToken,
+            refreshToken,
+            user: tokenPayload,
+          },
+          { remember: true }
+        );
       } else {
         const message =
-          data?.data?.message || "Something went wrong! Please try again later.";
+          authData?.message || "Something went wrong! Please try again later.";
         toast.error(message);
         return;
       }
@@ -84,8 +92,8 @@ export default function OrderSummary({
         billingCycle,
       };
       const paymentRes = await createPayment(paymentPayload);
-
-      if (paymentRes?.url) {
+  console.log('paymentres....',paymentRes)
+      if (paymentRes) {
         showSuccess("Redirecting to Stripe checkout...");
 
         sessionStorage.setItem(
@@ -98,13 +106,14 @@ export default function OrderSummary({
           })
         );
 
-        window.location.href = paymentRes.url;
+        window.location.href = paymentRes;
       const ownerPayload = {
         planId: selectedPlan.id,
         billingCycle,
         userId: user.id,
         ...formData,
       };
+      console.log('ownerpayload...', ownerPayload)
       } else {
         showError("Checkout URL not received from server.");
       }

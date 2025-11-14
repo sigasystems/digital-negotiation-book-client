@@ -9,6 +9,7 @@ import { getAllPlans } from "@/modules/landing/services/planService";
 import { generateReceiptHTML } from "../utils/sendReceipt";
 import { login } from "../../auth/authServices";
 import toast from "react-hot-toast";
+import useAuth from "@/app/hooks/useAuth";
 
 const CURRENCY_SYMBOL = { INR: "₹", USD: "$", EUR: "€" };
 
@@ -40,6 +41,7 @@ export default function PaymentSuccess() {
   const hasRun = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { login: setSession } = useAuth();
   const formatPrice = (amount) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -190,11 +192,17 @@ export default function PaymentSuccess() {
         password: savedOrder.password,
       });
 
-      const { accessToken, tokenPayload } = stored?.data || {};
+      const { accessToken, refreshToken, tokenPayload } = stored?.data || {};
       if (!accessToken || !tokenPayload) throw new Error("Invalid login response");
 
-      sessionStorage.setItem("authToken", accessToken);
-      sessionStorage.setItem("user", JSON.stringify(tokenPayload));
+      setSession(
+        {
+          accessToken,
+          refreshToken: refreshToken ?? null,
+          user: tokenPayload,
+        },
+        { remember: true }
+      );
       sessionStorage.removeItem("pendingBusinessData");
 
       toast.success(`Welcome, ${tokenPayload.name || "User"}!`);

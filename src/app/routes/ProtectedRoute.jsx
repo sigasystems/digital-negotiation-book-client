@@ -1,29 +1,37 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import useAuth from "@/app/hooks/useAuth";
 
-const getUserInfo = () => {
-  const userCookie = sessionStorage.getItem("user");
-  if (!userCookie) return null;
+const DEFAULT_ALLOWED_ROLES = ["super_admin", "business_owner"];
 
-  try {
-    return JSON.parse(userCookie);
-  } catch (error) {
-    console.error("Invalid cookie format:", error);
+export default function ProtectedRoute({
+  children,
+  allowedRoles = DEFAULT_ALLOWED_ROLES,
+}) {
+  const location = useLocation();
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
     return null;
   }
-};
 
-export default function ProtectedRoute({ children }) {
-  const userInfo = getUserInfo();
-
-  if (!userInfo) {
-    return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location.pathname }}
+      />
+    );
   }
 
-  const { userRole } = userInfo;
-
-  if (userRole === "super_admin" || userRole === "business_owner") {
-    return children;
+  if (
+    Array.isArray(allowedRoles) &&
+    allowedRoles.length > 0 &&
+    user?.userRole &&
+    !allowedRoles.includes(user.userRole)
+  ) {
+    return <Navigate to="/" replace />;
   }
 
-  return <Navigate to="/" replace />;
+  return children;
 }

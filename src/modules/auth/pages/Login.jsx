@@ -9,10 +9,12 @@ import { validateField } from "@/utils/validation";
 import {login} from "../authServices"
 import { InputField } from "@/components/common/InputField";
 import { PasswordField } from "../components/PasswordField";
+import useAuth from "@/app/hooks/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { login: setSession } = useAuth();
 
   const form = useForm({
     defaultValues: { businessName: "", email: "", password: "" },
@@ -27,9 +29,14 @@ export default function Login() {
       throw new Error("Missing tokens from server");
     }
 
-    sessionStorage.setItem("authToken", data.accessToken);
-    sessionStorage.setItem("refreshToken", data.refreshToken);
-    sessionStorage.setItem("user", JSON.stringify(data.tokenPayload));
+    setSession(
+      {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        user: data.tokenPayload,
+      },
+      { remember: true }
+    );
 
     toast.success(`Welcome back, ${data.tokenPayload?.name ?? "User"}!`);
     navigate("/dashboard");

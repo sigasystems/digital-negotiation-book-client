@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import LogoutDialog from "../common/LogoutModal";
 import {
@@ -22,33 +22,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { getSession } from "@/utils/auth";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useAuth from "@/app/hooks/useAuth";
 
 export default function Sidebar({ collapsed, setCollapsed, onClose }) {
-  const [sessionUser, setSessionUser] = useState(null);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
-  useEffect(() => {
-    const user = getSession();
-    setSessionUser(user);
-  }, []);
-
-  const userRole = sessionUser?.userRole || "guest";
-  const businessName = sessionUser?.businessName || "";
+  const userRole = user?.userRole || "guest";
+  const businessName = user?.businessName || "";
 
   const handleLogout = () => {
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("user");
-    navigate("/");
+    logout();
+    navigate("/login");
     if (onClose) onClose();
   };
 
