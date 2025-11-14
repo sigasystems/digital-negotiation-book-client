@@ -33,6 +33,7 @@ import Offers from "@/modules/offers/pages/Offers";
 import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
 import Negotiation from "@/modules/negotiation/pages/Negotiation";
+import AddCountry from "@/modules/country/pages/AddCountry";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -246,6 +247,14 @@ useEffect(() => {
           element={
             <ProtectedRoute user={user}>
               <OfferPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-country"
+          element={
+            <ProtectedRoute user={user}>
+              <AddCountry />
             </ProtectedRoute>
           }
         />
