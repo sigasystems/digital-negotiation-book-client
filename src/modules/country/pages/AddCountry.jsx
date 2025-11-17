@@ -53,10 +53,13 @@ const AddCountry = () => {
       setCountries([{ country: "", code: "" }]);
     } catch (error) {
       console.error(error);
-      showToast(
-        error?.response?.data?.message || "Failed to add countries",
-        "error"
-      );
+      const backend = error?.response?.data;
+      const msg =
+        backend?.error?.length
+          ? backend.error.join(", ")
+          : backend?.message || "Failed to add countries";
+
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }

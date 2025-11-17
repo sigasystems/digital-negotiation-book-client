@@ -35,6 +35,8 @@ import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
 import Negotiation from "@/modules/negotiation/pages/Negotiation";
 import AddCountry from "@/modules/country/pages/AddCountry";
+import Country from "@/modules/country/pages/Country";
+import CountryPage from "@/modules/country/pages/CountryPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -237,6 +239,22 @@ function AppContent() {
           element={
             <ProtectedRoute user={user}>
               <AddCountry />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/country"
+          element={
+            <ProtectedRoute user={user}>
+              <Country />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/country/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <CountryPage />
             </ProtectedRoute>
           }
         />
