@@ -13,6 +13,7 @@ import {
   resolveEntityRoute,
   getEntityType,
 } from "@/utils/actionsUtil/recordUtils";
+import { countryServices } from "@/modules/country/service";
 
 import { runAction, getErrorMessage } from "@/utils/actionsUtil/actionRunner";
 
@@ -101,6 +102,9 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
               }
               if (type === "product") {
                 return productService.deleteProduct(record.id);
+              }
+              if (type === "country") {
+                return countryServices.remove(record.id);
               }
               return roleBasedDataService.softDelete(role, record.id);
             },

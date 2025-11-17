@@ -13,8 +13,9 @@ export const getRecordDisplayName = (record) => {
 
 // Determine entity type
 export const getEntityType = (record) => {
+  const countryOrCode = record.country || country.code;
   if (!record) return null;
-
+  if(countryOrCode) return "country"
   if (record.offerName) return "offer";
   if (record.draftNo || record.type === "offer_draft") return "offer_draft";
   if (record.productName || record.type === "product") return "product";
@@ -41,6 +42,10 @@ export const resolveEntityRoute = (role, record) => {
 
   if (entity === "product") {
     return `/product/${id}`;
+  }
+
+  if(entity === "country") {
+    return `/country/${record.id || id}`
   }
 
   // role-based routing logic

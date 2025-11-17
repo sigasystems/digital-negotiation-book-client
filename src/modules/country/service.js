@@ -25,7 +25,7 @@ export const countryServices = {
 
   getAll: (params = {}) => api.get("/country", params),
 
-  search: (query = {}) => api.get("/country/search", query),
+  search: (query = {}) => api.get("/country/search", { query }),
 
   getById: (id) => {
     if (!id) throw new Error("Country ID is required");

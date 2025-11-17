@@ -34,11 +34,12 @@ export default function DashboardTable({
   totalItems,
   onSearch,
   searchFields = [],
+  columnsOverride = null,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const HIDDEN_KEYS = ["id", "ownerId", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand", "offerDraftId", "buyerId"];
+  const HIDDEN_KEYS = ["id", "ownerId", "ownerid", "isDeleted", "deletedAt", "businessOwnerId", "userId", "paymentId", "phoneNumber", "registrationNumber", "address", "is_approved", "is_verified", "planCode", "planId", "postalCode", "createdAt", "updatedAt", "is_deleted", "state", "city", "taxId", "contactPhone" , "countryCode", "origin", "processor", "plantApprovalNumber", "quantity", "tolerance", "paymentTerms", "remark", "packing", "total", "grandTotal", "offerValidityDate", "shipmentDate", "brand", "offerDraftId", "buyerId"];
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -60,6 +61,34 @@ export default function DashboardTable({
       ),
       enableSorting: false,
     };
+
+    if (columnsOverride) {
+      const mapped = columnsOverride.map((col) => ({
+        id: col.key,
+        accessorKey: col.key,
+        header: col.label,
+        cell: ({ row }) => String(row.getValue(col.key) ?? ""),
+      }));
+
+      const actionsColumn =
+        Array.isArray(userActions) && userActions.length > 0
+          ? {
+              id: "actions",
+              header: "Actions",
+              cell: ({ row }) => (
+                <ActionsCell
+                  row={row}
+                  refreshData={fetchOwners}
+                  userActions={userActions}
+                />
+              ),
+            }
+          : null;
+
+      return actionsColumn
+        ? [selectColumn, ...mapped, actionsColumn]
+        : [selectColumn, ...mapped];
+    }
 
     const dynamicColumns = Object.keys(data[0])
       .filter((key) => !HIDDEN_KEYS.includes(key))
@@ -110,13 +139,9 @@ export default function DashboardTable({
           header: formatHeader(key),
           cell: ({ row }) => {
             const value = row.getValue(key);
-            if (Array.isArray(value)) {
-              return <span>{value.length} item(s)</span>;
-            }
-
-            if (typeof value === "object" && value !== null) {
+            if (Array.isArray(value)) return <span>{value.length} item(s)</span>;
+            if (typeof value === "object" && value !== null)
               return <span>{JSON.stringify(value)}</span>;
-            }
             return <span>{String(value ?? "")}</span>;
           },
         };
@@ -136,7 +161,7 @@ return actionsColumn
   ? [selectColumn, ...dynamicColumns, actionsColumn]
   : [selectColumn, ...dynamicColumns];
 
-  }, [data, userActions]);
+  }, [data, userActions, columnsOverride]);
 
   const table = useReactTable({
     data,
@@ -158,7 +183,7 @@ return actionsColumn
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
-      <Table className="min-w-[1000px]">
+      <Table className="min-w-[900px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>

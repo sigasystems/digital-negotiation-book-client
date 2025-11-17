@@ -17,7 +17,9 @@ import {
   ShoppingCart,
   CreditCard,
   Tag,
-  ArrowUp
+  ArrowUp,
+  Globe,
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -61,7 +63,8 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Offer Drafts", icon: ClipboardList, path: "/offer-draft" },
           { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
           { name: "Offers", icon: Tag, path: "/offers" },
-          { name: "Add Country", icon:PlusCircle , path: "/add-country" },
+          { name: "Country", icon: Globe, path: "/country" },
+          { name: "Add Country", icon: MapPin, path: "/add-country" },
           { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
           { name: "Upgrade-Plan", icon:ArrowUp , path: "/upgrade-plan" }
         ]
