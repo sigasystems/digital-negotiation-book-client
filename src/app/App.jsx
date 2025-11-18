@@ -35,6 +35,8 @@ import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
 import Negotiation from "@/modules/negotiation/pages/Negotiation";
 import AddCountry from "@/modules/country/pages/AddCountry";
+import ProcessInstructions from "@/modules/landing/components/ProcessInstructions";
+import Contact from "@/modules/landing/components/Contact";
 import Country from "@/modules/country/pages/Country";
 import CountryPage from "@/modules/country/pages/CountryPage";
 import AddLocation from "@/modules/location/pages/AddLocation";
@@ -52,7 +54,9 @@ function AppContent() {
       "/",
       "/login",
       "/forgot-password",
+      "/contact",
       "/checkout",
+      "/onboard-process",
       "/subscription/success",
     ]);
 
@@ -76,8 +80,9 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/onboard-process" element={<ProcessInstructions />} />
         <Route path="/success" element={<PaymentSuccess />} />
-        {/* <Route path="/paymentsuccess" element={<PaymentSuccess />} /> */}
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="*" element={<NotFound />} />
 
