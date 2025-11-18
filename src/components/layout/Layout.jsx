@@ -16,7 +16,9 @@ export default function Layout({ children }) {
     "/checkout",
     "/success",
     "/login",
+    "/contact",
     "/paymentsuccess",
+    "/onboard-process",
     "/forgot-password",
   ];
 
