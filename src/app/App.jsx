@@ -38,6 +38,8 @@ import AddCountry from "@/modules/country/pages/AddCountry";
 import Country from "@/modules/country/pages/Country";
 import CountryPage from "@/modules/country/pages/CountryPage";
 import AddLocation from "@/modules/location/pages/AddLocation";
+import Locations from "@/modules/location/pages/Locations";
+import LocationPage from "@/modules/location/pages/LocationPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -235,30 +237,22 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
-          path="/add-country"
+        <Route
+          path="/location/:id"
           element={
             <ProtectedRoute user={user}>
-              <AddCountry />
-            </ProtectedRoute>
-          }
-        /> */}
-        {/* <Route
-          path="/country"
-          element={
-            <ProtectedRoute user={user}>
-              <Country />
+              <LocationPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/country/:id"
+          path="/location"
           element={
             <ProtectedRoute user={user}>
-              <CountryPage />
+              <Locations />
             </ProtectedRoute>
           }
-        /> */}
+        />
         <Route
           path="/add-location"
           element={

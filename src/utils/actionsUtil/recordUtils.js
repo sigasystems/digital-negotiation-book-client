@@ -45,7 +45,7 @@ export const resolveEntityRoute = (role, record) => {
   }
 
   if(entity === "country") {
-    return `/country/${record.id || id}`
+    return `/location/${record.id || id}`
   }
 
   // role-based routing logic
