@@ -13,9 +13,9 @@ export const getRecordDisplayName = (record) => {
 
 // Determine entity type
 export const getEntityType = (record) => {
-  const countryOrCode = record.country || country.code;
   if (!record) return null;
-  if(countryOrCode) return "country"
+  const {country, code} = record
+  if(country && code) return "country"
   if (record.offerName) return "offer";
   if (record.draftNo || record.type === "offer_draft") return "offer_draft";
   if (record.productName || record.type === "product") return "product";

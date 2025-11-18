@@ -63,8 +63,10 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Offer Drafts", icon: ClipboardList, path: "/offer-draft" },
           { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
           { name: "Offers", icon: Tag, path: "/offers" },
-          { name: "Country", icon: Globe, path: "/country" },
-          { name: "Add Country", icon: MapPin, path: "/add-country" },
+          { name: "Location", icon: Globe, path: "/location" },
+          { name: "Add Location", icon: MapPin, path: "/add-location" },
+          // { name: "Country", icon: Globe, path: "/country" },
+          // { name: "Add Country", icon: MapPin, path: "/add-country" },
           { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
           { name: "Upgrade-Plan", icon:ArrowUp , path: "/upgrade-plan" }
         ]

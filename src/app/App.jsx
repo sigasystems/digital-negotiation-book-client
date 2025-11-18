@@ -37,6 +37,7 @@ import Negotiation from "@/modules/negotiation/pages/Negotiation";
 import AddCountry from "@/modules/country/pages/AddCountry";
 import Country from "@/modules/country/pages/Country";
 import CountryPage from "@/modules/country/pages/CountryPage";
+import AddLocation from "@/modules/location/pages/AddLocation";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -234,15 +235,15 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/add-country"
           element={
             <ProtectedRoute user={user}>
               <AddCountry />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/country"
           element={
             <ProtectedRoute user={user}>
@@ -255,6 +256,14 @@ function AppContent() {
           element={
             <ProtectedRoute user={user}>
               <CountryPage />
+            </ProtectedRoute>
+          }
+        /> */}
+        <Route
+          path="/add-location"
+          element={
+            <ProtectedRoute user={user}>
+              <AddLocation />
             </ProtectedRoute>
           }
         />
