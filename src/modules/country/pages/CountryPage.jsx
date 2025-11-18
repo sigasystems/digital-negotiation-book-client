@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { countryServices } from "../service";
 import toast from "react-hot-toast";
+import { InputField } from "@/components/common/InputField";
 
 const CountryPage = () => {
   const { id } = useParams();
@@ -50,19 +51,22 @@ const CountryPage = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const regex = /^[a-zA-Z\s]*$/;
+
+    if (regex.test(value)) {
+      setForm({ ...form, [name]: value });
+    }
   };
 
 const handleUpdate = async () => {
   setError("");
 
-  // Required fields
   if (!form.code.trim() || !form.country.trim()) {
     setError("All fields are required.");
     return;
   }
 
-  // Detect unchanged form (no modifications)
   if (
     form.code === original.code &&
     form.country === original.country
@@ -91,28 +95,24 @@ const handleUpdate = async () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-lg text-slate-600">Loading...</span>
-          </div>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="bg-white rounded-2xl shadow-xl p-8 flex items-center space-x-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8 sm:px-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-white">Edit Country</h2>
             <p className="mt-2 text-blue-100 text-sm">Update country information</p>
           </div>
 
-          {/* Form Content */}
           <div className="px-6 py-8 sm:px-8 sm:py-10">
             {error && (
               <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4">
@@ -126,57 +126,32 @@ const handleUpdate = async () => {
             )}
 
             <div className="space-y-6">
-              {/* Code Field */}
-              <div>
-                <label htmlFor="code" className="block text-sm font-semibold text-slate-700 mb-2">
-                  Country Code
-                </label>
-                <input
-                  id="code"
+                <InputField
+                  label="Country Code"
+                  required
                   name="code"
-                  type="text"
                   value={form.code}
                   onChange={handleChange}
                   placeholder="e.g., US, IN, GB"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-slate-900 placeholder-slate-400"
                 />
-              </div>
 
-              {/* Country Field */}
-              <div>
-                <label htmlFor="country" className="block text-sm font-semibold text-slate-700 mb-2">
-                  Country Name
-                </label>
-                <input
-                  id="country"
+                <InputField
+                  label="Country Name"
+                  required
                   name="country"
-                  type="text"
                   value={form.country}
                   onChange={handleChange}
                   placeholder="e.g., United States, India"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-slate-900 placeholder-slate-400"
                 />
-              </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={handleUpdate}
                 disabled={saving}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 shadow-lg shadow-blue-500/30 cursor-pointer"
               >
-                {saving ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Updating...
-                  </span>
-                ) : (
-                  "Update Country"
-                )}
+                {saving ? "Updating..." : "Update Country"}
               </button>
 
               <button
@@ -190,7 +165,6 @@ const handleUpdate = async () => {
           </div>
         </div>
 
-        {/* Helper Text */}
         <p className="mt-6 text-center text-sm text-slate-500">
           Changes will be saved immediately upon update
         </p>

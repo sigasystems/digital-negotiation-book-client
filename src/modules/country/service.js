@@ -18,28 +18,15 @@ const api = {
 };
 
 export const countryServices = {
-    create: (data) => {
-    if (!data) throw new Error("Data is required to create country");
-    return api.post("/country", data);
-  },
+    create: (data) => api.post("/country", data),
 
   getAll: (params = {}) => api.get("/country", params),
 
-  search: (query = {}) => api.get("/country/search", { query }),
+  search: (params = {}) => api.get("/country/search", params),
 
-  getById: (id) => {
-    if (!id) throw new Error("Country ID is required");
-    return api.get(`/country/${id}`);
-  },
+  getById: (id) => api.get(`/country/${id}`),
 
-  update: (id, data) => {
-    if (!id) throw new Error("Country ID is required");
-    if (!data) throw new Error("Data is required to update country");
-    return api.put(`/country/${id}`, data);
-  },
+  update: (id, data) => api.put(`/country/${id}`, data),
 
-  remove: (id) => {
-    if (!id) throw new Error("Country ID is required");
-    return api.delete(`/country/${id}`);
-  },
+  remove: (id) => api.delete(`/country/${id}`),
 }
