@@ -1,0 +1,88 @@
+import React, { useEffect, useState } from "react";
+import DashboardTable from "@/modules/dashboard/components/DashboardTable";
+import { countryServices } from "@/modules/country/service";
+
+const Locations = () => {
+  const [locations, setLocations] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const [rowSelection, setRowSelection] = useState({});
+  const [filters, setFilters] = useState(null);
+
+  const fetchLocations = async () => {
+    setLoading(true);
+    try {
+      let response;
+
+      if (filters && Object.keys(filters).length > 0) {
+        response = await countryServices.search(filters, pageIndex, pageSize);
+      } else {
+        response = await countryServices.getAll({ pageIndex, pageSize });
+      }
+
+      const payload = response?.data?.data;
+      const items = payload?.data || payload?.rows || [];
+      const total = payload?.totalItems || payload?.count || 0;
+
+      setLocations(items);
+      setTotalItems(total);
+    } catch (err) {
+      console.error("Failed to fetch locations:", err);
+      setLocations([]);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (queryFilters) => {
+    setFilters(queryFilters);
+    setPageIndex(0);
+  };
+
+  useEffect(() => {
+    fetchLocations();
+  }, [pageIndex, pageSize, filters]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <p>Loading locations...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-800">Locations</h1>
+
+      <DashboardTable
+        data={locations}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+        fetchOwners={fetchLocations}
+        userActions={["edit", "delete"]}
+        onSearch={handleSearch}
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        setPageIndex={setPageIndex}
+        setPageSize={setPageSize}
+        totalItems={totalItems}
+        searchFields={[
+          { name: "city", label: "City", type: "text" },
+          { name: "state", label: "State", type: "text" },
+          { name: "country.name", label: "Country", type: "text" },
+        ]}
+        columnsOverride={[
+          { key: "city", label: "City" },
+          { key: "state", label: "State" },
+          { key: "country.name", label: "Country" }
+        ]}
+      />
+    </div>
+  );
+};
+
+export default Locations;

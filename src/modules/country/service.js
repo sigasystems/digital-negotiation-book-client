@@ -22,6 +22,8 @@ export const countryServices = {
 
   getAll: (params = {}) => api.get("/country", params),
 
+  getAllCountries: (params = {}) => api.get("/country/all", params),
+
   search: (params = {}) => api.get("/country/search", params),
 
   getById: (id) => api.get(`/country/${id}`),
