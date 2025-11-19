@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Flag, Check, X, Plus, Edit3 } from "lucide-react";
 import { locationServices } from "../service";
 import { countryServices } from "@/modules/country/service";
+import planUsageService from "@/services/planUsageService";
 
 const AddLocation = () => {
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const [form, setForm] = useState([
     {
       city: "",
@@ -20,6 +22,27 @@ const AddLocation = () => {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [errors, setErrors] = useState({});
+
+
+  
+      const [remainingLocations, setRemainingLocations] = useState(0);
+    
+        // Fetch plan usage on mount
+        useEffect(() => {
+          const fetchPlanUsage = async () => {
+            try {
+              await planUsageService.fetchUsage(user.id);
+              const remaining = planUsageService.getRemainingCredits("locations");
+              setRemainingLocations(remaining);
+            } catch (err) {
+              console.error("Failed to fetch plan usage:", err);
+              showToast("error", "Failed to load plan info.");
+            }
+          };
+          fetchPlanUsage();
+        }, [user.id]);
+
+    
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -118,7 +141,6 @@ const handleSubmit = async () => {
         trimmed.countryName = loc.countryName.trim();
         trimmed.countryCode = loc.countryCode.trim().toUpperCase();
       }
-
       // If selected from dropdown → DO NOT SEND countryId, send countryName+countryCode
       if (!loc.manualCountry && loc.countryId) {
         const selected = countries.find((c) => c.id === loc.countryId);
@@ -131,7 +153,6 @@ const handleSubmit = async () => {
       return trimmed;
     });
 
-    console.log("FINAL PAYLOAD SENT:", payload);
 
     await countryServices.create(payload);
     showToast("Locations added successfully!", "success");
@@ -163,8 +184,6 @@ const handleSubmit = async () => {
   }
 };
 
-console.log("countries",countries)
-
   return (
     <div className="min-h-screen p-6">
 
@@ -183,7 +202,11 @@ console.log("countries",countries)
         </div>
       )}
 
+<div>
+          Remaining Credits : {remainingLocations}
+        </div>
       <div className="flex items-center gap-3 mb-2">
+        
         <div className="p-2 rounded-xl">
           <Flag size={24} className="text-blue-600" />
         </div>

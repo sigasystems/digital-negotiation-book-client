@@ -12,6 +12,7 @@ import DatePicker from "../components/DatePicker";
 import ProductSection from "../components/ProductSection";
 import Footer from "../components/Footer";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
+import planUsageService from "@/services/planUsageService";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -25,6 +26,24 @@ const EMPTY_PRODUCT = {
 
 const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+    const [remainingOffers, setRemainingOffers] = useState(0);
+  
+      // Fetch plan usage on mount
+      useEffect(() => {
+        const fetchPlanUsage = async () => {
+          try {
+            await planUsageService.fetchUsage(user.id);
+            const remaining = planUsageService.getRemainingCredits("offers");
+            setRemainingOffers(remaining);
+          } catch (err) {
+            console.error("Failed to fetch plan usage:", err);
+            showToast("error", "Failed to load plan info.");
+          }
+        };
+        fetchPlanUsage();
+      }, [user.id]);
+    
 
   const initialForm = useMemo(
     () => ({
@@ -213,6 +232,12 @@ const CreateOfferDraft = () => {
       <div className="max-w-5xl mx-auto">
         <Header onBack={() => (window.location.href = "/dashboard")} />
 
+
+      <div>
+
+        Remaining Credits For Create Offer : {remainingOffers}
+
+      </div>
         <form
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
