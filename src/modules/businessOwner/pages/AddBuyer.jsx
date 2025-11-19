@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, UserCircle2, MapPin } from "lucide-react";
 import { businessOwnerService } from "../services/businessOwner";
@@ -8,9 +8,27 @@ import { BUYER_FORM_FIELDS } from "@/app/config/buyerFormConfig";
 import {InputField} from "@/components/common/InputField";
 import FormSection from "@/components/common/FormSection";
 import toast from "react-hot-toast";
+import planUsageService from "@/services/planUsageService";
 
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const [remainingBuyers, setRemainingBuyers] = useState(0);
+
+    // Fetch plan usage on mount
+    useEffect(() => {
+      const fetchPlanUsage = async () => {
+        try {
+          await planUsageService.fetchUsage(user.id);
+          const remaining = planUsageService.getRemainingCredits("buyers");
+          setRemainingBuyers(remaining);
+        } catch (err) {
+          console.error("Failed to fetch plan usage:", err);
+          showToast("error", "Failed to load plan info.");
+        }
+      };
+      fetchPlanUsage();
+    }, [user.id]);
+  
 
   const initialData = {
     ownerId: user?.businessOwnerId || "",
@@ -93,6 +111,10 @@ export default function AddBuyerForm() {
           onSubmit={handleSubmit}
           className="bg-white shadow-2xl rounded-2xl overflow-hidden"
         >
+
+          <div>
+            <h4>remaining buyers: {remainingBuyers}</h4>
+          </div>
           {/* Company */}
           <FormSection icon={Building2} title="Company Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
