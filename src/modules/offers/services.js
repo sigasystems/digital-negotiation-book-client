@@ -21,4 +21,6 @@ export const offerService = {
   deleteOffer: (id) => api.delete(`/offer/delete/${id}`),
 
   searchOffers: (query) => api.get("/offer/search", query),
+
+  getOfferName: () => api.get(`/offer/next-offer-name`),
 };
