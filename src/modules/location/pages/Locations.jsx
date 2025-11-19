@@ -9,22 +9,28 @@ const Locations = () => {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
-  const [filters, setFilters] = useState(null);
+  const [filters, setFilters] = useState("");
 
   const fetchLocations = async () => {
     setLoading(true);
     try {
+      const hasFilters =
+      filters &&
+      Object.values(filters).some(
+        (val) => val && val.toString().trim().length > 0
+      );
+
       let response;
 
-      if (filters && Object.keys(filters).length > 0) {
+      if (hasFilters) {
         response = await countryServices.search(filters, pageIndex, pageSize);
       } else {
         response = await countryServices.getAll({ pageIndex, pageSize });
       }
 
       const payload = response?.data?.data;
-      const items = payload?.data || payload?.rows || [];
-      const total = payload?.totalItems || payload?.count || 0;
+      const items = payload?.data || [];
+      const total = payload?.totalItems || 0;
 
       setLocations(items);
       setTotalItems(total);
@@ -37,8 +43,8 @@ const Locations = () => {
     }
   };
 
-  const handleSearch = (queryFilters) => {
-    setFilters(queryFilters);
+  const handleSearch = (query) => {
+    setFilters(query);
     setPageIndex(0);
   };
 
@@ -73,7 +79,7 @@ const Locations = () => {
         searchFields={[
           { name: "city", label: "City", type: "text" },
           { name: "state", label: "State", type: "text" },
-          { name: "country.name", label: "Country", type: "text" },
+          { name: "country", label: "Country", type: "text" },
         ]}
         columnsOverride={[
           { key: "city", label: "City" },

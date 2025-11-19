@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { countryServices } from "@/modules/country/service"; // adjust imports
+import { countryServices } from "@/modules/country/service";
 import toast from "react-hot-toast";
 import { InputField } from "@/components/common/InputField";
 

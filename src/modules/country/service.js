@@ -31,4 +31,13 @@ export const countryServices = {
   update: (id, data) => api.put(`/country/${id}`, data),
 
   remove: (id) => api.delete(`/country/${id}`),
+
+  search: (query = "", pageIndex = 0, pageSize = 10) => {
+    const params = {
+      query,
+      pageIndex,
+      pageSize,
+    };
+    return api.get("/country/search", params);
+  },
 }
