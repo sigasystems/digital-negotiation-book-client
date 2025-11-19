@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import LogoutDialog from "../common/LogoutModal";
 import {
   LayoutDashboard,
   Users,
-  Settings,
   LogOut,
   ChevronRight,
   UserPlus,
@@ -19,7 +18,7 @@ import {
   Tag,
   ArrowUp,
   Globe,
-  MapPin
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -35,7 +34,7 @@ import useAuth from "@/app/hooks/useAuth";
 export default function Sidebar({ collapsed, setCollapsed, onClose }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
@@ -65,10 +64,8 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Offers", icon: Tag, path: "/offers" },
           { name: "Location", icon: Globe, path: "/location" },
           { name: "Add Location", icon: MapPin, path: "/add-location" },
-          // { name: "Country", icon: Globe, path: "/country" },
-          // { name: "Add Country", icon: MapPin, path: "/add-country" },
           { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
-          { name: "Upgrade-Plan", icon:ArrowUp , path: "/upgrade-plan" }
+          { name: "Upgrade Plan", icon: ArrowUp, path: "/upgrade-plan" },
         ]
       : []),
     ...(userRole === "super_admin"
@@ -85,17 +82,17 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       <TooltipProvider>
         <aside
           className={cn(
-            "flex fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex-col transition-all duration-300 z-40",
+            "fixed top-0 left-0 h-screen bg-white border-r shadow-sm flex flex-col transition-width duration-300 z-40",
             collapsed ? "w-16" : "w-64"
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 h-16 border-b">
+          <div className="flex items-center justify-between px-4 h-16 border-b select-none">
             {!collapsed && (
-              <div className="flex flex-col">
-                <h2 className="text-xl font-bold text-indigo-600">DNB</h2>
+              <div className="flex flex-col max-w-[180px] truncate">
+                <h2 className="text-2xl font-extrabold text-indigo-600 truncate">DNB</h2>
                 {businessName && (
-                  <span className="text-sm font-medium text-gray-700 truncate max-w-[180px]">
+                  <span className="text-sm font-semibold text-gray-700 truncate">
                     {businessName}
                   </span>
                 )}
@@ -105,13 +102,16 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               variant="ghost"
               size="icon"
               onClick={toggleCollapse}
-              className="hidden lg:flex cursor-pointer"
+              className="hidden lg:flex cursor-pointer p-2 hover:bg-indigo-100 rounded focus-visible:ring focus-visible:ring-indigo-400"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              type="button"
             >
               <ChevronRight
                 className={cn(
-                  "w-5 h-5 transition-transform",
+                  "w-5 h-5 text-indigo-600 transition-transform",
                   collapsed ? "rotate-0" : "rotate-180"
                 )}
+                strokeWidth={2.5}
               />
             </Button>
 
@@ -120,9 +120,11 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="lg:hidden cursor-pointer"
+                className="lg:hidden cursor-pointer p-2 hover:bg-gray-200 rounded"
+                aria-label="Close sidebar"
+                type="button"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-gray-700" strokeWidth={2} />
               </Button>
             )}
           </div>
@@ -130,39 +132,42 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           {/* Navigation */}
           <nav
             className={cn(
-              "flex-1 overflow-y-auto py-4 space-y-1 transition-all",
-              collapsed ? "flex flex-col items-center px-0" : "px-2"
+              "flex-1 overflow-y-auto py-3",
+              "scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 px-2",
+              collapsed ? "flex flex-col items-center space-y-6" : "space-y-2"
             )}
           >
-            {navItems.map((item) => {
-              const Icon = item.icon;
+            {navItems.map(({ name, icon: Icon, path }) => {
               const link = (
                 <NavLink
-                  key={item.name}
-                  to={item.path}
+                  key={name}
+                  to={path}
                   onClick={() => onClose && onClose()}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center rounded-md text-sm font-normal transition-all",
-                      collapsed
-                        ? "justify-center w-10 h-10"
-                        : "gap-3 px-5 py-2 w-full justify-start"
+                      "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none",
+                      collapsed ? "justify-center p-2" : "gap-3 px-4 py-2",
+                      isActive
+                        ? "bg-indigo-100 text-indigo-700 font-semibold"
+                        : "text-gray-700 hover:text-indigo-700 hover:bg-indigo-50",
+                      "cursor-pointer"
                     )
                   }
+                  title={collapsed ? name : undefined}
                 >
-                  <Icon className="w-5 h-5 shrink-0" />
-                  {!collapsed && <span>{item.name}</span>}
+                  <Icon className="w-5 h-5 shrink-0 text-indigo-600" strokeWidth={2.2} />
+                  {!collapsed && <span className="truncate">{name}</span>}
                 </NavLink>
               );
 
               return collapsed ? (
-                <Tooltip key={item.name} delayDuration={150}>
+                <Tooltip key={name} delayDuration={150}>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
                   <TooltipContent
                     side="right"
-                    className="bg-gray-900 text-white text-sm px-2 py-1 rounded-md"
+                    className="bg-indigo-900 text-white text-sm px-3 py-1 rounded-md shadow-lg select-none"
                   >
-                    {item.name}
+                    {name}
                   </TooltipContent>
                 </Tooltip>
               ) : (
@@ -171,24 +176,25 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
             })}
           </nav>
 
-          <Separator className="my-2" />
+          <Separator className="my-3" />
 
           {/* Footer / Logout */}
-          <div className="px-2 py-4">
+          <div className="px-2 pb-4 pt-2">
             {collapsed ? (
               <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-center text-red-600 cursor-pointer"
+                    className="w-full justify-center text-red-600 hover:bg-red-100 cursor-pointer px-2 py-2 rounded-md"
                     onClick={() => setLogoutOpen(true)}
+                    aria-label="Logout"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-5 h-5" strokeWidth={2} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
                   side="right"
-                  className="bg-gray-900 text-white text-sm px-2 py-1 rounded-md"
+                  className="bg-red-900 text-white text-sm px-3 py-1 rounded-md shadow select-none"
                 >
                   Logout
                 </TooltipContent>
@@ -196,11 +202,13 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start text-red-600 cursor-pointer"
+                className="w-full justify-start text-red-600 hover:bg-red-100 cursor-pointer gap-2 rounded-md px-4 py-2"
                 onClick={() => setLogoutOpen(true)}
+                aria-label="Logout"
+                type="button"
               >
-                <LogOut className="w-5 h-5 mr-2" />
-                Logout
+                <LogOut className="w-5 h-5" strokeWidth={2} />
+                <span className="select-none">Logout</span>
               </Button>
             )}
           </div>
