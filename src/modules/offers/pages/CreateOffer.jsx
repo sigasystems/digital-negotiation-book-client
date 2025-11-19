@@ -14,6 +14,7 @@ import { createHandleProductSelect } from "@/utils/getAllProducts";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
 import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { offerService } from "../services";
+import { locationServices } from "@/modules/location/service";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -47,6 +48,7 @@ const CreateOffer = () => {
     paymentTerms: "",
     remark: "",
     grandTotal: "",
+    destination: "",
     products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
   }), [user]);
 
@@ -59,6 +61,7 @@ const CreateOffer = () => {
   const [speciesMap, setSpeciesMap] = useState({});
   const [offerName, setOfferName] = useState("");
   const [buyers, setBuyers] = useState([]);
+  const [locations, setLocations] = useState([]);
 
   const fetchProductDetails = async (productId) => {
     try {
@@ -72,9 +75,8 @@ const CreateOffer = () => {
     }
   };
 
-  const handleChange = (key, value) => {
+  const handleChange = (key, value) =>
     setFormData((prev) => ({ ...prev, [key]: value }));
-  };
 
   const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
 
@@ -101,12 +103,24 @@ const CreateOffer = () => {
     }));
   };
 
+  const loadNextOfferName = async () => {
+  try {
+    const res = await offerService.getOfferName();
+    const name = res?.data?.data?.offerName;
+    if (name) setOfferName(name);
+  } catch {
+    toast.error("Unable to load next offer name");
+  }
+};
+
+
   useEffect(() => {
     const loadDraft = async () => {
       if (!draftId) return;
       try {
         const res = await offerDraftService.getDraftById(draftId);
         const data = res?.data?.data?.draft;
+
         if (data) {
           const mappedProducts = (data.draftProducts || []).map((p) => ({
             productId: p.productId,
@@ -129,6 +143,7 @@ const CreateOffer = () => {
           ...data,
             products: mappedProducts.length ? mappedProducts : [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
         }));
+          setOfferName(`Offer ${data.draftNo}`);
         }
       } catch {
         toast.error("Failed to load draft details.");
@@ -155,9 +170,20 @@ const CreateOffer = () => {
       }
     };
 
+    const loadLocations = async () => {
+      try {
+        const res = await locationServices.getAllLocations();
+        setLocations(res.data?.data?.locations || []);
+      } catch {
+        toast.error("Unable to load locations");
+      }
+    };
+
     loadDraft();
     loadProducts();
     loadBuyers();
+    loadLocations();
+    loadNextOfferName();
   }, [draftId]);
 
   const handleCreateOffer = () => {
@@ -172,8 +198,11 @@ const CreateOffer = () => {
     try {
       const payload = { ...formData, offerName };
       const res = await offerService.createOffer(draftId, payload);
+      const msg = res?.data?.message || "Offer created successfully";
+      toast.success(msg);
+      setTimeout(() => navigate("/offers"), 800);
+
     } catch (err) {
-      console.error("createOffer error:", err);
       toast.error(err?.response?.data?.message || "Failed to create offer");
     } finally {
       setCreating(false);
@@ -187,11 +216,11 @@ const CreateOffer = () => {
       <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
         <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer">
+              <ArrowLeft className="w-4 h-4 mr-2 cursor-pointer" /> Back
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow cursor-pointer">
                 <FilePlus2 className="text-white w-5 h-5" />
               </div>
               <div>
@@ -201,7 +230,7 @@ const CreateOffer = () => {
             </div>
           </div>
 
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 cursor-pointer">
             Draft Loaded
           </Badge>
         </div>
@@ -217,11 +246,13 @@ const CreateOffer = () => {
             placeholder="Enter a unique offer name"
             value={offerName}
             onChange={(e) => setOfferName(e.target.value)}
-            className="mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500"
+            className="mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer"
           />
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
           <label className="text-sm font-medium text-slate-700">
             To Party <span className="text-red-500">*</span>
           </label>
@@ -236,13 +267,13 @@ const CreateOffer = () => {
             }}
             value={formData.buyerId || ""}
           >
-            <SelectTrigger className="mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500">
+            <SelectTrigger className="cursor-pointer mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500">
               <SelectValue placeholder="Select To Party" />
             </SelectTrigger>
             <SelectContent>
               {buyers.length > 0 ? (
                 buyers.map((buyer) => (
-                  <SelectItem key={buyer.id} value={buyer.id}>
+                  <SelectItem key={buyer.id} value={buyer.id} className="cursor-pointer">
                     {buyer.buyersCompanyName}
                   </SelectItem>
                 ))
@@ -254,6 +285,49 @@ const CreateOffer = () => {
             </SelectContent>
           </Select>
         </div>
+
+
+      <div>
+        <label className="text-sm font-medium text-slate-700">
+          Destination <span className="text-red-500">*</span>
+        </label>
+
+        <Select
+          onValueChange={(val) => {
+            const loc = locations.find((l) => l.id === val);
+            setFormData((prev) => ({
+              ...prev,
+              destination: `${loc.city}, ${loc.state}, ${loc.country?.name}`,
+            }));
+          }}
+        >
+          <SelectTrigger className="cursor-pointer mt-2 bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500">
+            <SelectValue placeholder="Select Destination" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {locations.length > 0 ? (
+              locations.map((loc) => (
+                <SelectItem
+                  key={loc.id}
+                  value={loc.id}
+                  className="cursor-pointer"
+                >
+                  {`${loc.city}, ${loc.state}, ${loc.country?.name}`}
+                </SelectItem>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-slate-500 text-sm">
+                No locations found
+              </div>
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
+
+        </div>
+      </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow p-6">
           <h2 className="font-semibold text-lg text-slate-800 mb-4">Basic Draft Details</h2>
@@ -273,7 +347,7 @@ const CreateOffer = () => {
               ["quantity", "Quantity"],
               ["tolerance", "Tolerance"],
               ["paymentTerms", "Payment Terms"],
-              ["remark", "Remark"]
+              ["remark", "Remark"],
             ].map(([key, label]) => (
               <div key={key}>
                 <label className="text-sm font-medium text-slate-700">{label}</label>
@@ -289,7 +363,7 @@ const CreateOffer = () => {
                   value={formData[key] || ""}
                   disabled={["draftNo", "businessOwnerId", "fromParty", "processor", "brand"].includes(key)}
                   onChange={(e) => handleChange(key, e.target.value)}
-                    className={`mt-1 ${["draftNo", "businessOwnerId", "fromParty", "processor", "brand"].includes(key) ? "bg-slate-100 cursor-not-allowed text-slate-600" : "bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500"}`}
+                    className={`mt-1 ${["draftNo", "businessOwnerId", "fromParty", "processor", "brand"].includes(key) ? "bg-slate-100 cursor-not-allowed text-slate-600" : "bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer"}`}
                   />
                 )}
               </div>
@@ -310,7 +384,7 @@ const CreateOffer = () => {
 
         <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 shadow-lg sm:shadow-none">
           <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-end gap-3 px-4">
-            <Button variant="outline" onClick={() => navigate(-1)} disabled={creating} className="w-full sm:w-auto">
+            <Button variant="outline" onClick={() => navigate(-1)} disabled={creating} className="w-full sm:w-auto cursor-pointer">
               Cancel
             </Button>
 
