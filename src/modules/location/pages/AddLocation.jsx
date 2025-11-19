@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flag, Check, X, Plus, Edit3 } from "lucide-react";
-import { locationServices } from "../service";
+import { Flag, Check, X, Plus, Edit3, MapPin, ArrowLeft } from "lucide-react";
 import { countryServices } from "@/modules/country/service";
 import planUsageService from "@/services/planUsageService";
 
@@ -120,6 +119,7 @@ const AddLocation = () => {
     setErrors(e);
     return Object.keys(e).length === 0;
   };
+
 const handleSubmit = async () => {
   if (!validate()) {
     showToast("Please fix errors before submitting", "error");
@@ -136,12 +136,15 @@ const handleSubmit = async () => {
         code: loc.code.trim().toUpperCase(),
       };
 
-      // If manual entry → send countryName + countryCode
       if (loc.manualCountry) {
         trimmed.countryName = loc.countryName.trim();
         trimmed.countryCode = loc.countryCode.trim().toUpperCase();
       }
+<<<<<<< Updated upstream
       // If selected from dropdown → DO NOT SEND countryId, send countryName+countryCode
+=======
+
+>>>>>>> Stashed changes
       if (!loc.manualCountry && loc.countryId) {
         const selected = countries.find((c) => c.id === loc.countryId);
         if (selected) {
@@ -157,7 +160,6 @@ const handleSubmit = async () => {
     await countryServices.create(payload);
     showToast("Locations added successfully!", "success");
 
-    // Reset
     setForm([
       {
         city: "",
@@ -184,8 +186,12 @@ const handleSubmit = async () => {
   }
 };
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-4 py-8">
 
       {toast && (
         <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top">
@@ -202,6 +208,7 @@ const handleSubmit = async () => {
         </div>
       )}
 
+<<<<<<< Updated upstream
 <div>
           Remaining Credits : {remainingLocations}
         </div>
@@ -209,84 +216,110 @@ const handleSubmit = async () => {
         
         <div className="p-2 rounded-xl">
           <Flag size={24} className="text-blue-600" />
+=======
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 rounded-xl text-gray-700 font-medium shadow-sm border border-gray-200 transition-all hover:shadow-md cursor-pointer group mb-6"
+          >
+            <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+            <span>Back</span>
+          </button>
+
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+              <MapPin size={32} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Add Locations</h1>
+              <p className="text-gray-600 mt-1">
+                Add up to 5 locations including country, city, state and location code
+              </p>
+            </div>
+>>>>>>> Stashed changes
         </div>
-        <h2 className="text-3xl font-bold text-gray-900">Add Locations</h2>
       </div>
 
-      <p className="text-gray-500 mb-8 ml-14">
-        Add up to 5 locations including country, city, state and location code.
-      </p>
-
+        {/* Location Cards */}
       <div className="space-y-6">
         {form.map((loc, i) => (
           <div
             key={i}
-            className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-200 transition-all duration-200"
+            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-gray-700 bg-white px-3 py-1 rounded-full border border-gray-200">
-                Location {i + 1}
-              </span>
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 rounded-lg">
+                    <Flag size={20} className="text-blue-600" />
+                  </div>
+                  <span className="text-lg font-semibold text-gray-800">
+                    Location {i + 1}
+                  </span>
+                </div>
 
               {form.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeLocation(i)}
-                  className="p-2 bg-rose-100 hover:bg-rose-200 text-rose-600 rounded-lg transition-colors duration-200 cursor-pointer"
+                  className="p-2 bg-rose-100 hover:bg-rose-200 text-rose-600 rounded-xl transition-all duration-200 cursor-pointer hover:scale-105"
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {/* City */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">City</label>
+                <label className="text-sm font-semibold text-gray-700">
+                    City <span className="text-rose-500">*</span>
+                  </label>
                 <input
                   type="text"
                   value={loc.city}
                   onChange={(e) => handleChange(i, "city", e.target.value)}
                   placeholder="Enter city"
-                  className={`w-full border-2 rounded-xl px-4 py-2.5 ${
+                  className={`w-full border-2 rounded-xl px-4 py-3 transition-all ${
                     errors[`city-${i}`]
-                      ? "border-rose-400 bg-rose-50"
-                      : "border-gray-200 bg-white"
-                  } focus:ring-2 focus:ring-blue-500`}
+                      ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                      : "border-gray-200 bg-white focus:border-blue-400 focus:ring-blue-200"
+                  } focus:ring-2 focus:outline-none`}
                 />
                 {errors[`city-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`city-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`city-${i}`]}
                   </p>
                 )}
               </div>
 
               {/* State */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">State</label>
+                <label className="text-sm font-semibold text-gray-700">
+                    State <span className="text-rose-500">*</span>
+                  </label>
                 <input
                   type="text"
                   value={loc.state}
                   onChange={(e) => handleChange(i, "state", e.target.value)}
                   placeholder="Enter state"
-                  className={`w-full border-2 rounded-xl px-4 py-2.5 ${
+                  className={`w-full border-2 rounded-xl px-4 py-3 transition-all ${
                     errors[`state-${i}`]
-                      ? "border-rose-400 bg-rose-50"
-                      : "border-gray-200 bg-white"
-                  } focus:ring-2 focus:ring-blue-500`}
+                      ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                      : "border-gray-200 bg-white focus:border-blue-400 focus:ring-blue-200"
+                  } focus:ring-2 focus:outline-none`}
                 />
                 {errors[`state-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`state-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`state-${i}`]}
                   </p>
                 )}
               </div>
 
               {/* Country */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Country
+                <label className="text-sm font-semibold text-gray-700">
+                  Country <span className="text-rose-500">*</span>
                 </label>
 
                 {!loc.manualCountry ? (
@@ -294,17 +327,17 @@ const handleSubmit = async () => {
                     <select
                     value={loc.countryId}
                     onChange={(e) => handleChange(i, "countryId", e.target.value)}
-                    className={`w-full border-2 rounded-xl px-4 py-2.5 bg-white appearance-none cursor-pointer ${
+                    className={`w-full border-2 rounded-xl px-4 py-3 bg-white appearance-none cursor-pointer transition-all ${
                         errors[`countryId-${i}`]
-                        ? "border-rose-400 bg-rose-50"
-                        : "border-gray-200"
-                    } focus:ring-2 focus:ring-blue-500`}
+                        ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                        : "border-gray-200 focus:border-blue-400 focus:ring-blue-200"
+                    } focus:ring-2 focus:outline-none`}
                     >
                     <option value="">Select country</option>
                     {countries.length > 0 &&
                         countries.map((c) => (
                         <option key={c.id} value={c.id}>
-                            {c.name} ({c.code})
+                            {c.country.name} ({c.country.code})
                         </option>
                         ))}
                     </select>
@@ -312,7 +345,7 @@ const handleSubmit = async () => {
                     <button
                       type="button"
                       onClick={() => toggleManualCountry(i)}
-                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors mt-1.5 cursor-pointer"
+                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors mt-2 cursor-pointer"
                     >
                       <Edit3 size={13} /> Country not listed? Add manually
                     </button>
@@ -326,11 +359,11 @@ const handleSubmit = async () => {
                         handleChange(i, "countryName", e.target.value)
                       }
                       placeholder="Country name"
-                      className={`w-full border-2 rounded-xl px-4 py-2.5 ${
+                      className={`w-full border-2 rounded-xl px-4 py-3 mb-2 transition-all ${
                         errors[`countryName-${i}`]
-                          ? "border-rose-400 bg-rose-50"
-                          : "border-gray-200 bg-white"
-                      } focus:ring-2 focus:ring-blue-500`}
+                          ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                          : "border-gray-200 bg-white focus:border-blue-400 focus:ring-blue-200"
+                      } focus:ring-2 focus:outline-none`}
                     />
 
                     <input
@@ -344,17 +377,18 @@ const handleSubmit = async () => {
                         )
                       }
                       placeholder="Code (US)"
-                      className={`w-full border-2 rounded-xl px-4 py-2.5 font-bold text-lg text-center tracking-wider ${
+                        maxLength={3}
+                      className={`w-full border-2 rounded-xl px-4 py-3 font-bold text-lg text-center tracking-wider transition-all ${
                         errors[`countryCode-${i}`]
-                          ? "border-rose-400 bg-rose-50"
-                          : "border-gray-200 bg-white"
-                      } focus:ring-2 focus:ring-blue-500`}
+                          ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                          : "border-gray-200 bg-white focus:border-blue-400 focus:ring-blue-200"
+                      } focus:ring-2 focus:outline-none`}
                     />
 
                     <button
                       type="button"
                       onClick={() => toggleManualCountry(i)}
-                      className="text-xs text-gray-600 hover:text-gray-800 mt-1.5 cursor-pointer"
+                      className="text-xs text-gray-600 hover:text-gray-800 mt-2 cursor-pointer font-medium"
                     >
                       ← Back to country list
                     </button>
@@ -362,26 +396,26 @@ const handleSubmit = async () => {
                 )}
 
                 {errors[`countryId-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`countryId-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`countryId-${i}`]}
                   </p>
                 )}
                 {errors[`countryName-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`countryName-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`countryName-${i}`]}
                   </p>
                 )}
                 {errors[`countryCode-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`countryCode-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`countryCode-${i}`]}
                   </p>
                 )}
               </div>
 
-              {/* CODE */}
+              {/* Location Code */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Location Code
+                <label className="text-sm font-semibold text-gray-700">
+                  Location Code <span className="text-rose-500">*</span>
                 </label>
 
                 <input
@@ -391,17 +425,17 @@ const handleSubmit = async () => {
                   onChange={(e) =>
                     handleChange(i, "code", e.target.value.toUpperCase())
                   }
-                  placeholder="ABC1"
-                  className={`w-full border-2 rounded-xl px-4 py-2.5 text-lg font-bold text-center tracking-widest ${
+                 placeholder="ABC1"
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-lg font-bold text-center tracking-widest transition-all ${
                     errors[`code-${i}`]
-                      ? "border-rose-400 bg-rose-50"
-                      : "border-gray-200 bg-white"
-                  } focus:ring-2 focus:ring-blue-500`}
+                      ? "border-rose-400 bg-rose-50 focus:ring-rose-300"
+                      : "border-gray-200 bg-white focus:border-blue-400 focus:ring-blue-200"
+                  } focus:ring-2 focus:outline-none`}
                 />
 
                 {errors[`code-${i}`] && (
-                  <p className="text-rose-600 text-xs font-medium">
-                    {errors[`code-${i}`]}
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                      <X size={12} /> {errors[`code-${i}`]}
                   </p>
                 )}
               </div>
@@ -412,33 +446,43 @@ const handleSubmit = async () => {
 
       {/* Action Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row gap-4">
-
         {form.length < 5 && (
           <button
             onClick={addLocation}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <Plus size={20} /> Add Another Location
+            <Plus size={20} strokeWidth={2.5} />
+              <span>Add Another Location</span>
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                {form.length}/5
+              </span>
           </button>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointerF"
+          className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all transform hover:scale-[1.02] active:scale-[0.98]"
         >
           {loading ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Submitting...
+                <span>Submitting...</span>
             </>
           ) : (
             <>
-              <Check size={20} />
-              Submit Locations
+              <Check size={20} strokeWidth={2.5} />
+                <span>Submit Locations</span>
             </>
           )}
         </button>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            All fields marked with <span className="text-rose-500">*</span> are required. Location codes must be 4 characters or less.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { format, isBefore, startOfDay, parseISO } from "date-fns";
+import { FileText, Sparkles } from "lucide-react";
 import { offerDraftService } from "../services";
 import { productService } from "@/modules/product/services";
 
@@ -133,7 +134,6 @@ const CreateOfferDraft = () => {
     }
   }
 
-  // Date validations
   const today = startOfDay(new Date());
   const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
   const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
@@ -204,6 +204,7 @@ const CreateOfferDraft = () => {
       const res = await productService.getAllProducts(0, 500);
       setProductsList(res.data?.data?.products || []);
     } catch (err) {
+        console.error(err);
       toast.error("Unable to load products");
     }
   };
@@ -228,10 +229,12 @@ const CreateOfferDraft = () => {
 }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-4 py-8">
       <div className="max-w-5xl mx-auto">
+        <div className="mb-8">
         <Header onBack={() => (window.location.href = "/dashboard")} />
 
+<<<<<<< Updated upstream
 
       <div>
 
@@ -241,33 +244,117 @@ const CreateOfferDraft = () => {
         <form
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
+=======
+        <div className="mt-6 flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg">
+              <FileText size={32} className="text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create Offer Draft</h1>
+                <Sparkles size={24} className="text-yellow-500" />
+              </div>
+              <p className="text-gray-600 mt-1">Generate professional offer drafts for your clients</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Form */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
+>>>>>>> Stashed changes
         >
 
              <Section title="Draft Details">
             <div className="grid sm:grid-cols-2 gap-6">
               <ReadOnlyField label="Draft Name" value={formData.draftName} />
-              <InputField required={true} label="Quantity (MT)" name="quantity" value={formData.quantity} onChange={handleChange} />
-              <InputField required={true} label="Tolerance (%)" name="tolerance" value={formData.tolerance} onChange={handleChange} />
-              <InputField required={true} label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} />
-              <InputField required={true} label="Remarks" name="remark" value={formData.remark} onChange={handleChange} />
-              <InputField required={true} label="Grand Total (USD)" name="grandTotal" value={formData.grandTotal} onChange={handleChange} />
+              <InputField 
+                required={true} 
+                label="Quantity (MT)" 
+                name="quantity" 
+                value={formData.quantity} 
+                onChange={handleChange} 
+              />
+              <InputField 
+                required={true} 
+                label="Tolerance (%)" 
+                name="tolerance" 
+                value={formData.tolerance} 
+                onChange={handleChange} 
+              />
+              <InputField 
+                required={true} 
+                label="Payment Terms" 
+                name="paymentTerms" 
+                value={formData.paymentTerms} 
+                onChange={handleChange} 
+              />
+              <InputField 
+                required={true} 
+                label="Remarks" 
+                name="remark" 
+                value={formData.remark} 
+                onChange={handleChange} 
+              />
+              <InputField 
+                required={true} 
+                label="Grand Total (USD)" 
+                name="grandTotal" 
+                value={formData.grandTotal} 
+                onChange={handleChange} 
+              />
             </div>
           </Section>
 
-           <Section title="Dates">
+          <Section title="Dates">
             <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker label="Offer Validity Date" value={formData.offerValidityDate} onSelect={(d) => handleDateSelect("offerValidityDate", d)} open={openPicker.validity} setOpen={(v) => setOpenPicker(prev => ({ ...prev, validity: v }))} />
-              <DatePicker label="Shipment Date" value={formData.shipmentDate} onSelect={(d) => handleDateSelect("shipmentDate", d)} open={openPicker.shipment} setOpen={(v) => setOpenPicker(prev => ({ ...prev, shipment: v }))} />
+              <DatePicker 
+                label="Offer Validity Date" 
+                value={formData.offerValidityDate} 
+                onSelect={(d) => handleDateSelect("offerValidityDate", d)} 
+                open={openPicker.validity} 
+                setOpen={(v) => setOpenPicker(prev => ({ ...prev, validity: v }))} 
+              />
+              <DatePicker 
+                label="Shipment Date" 
+                value={formData.shipmentDate} 
+                onSelect={(d) => handleDateSelect("shipmentDate", d)} 
+                open={openPicker.shipment} 
+                setOpen={(v) => setOpenPicker(prev => ({ ...prev, shipment: v }))} 
+              />
             </div>
           </Section>
 
           <Section title="Business Information">
             <div className="grid sm:grid-cols-2 gap-6">
               <ReadOnlyField label="From Party" value={formData.fromParty} />
-              <InputField required={true} label="Origin" name="origin" value={formData.origin} onChange={handleChange}/>
-              <InputField required={true} label="Processor" name="processor" value={formData.processor} onChange={handleChange} />
-              <InputField required={true} label="Plant Approval Number" name="plantApprovalNumber" value={formData.plantApprovalNumber} onChange={handleChange}/>
-              <InputField required={true} label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
+              <InputField 
+                required={true} 
+                label="Origin" 
+                name="origin" 
+                value={formData.origin} 
+                onChange={handleChange}
+              />
+              <InputField 
+                required={true} 
+                label="Processor" 
+                name="processor" 
+                value={formData.processor} 
+                onChange={handleChange} 
+              />
+              <InputField 
+                required={true} 
+                label="Plant Approval Number" 
+                name="plantApprovalNumber" 
+                value={formData.plantApprovalNumber} 
+                onChange={handleChange}
+              />
+              <InputField 
+                required={true} 
+                label="Brand" 
+                name="brand" 
+                value={formData.brand} 
+                onChange={handleChange} 
+              />
             </div>
           </Section>
 
@@ -283,6 +370,12 @@ const CreateOfferDraft = () => {
 
           <Footer loading={loading} />
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            All fields marked with an asterisk (*) are required. Please ensure all information is accurate before submitting.
+          </p>
+        </div>
       </div>
     </div>
   );
