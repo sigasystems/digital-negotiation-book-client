@@ -145,7 +145,7 @@ const AddProduct = () => {
       </div>
 
       <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div className="mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -153,13 +153,10 @@ const AddProduct = () => {
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </button>
-        <div className="mb-4 px-4 py-2 bg-blue-50 text-blue-800 rounded-lg font-medium">
-          Credits Remaining:{" "}
-          <strong>{remainingProducts}</strong>
-        </div>
+        
           <div className="flex items-center gap-3 ml-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md">
-              <Package className="w-5 h-5 text-white" />
+              <Package className="w-5 h-5 text-black" />
             </div>
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-slate-900">
@@ -175,8 +172,13 @@ const AddProduct = () => {
       </header>
 
       <main className="mx-auto py-6">
+        
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          
             <div className="divide-y divide-slate-200">
+              <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+           Remaining Credits : {remainingProducts}
+        </div>
             {products.map((p, i) => (
               <ProductCard
                 key={i}

@@ -199,7 +199,7 @@ const handleSubmit = async () => {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto">
+      <div className=" mx-auto">
         <div className="mb-8">
           <button
             onClick={() => window.history.back()}
@@ -229,10 +229,11 @@ const handleSubmit = async () => {
             key={i}
             className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div>
-          Remaining Credits : {remainingLocations}
+            <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+           Remaining Credits : {remainingLocations}
         </div>
+            <div className="flex items-center justify-between mb-6">
+             
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-50 rounded-lg">
                     <Flag size={20} className="text-blue-600" />
