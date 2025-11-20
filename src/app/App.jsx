@@ -42,6 +42,7 @@ import CountryPage from "@/modules/country/pages/CountryPage";
 import AddLocation from "@/modules/location/pages/AddLocation";
 import Locations from "@/modules/location/pages/Locations";
 import LocationPage from "@/modules/location/pages/LocationPage";
+import UnauthorizedNegotiation from "@/modules/landing/pages/UnauthorizedNegotiation";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -83,6 +84,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/onboard-process" element={<ProcessInstructions />} />
         <Route path="/success" element={<PaymentSuccess />} />
+        <Route path="/negotiation/unauthorized" element={<UnauthorizedNegotiation />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="*" element={<NotFound />} />
 
@@ -111,9 +113,6 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
-        
-
         <Route
           path="/upgrade-plan"
           element={
