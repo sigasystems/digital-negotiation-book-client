@@ -75,7 +75,7 @@ const Negotiation = () => {
     { label: "Plant Approval No.", key: "plantApprovalNumber", source: "offer" },
     { label: "Brand", key: "brand", source: "offer" },
     { label: "Origin", key: "origin", source: "offer" },
-    { label: "Destination", key: "destination", source: "version" },
+    { label: "Destination", key: "destination", source: "offer" },
     { label: "Product", key: "productName", source: "version" },
     { label: "Species", key: "speciesName", source: "version" },
   ];

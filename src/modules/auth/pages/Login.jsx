@@ -39,7 +39,12 @@ export default function Login() {
     );
 
     toast.success(`Welcome back, ${data.tokenPayload?.name ?? "User"}!`);
-    navigate("/dashboard");
+    const activeNegId = data.tokenPayload?.activeNegotiationId;
+    if (activeNegId) {
+      navigate(`/negotiation/${activeNegId}`);
+    } else {
+      navigate("/dashboard");
+    }
   } catch (err) {
       toast.error(
       err.response?.data?.message || err.message || "Login failed"
