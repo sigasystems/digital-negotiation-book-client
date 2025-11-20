@@ -66,7 +66,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Location", icon: Globe, path: "/location" },
           { name: "Add Location", icon: MapPin, path: "/add-location" },
           { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
-          { name: "Upgrade Plan", icon: ArrowUp, path: "/upgrade-plan" },
+          // { name: "Upgrade Plan", icon: ArrowUp, path: "/upgrade-plan" },
         ]
       : []),
     ...(userRole === "super_admin"
@@ -155,7 +155,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                   }
                   title={collapsed ? name : undefined}
                 >
-                  <Icon className="w-5 h-5 shrink-0 text-indigo-600" strokeWidth={2.2} />
+                  <Icon className="w-5 h-5 shrink-0 text-black-400" strokeWidth={2.2} />
                   {!collapsed && <span className="truncate">{name}</span>}
                 </NavLink>
               );

@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { Minus } from "lucide-react";
 
 const EMPTY_BREAKUP = { size: "", breakup: "", price: "", condition: "" };
 const EMPTY_PRODUCT = {
@@ -99,7 +99,7 @@ const ProductSection = ({
 
         return (
           <div key={pIndex} className="border p-6 rounded-xl bg-gray-50 shadow relative">
-            <X
+            <Minus
               className="absolute top-4 right-4 w-5 h-5 text-red-600 cursor-pointer hover:text-red-800"
               onClick={() => removeProduct(pIndex)}
             />
@@ -242,11 +242,12 @@ const ProductSection = ({
                     />
                   </td>
                 <td className="px-3 py-2 text-right">
-                    <X
+                    <Minus
                 onClick={() => removeBreakupRow(pIndex, rIndex)}
                           size={16}
                 className="text-red-600 cursor-pointer"
                         />
+                        
                 </td>
               </tr>
             ))}

@@ -29,7 +29,7 @@ const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const { showToast } = useToast();
 
-    const [, setRemainingOffers] = useState(0);
+    const [ remainingOffers, setRemainingOffers] = useState(0);
   
       // Fetch plan usage on mount
       useEffect(() => {
@@ -232,7 +232,7 @@ const CreateOfferDraft = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
    <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
-      <div className="max-w-5xl mx-auto px-6 py-4">
+      <div className=" mx-auto px-6 py-4">
 
         <div className="flex items-center gap-5">
 
@@ -260,6 +260,9 @@ const CreateOfferDraft = () => {
 
       <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
 
+<div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+           Remaining Credits : {remainingOffers}
+        </div>
         <form onSubmit={handleSubmit}>
 
              <Section title="Draft Details">

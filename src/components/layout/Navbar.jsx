@@ -175,7 +175,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               onClick={handleDashboardCTA}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
             >
-                Access Dashboard
+              Login
             </button>
             )
           )}
@@ -233,7 +233,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
                   onClick={handleDashboardCTA}
                   className="block w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition text-center cursor-pointer"
                 >
-                  Access Dashboard
+                 Login
                 </button>
               </div>
             )}

@@ -196,8 +196,8 @@ if (res?.success && checkoutUrl) {
                   <div className="space-y-4 text-left">
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-700">Users: </span>
-                        <span className="font-medium">{plan.maxUsers}</span>
+                        <span className="text-gray-700">Locations: </span>
+                        <span className="font-medium">{plan.maxLocations}</span>
                       </div>
                       <div>
                         <span className="text-gray-700">Products: </span>
