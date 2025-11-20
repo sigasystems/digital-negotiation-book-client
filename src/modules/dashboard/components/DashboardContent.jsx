@@ -1,8 +1,223 @@
+// import React, { useState, useEffect, useMemo } from "react";
+// import { roleBasedDataService } from "@/services/roleBasedDataService";
+// import { MobileCard } from "@/utils/Pagination";
+// import DashboardTable from "./DashboardTable";
+// import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
+
+// export default function ResponsiveDashboard() {
+//   const [data, setData] = useState([]);
+//   const [totalItems, setTotalItems] = useState(0);
+//   const [loading, setLoading] = useState(true);
+//   const [pageIndex, setPageIndex] = useState(0);
+//   const [pageSize, setPageSize] = useState(10);
+//   const [rowSelection, setRowSelection] = useState({});
+//   const [emailFilter] = useState("");
+//    const [totalPages, setTotalPages] = useState(1);
+//    const [activeUsers, setActiveUsers] = useState(0)
+//    const [inactiveUsers, setInactiveUsers] = useState(0)
+//    const [deletedUsers, setDeletedUsers] = useState(0)
+
+//   const user = sessionStorage.getItem("user");
+//   const userRole = JSON.parse(user)?.userRole || "guest";
+//   const userActions = [];
+
+//   useReloadOncePerSession("landingPageReloaded");
+//   const fetchData = async () => {
+//     setLoading(true);
+//     try {
+//       const response = await roleBasedDataService.getDashboardData(userRole, {
+//         pageIndex,
+//         pageSize,
+//       });
+
+//       const {
+//         data: fetchedData,
+//         totalItems,
+//         totalPages,
+//         totalDeleted,
+//         totalInactive,
+//         totalActive,
+//       } = response || {};
+
+//       setData(fetchedData || []);
+//       setTotalItems(totalItems || 0);
+//       setTotalPages(totalPages || 1);
+//       setActiveUsers(totalActive || 0);
+//       setInactiveUsers(totalInactive || 0);
+//       setDeletedUsers(totalDeleted || 0);
+//     } catch (err) {
+//       console.error("Failed to fetch dashboard data:", err);
+//       setData([]);
+//       setTotalItems(0);
+//       setTotalPages(1);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchData();
+//   }, [pageIndex, pageSize, userRole]);
+
+//   // Filter by email
+//   const filteredData = useMemo(() => {
+//     if (!emailFilter) return data;
+//     return data.filter((item) =>
+//       (item.email || item.contactEmail)
+//         ?.toLowerCase()
+//         .includes(emailFilter.toLowerCase())
+//     );
+//   }, [data, emailFilter]);
+
+//   const tableData = filteredData?.map((item) => ({
+//     id: item.id,
+//     name:
+//       `${item.first_name || ""} ${item.last_name || ""}`.trim() ||
+//       item.contactName,
+//     email: item.email || item.contactEmail,
+//     status: item.status,
+//     businessName:
+//       item.businessName || item.companyName || item.buyersCompanyName || "-",
+//   }));
+
+//   // 🔹 Determine label based on role
+//   const userLabel =
+//     userRole === "super_admin"
+//       ? "Businesses"
+//       : userRole === "business_owner"
+//       ? "Buyers"
+//       : "Users";
+
+//   // 🔹 Stats (remove deleted for both roles)
+//   const stats = [
+//     { label: `Total ${userLabel}`, value: totalItems, color: "text-indigo-600" },
+//     { label: `Active ${userLabel}`, value: activeUsers, color: "text-green-600" },
+//     { label: `Inactive ${userLabel}`, value: inactiveUsers, color: "text-gray-700" },
+//   ];
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center py-20">
+//         <div className="text-center">
+//           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+//           <p className="text-gray-700">Loading dashboard...</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="w-full space-y-8">
+//       {/* Page Header */}
+//       <div>
+//         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+//         <p className="text-sm sm:text-base text-gray-500 mt-2">
+//           Welcome back! Here's an overview of your {userLabel.toLowerCase()}.
+//         </p>
+//       </div>
+
+//       {/* Stats Section */}
+//       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+//         {stats.map((stat, i) => (
+//           <div
+//             key={stat.label}
+//             className={`bg-white shadow-sm rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center w-full
+//               ${i === 2 ? 'col-span-2 md:col-span-1 justify-self-center sm:justify-self-stretch' : ''}`}
+//           >
+//             <p className="text-gray-800 text-xs sm:text-sm font-medium">{stat.label}</p>
+//             <h2 className={`text-xl sm:text-2xl lg:text-3xl font-bold mt-1 sm:mt-2 ${stat.color}`}
+//             >
+//               {stat.value}
+//             </h2>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* User/Business/Buyer Management Section */}
+//       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+//         {/* Mobile cards */}
+//         <div className="lg:hidden p-4 space-y-4">
+//           {tableData.length > 0 ? (
+//             tableData.map((item) => (
+//               <MobileCard
+//                 key={item.id}
+//                 item={item}
+//                 isSelected={rowSelection[item.id]}
+//                 onSelect={(checked) =>
+//                   setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
+//                 }
+//               />
+//             ))
+//           ) : (
+//             <div className="text-center py-12">
+//               <p className="text-gray-500 text-sm font-medium">No {userLabel.toLowerCase()} found</p>
+//               <p className="text-gray-400 text-xs mt-1">Try adjusting your filters</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Desktop table */}
+//         <div className="hidden lg:block">
+//           <DashboardTable
+//             data={tableData}
+//             rowSelection={rowSelection}
+//             setRowSelection={setRowSelection}
+//             fetchOwners={fetchData}
+//             userActions={userActions}
+//             filterKey="email"
+//             pageIndex={pageIndex}
+//             pageSize={pageSize}
+//             setPageIndex={setPageIndex}
+//             setPageSize={setPageSize}
+//             totalItems={totalItems}
+//             totalPages={totalPages}
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
 import React, { useState, useEffect, useMemo } from "react";
-import { roleBasedDataService } from "@/services/roleBasedDataService";
-import { MobileCard } from "@/utils/Pagination";
-import DashboardTable from "./DashboardTable";
+import { BarChart3, TrendingUp, Users, Activity, Calendar, Filter, Download, RefreshCw, Search, Bell, Settings, ChevronDown } from "lucide-react";
 import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
+import DashboardTable from "./DashboardTable";
+import { roleBasedDataService } from "@/services/roleBasedDataService";
+
+
+
+// Mock service (replace with your actual service)
+
+const MobileCard = ({ item, isSelected, onSelect }) => (
+  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="flex items-start justify-between mb-3">
+      <div className="flex-1">
+        <h3 className="font-semibold text-gray-900">{item.name}</h3>
+        <p className="text-sm text-gray-600 mt-1">{item.email}</p>
+      </div>
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+        item.status === 'active' ? 'bg-green-100 text-green-700' :
+        item.status === 'inactive' ? 'bg-gray-100 text-gray-700' :
+        'bg-yellow-100 text-yellow-700'
+      }`}>
+        {item.status}
+      </span>
+    </div>
+    <div className="text-sm text-gray-600">
+      <p><span className="font-medium">Business:</span> {item.businessName}</p>
+    </div>
+  </div>
+);
+
 
 export default function ResponsiveDashboard() {
   const [data, setData] = useState([]);
@@ -11,17 +226,24 @@ export default function ResponsiveDashboard() {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
-  const [emailFilter] = useState("");
-   const [totalPages, setTotalPages] = useState(1);
-   const [activeUsers, setActiveUsers] = useState(0)
-   const [inactiveUsers, setInactiveUsers] = useState(0)
-   const [deletedUsers, setDeletedUsers] = useState(0)
+  const [emailFilter, setEmailFilter] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [inactiveUsers, setInactiveUsers] = useState(0);
+  const [deletedUsers, setDeletedUsers] = useState(0);
+  const [pendingUsers, setPendingUsers] = useState(0);
+  const [revenueGrowth, setRevenueGrowth] = useState(0);
+  const [userGrowth, setUserGrowth] = useState(0);
+  const [timeRange, setTimeRange] = useState("30d");
+  const [showFilters, setShowFilters] = useState(false);
 
-  const user = sessionStorage.getItem("user");
-  const userRole = JSON.parse(user)?.userRole || "guest";
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  console.log('user....',user)
+  const  userRole = user?.userRole || "guest";
   const userActions = [];
 
   useReloadOncePerSession("landingPageReloaded");
+  
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -37,6 +259,9 @@ export default function ResponsiveDashboard() {
         totalDeleted,
         totalInactive,
         totalActive,
+        totalPending,
+        revenueGrowth,
+        userGrowth
       } = response || {};
 
       setData(fetchedData || []);
@@ -45,6 +270,9 @@ export default function ResponsiveDashboard() {
       setActiveUsers(totalActive || 0);
       setInactiveUsers(totalInactive || 0);
       setDeletedUsers(totalDeleted || 0);
+      setPendingUsers(totalPending || 0);
+      setRevenueGrowth(revenueGrowth || 0);
+      setUserGrowth(userGrowth || 0);
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
       setData([]);
@@ -59,7 +287,6 @@ export default function ResponsiveDashboard() {
     fetchData();
   }, [pageIndex, pageSize, userRole]);
 
-  // Filter by email
   const filteredData = useMemo(() => {
     if (!emailFilter) return data;
     return data.filter((item) =>
@@ -71,107 +298,291 @@ export default function ResponsiveDashboard() {
 
   const tableData = filteredData?.map((item) => ({
     id: item.id,
-    name:
-      `${item.first_name || ""} ${item.last_name || ""}`.trim() ||
-      item.contactName,
+    name: `${item.first_name || ""} ${item.last_name || ""}`.trim() || item.contactName,
     email: item.email || item.contactEmail,
     status: item.status,
-    businessName:
-      item.businessName || item.companyName || item.buyersCompanyName || "-",
+    businessName: item.businessName || item.companyName || item.buyersCompanyName || "-",
   }));
 
-  // 🔹 Determine label based on role
-  const userLabel =
-    userRole === "super_admin"
-      ? "Businesses"
-      : userRole === "business_owner"
-      ? "Buyers"
-      : "Users";
+  const userLabel = userRole === "super_admin" ? "Businesses" : userRole === "business_owner" ? "Buyers" : "Users";
 
-  // 🔹 Stats (remove deleted for both roles)
   const stats = [
-    { label: `Total ${userLabel}`, value: totalItems, color: "text-indigo-600" },
-    { label: `Active ${userLabel}`, value: activeUsers, color: "text-green-600" },
-    { label: `Inactive ${userLabel}`, value: inactiveUsers, color: "text-gray-700" },
+    { 
+      label: `Total ${userLabel}`, 
+      value: totalItems, 
+      color: "bg-gradient-to-br from-indigo-500 to-indigo-600",
+      icon: Users,
+      change: `+${userGrowth}%`,
+      changeType: "positive"
+    },
+    { 
+      label: `Active ${userLabel}`, 
+      value: activeUsers, 
+      color: "bg-gradient-to-br from-green-500 to-green-600",
+      icon: Activity,
+      change: "+5.2%",
+      changeType: "positive"
+    },
+    { 
+      label: `Pending ${userLabel}`, 
+      value: pendingUsers, 
+      color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
+      icon: TrendingUp,
+      change: "+2.1%",
+      changeType: "positive"
+    },
+    { 
+      label: `Inactive ${userLabel}`, 
+      value: inactiveUsers, 
+      color: "bg-gradient-to-br from-gray-500 to-gray-600",
+      icon: BarChart3,
+      change: "-1.3%",
+      changeType: "negative"
+    },
   ];
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-700">Loading dashboard...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600 mx-auto"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-indigo-600" />
+            </div>
+          </div>
+          <p className="text-gray-700 font-medium mt-4">Loading your dashboard...</p>
+          <p className="text-gray-500 text-sm mt-1">Please wait a moment</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-500 mt-2">
-          Welcome back! Here's an overview of your {userLabel.toLowerCase()}.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+     
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-        {stats.map((stat, i) => (
-          <div
-            key={stat.label}
-            className={`bg-white shadow-sm rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center w-full
-              ${i === 2 ? 'col-span-2 md:col-span-1 justify-self-center sm:justify-self-stretch' : ''}`}
-          >
-            <p className="text-gray-800 text-xs sm:text-sm font-medium">{stat.label}</p>
-            <h2 className={`text-xl sm:text-2xl lg:text-3xl font-bold mt-1 sm:mt-2 ${stat.color}`}
-            >
-              {stat.value}
-            </h2>
-          </div>
-        ))}
-      </div>
-
-      {/* User/Business/Buyer Management Section */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        {/* Mobile cards */}
-        <div className="lg:hidden p-4 space-y-4">
-          {tableData.length > 0 ? (
-            tableData.map((item) => (
-              <MobileCard
-                key={item.id}
-                item={item}
-                isSelected={rowSelection[item.id]}
-                onSelect={(checked) =>
-                  setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
-                }
-              />
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-sm font-medium">No {userLabel.toLowerCase()} found</p>
-              <p className="text-gray-400 text-xs mt-1">Try adjusting your filters</p>
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Welcome Section with Quick Actions */}
+        <div className="bg-gradient-to-r from-indigo-400 to-indigo-400 rounded-2xl shadow-xl p-6 sm:p-8 text-white">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Welcome back, {user.businessName}! 👋</h2>
+              <p className="text-indigo-100 text-sm sm:text-base">
+                Here's what's happening with your {userLabel.toLowerCase()} today.
+              </p>
+              <div className="flex items-center gap-2 mt-3 text-indigo-100 text-sm">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
             </div>
-          )}
+            <div className="flex gap-2">
+              <button 
+                onClick={fetchData}
+                className="flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors shadow-md"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Refresh
+              </button>
+              <button className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-400 transition-colors">
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Desktop table */}
-        <div className="hidden lg:block">
-          <DashboardTable
-            data={tableData}
-            rowSelection={rowSelection}
-            setRowSelection={setRowSelection}
-            fetchOwners={fetchData}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={stat.label}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
+              >
+                <div className={`${stat.color} p-4 sm:p-6`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 group-hover:scale-110 transition-transform">
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      stat.changeType === 'positive' ? 'bg-green-400/30 text-green-50' : 'bg-red-400/30 text-red-50'
+                    }`}>
+                      {stat.change}
+                    </span>
+                  </div>
+                  <h3 className="text-3xl sm:text-4xl font-bold text-white mb-1">
+                    {stat.value.toLocaleString()}
+                  </h3>
+                  <p className="text-white/90 text-sm font-medium">{stat.label}</p>
+                </div>
+                <div className="px-4 py-3 bg-gray-50">
+                  <p className="text-xs text-gray-600">
+                    {stat.changeType === 'positive' ? '↑' : '↓'} vs last period
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Time Range Filter & Search */}
+        <div className="bg-white rounded-xl shadow-md p-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button className="flex items-center gap-2 text-sm text-gray-700 hover:text-indigo-600 transition-colors">
+                <Filter className="w-4 h-4" />
+                Filters
+              </button>
+              {['7d', '30d', '90d', '1y'].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                    timeRange === range
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {range === '7d' ? 'Last 7 days' : range === '30d' ? 'Last 30 days' : range === '90d' ? 'Last 90 days' : 'Last year'}
+                </button>
+              ))}
+            </div>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by email..."
+                value={emailFilter}
+                onChange={(e) => setEmailFilter(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Activity Overview Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+              <TrendingUp className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-0">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">New user registered</p>
+                    <p className="text-xs text-gray-500">{i} hour{i > 1 ? 's' : ''} ago</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Growth Rate</h3>
+              <BarChart3 className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">User Growth</span>
+                  <span className="font-semibold text-green-600">+{userGrowth}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: `${userGrowth * 5}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">Revenue Growth</span>
+                  <span className="font-semibold text-indigo-600">+{revenueGrowth}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${revenueGrowth * 5}%` }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+              <Activity className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Conversion Rate</span>
+                <span className="text-sm font-semibold text-gray-900">24.8%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Avg. Session Time</span>
+                <span className="text-sm font-semibold text-gray-900">4m 32s</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Bounce Rate</span>
+                <span className="text-sm font-semibold text-gray-900">32.5%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Data Table */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{userLabel} Management</h3>
+              <p className="text-sm text-gray-500 mt-1">Manage and monitor all your {userLabel.toLowerCase()}</p>
+            </div>
+            {/* <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+              <Users className="w-4 h-4" />
+              Add New
+            </button> */}
+          </div>
+
+          {/* Mobile cards */}
+          <div className="lg:hidden p-4 space-y-4">
+            {tableData.length > 0 ? (
+              tableData.map((item) => (
+                <MobileCard
+                  key={item.id}
+                  item={item}
+                  isSelected={rowSelection[item.id]}
+                  onSelect={(checked) =>
+                    setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
+                  }
+                />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium">No {userLabel.toLowerCase()} found</p>
+                <p className="text-gray-400 text-xs mt-1">Try adjusting your filters or search query</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden lg:block">
+            <DashboardTable
+              data={tableData}
+              rowSelection={rowSelection}
+              setRowSelection={setRowSelection}
+                  fetchOwners={fetchData}
             userActions={userActions}
             filterKey="email"
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            setPageIndex={setPageIndex}
-            setPageSize={setPageSize}
-            totalItems={totalItems}
-            totalPages={totalPages}
-          />
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              setPageIndex={setPageIndex}
+              setPageSize={setPageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+            />
+          </div>
         </div>
       </div>
     </div>
