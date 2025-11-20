@@ -23,7 +23,7 @@ import planUsageService from "@/services/planUsageService";
 
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const [remainingBuyers, setRemainingBuyers] = useState(0);
+  const [setRemainingBuyers] = useState(0);
 
     // Fetch plan usage on mount
     useEffect(() => {
@@ -92,7 +92,7 @@ export default function AddBuyerForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8">
+    <div className="min-h-screen pb-24 lg:pb-8">
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map((t) => (
           <div
@@ -140,19 +140,6 @@ export default function AddBuyerForm() {
               </div>
             </div>
 
-<<<<<<< Updated upstream
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-2xl rounded-2xl overflow-hidden"
-        >
-
-          <div>
-            <h4>remaining buyers: {remainingBuyers}</h4>
-          </div>
-          {/* Company */}
-          <FormSection icon={Building2} title="Company Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-=======
             <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-300 px-3 py-1.5 text-xs sm:text-sm font-medium w-fit">
               New Registration
             </Badge>
@@ -160,7 +147,7 @@ export default function AddBuyerForm() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="mx-auto pt-4">
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Company Information */}
           <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
@@ -175,7 +162,6 @@ export default function AddBuyerForm() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
->>>>>>> Stashed changes
               {BUYER_FORM_FIELDS.company.map((field) => (
                 <div key={field.name} className="space-y-2">
                 <InputField

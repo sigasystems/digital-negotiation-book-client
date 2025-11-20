@@ -197,7 +197,7 @@ const ViewOfferDraft = () => {
           </Button>
           
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg">
               <FileText className="text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
@@ -229,7 +229,7 @@ const ViewOfferDraft = () => {
     </div>
   </header>
 
-  <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+  <main className="mx-auto py-4 space-y-6 sm:space-y-8">
     {/* Business Information */}
     <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
       <div className="flex items-center gap-3 mb-5 sm:mb-6">

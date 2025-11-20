@@ -3,6 +3,62 @@ import { useNavigate, useParams } from "react-router-dom";
 import { countryServices } from "@/modules/country/service";
 import toast from "react-hot-toast";
 import { InputField } from "@/components/common/InputField";
+import { ArrowLeft, MapPin, Save, X, Loader2 } from "lucide-react";
+
+const Button = ({ variant = 'default', size = 'md', children, className = '', ...props }) => {
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const variants = {
+    default: 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md hover:shadow-lg',
+    outline: 'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700',
+    ghost: 'hover:bg-slate-100 text-slate-700'
+  };
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm'
+  };
+  
+  return (
+    <button className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const Badge = ({ children, className = '' }) => {
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${className}`}>
+      {children}
+    </span>
+  );
+};
+
+const Spinner = ({ className = '' }) => (
+  <Loader2 className={`animate-spin ${className}`} />
+);
+
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, description, confirmText, cancelText, confirmButtonColor }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in fade-in duration-200">
+        <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+        <p className="text-sm text-slate-600 mb-6">{description}</p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={onClose}>
+            {cancelText}
+          </Button>
+          <button
+            onClick={onConfirm}
+            className={`px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-200 ${confirmButtonColor}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LocationPage = () => {
   const { id } = useParams();
@@ -28,6 +84,13 @@ const LocationPage = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const hasChanges = 
+    form.city !== original.city ||
+    form.state !== original.state ||
+    form.code !== original.code ||
+    form.countryId !== original.countryId;
 
   const fetchCountries = async () => {
     try {
@@ -94,6 +157,7 @@ const LocationPage = () => {
       form.countryId === original.countryId
     ) {
       toast.error("No changes made");
+      setIsConfirmOpen(false);
       return;
     }
 
@@ -106,10 +170,12 @@ const LocationPage = () => {
         countryId: form.countryId,
       });
       toast.success("Location updated");
+      setIsConfirmOpen(false);
       navigate(-1);
     } catch (err) {
       console.error(err);
       setError("Update failed.");
+      setIsConfirmOpen(false);
     } finally {
       setSaving(false);
     }
@@ -117,9 +183,9 @@ const LocationPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
         <div className="bg-white rounded-2xl shadow-xl p-8 flex items-center space-x-3">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
           <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
@@ -127,20 +193,54 @@ const LocationPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8 sm:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">Edit Location</h2>
-            <p className="mt-2 text-blue-100 text-sm">Update location information</p>
+    <div className="relative min-h-screen bg-slate-50">
+      {saving && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
+          <p className="text-slate-700 font-medium">Updating location...</p>
+        </div>
+      )}
+
+      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
+
+            <div className="flex items-center gap-3 ml-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md">
+                <MapPin className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                  Edit Location
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500">
+                  Location ID: {id}
+                </p>
+              </div>
+            </div>
           </div>
 
+          {hasChanges && (
+            <Badge
+              variant="outline"
+              className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              Unsaved Changes
+            </Badge>
+          )}
+        </div>
+      </header>
+
+      <main className="mx-auto py-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="px-6 py-8 sm:px-8 sm:py-10">
             {error && (
               <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4">
-                <div className="flex items-start">
                   <p className="text-red-700 text-sm font-medium">{error}</p>
-                </div>
               </div>
             )}
 
@@ -183,7 +283,7 @@ const LocationPage = () => {
                         />
                         <button
                             type="button"
-                            className="text-sm text-blue-600 underline mt-1 self-start"
+                            className="text-sm text-indigo-600 hover:text-indigo-700 underline mt-1.5 self-start transition-colors"
                             onClick={() => setShowCountryDropdown(true)}
                         >
                             Change country
@@ -191,18 +291,16 @@ const LocationPage = () => {
                     </>
                 ) : (
                     <>
-                    <label htmlFor="countryId" className="mb-1 font-medium text-gray-700">
-                        Country
+                    <label className="mb-1.5 font-medium text-slate-700 text-sm">
+                        Country <span className="text-red-500">*</span>
                     </label>
                     <select
                         name="countryId"
-                        id="countryId"
                         value={form.countryId}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all cursor-pointer"
                     >
-                        {countries.length > 0 &&
-                        countries.map((c) => (
+                        {countries.map((c) => (
                             <option key={c.id} value={c.id}>
                             {c.name} ({c.code})
                             </option>
@@ -212,31 +310,46 @@ const LocationPage = () => {
                 )}
                 </div>
             </div>
-
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button
-                onClick={handleUpdate}
-                disabled={saving}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 shadow-lg shadow-blue-500/30 cursor-pointer"
-              >
-                {saving ? "Updating..." : "Update Location"}
-              </button>
-
-              <button
-                onClick={() => navigate(-1)}
-                disabled={saving}
-                className="flex-1 sm:flex-initial bg-slate-100 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 cursor-pointer"
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Changes will be saved immediately upon update
-        </p>
-      </div>
+        <div className="flex justify-end gap-3 mt-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate(-1)}
+            disabled={saving}
+            className="cursor-pointer"
+          >
+            <X className="w-4 h-4 mr-2" /> Cancel
+          </Button>
+          <Button
+            onClick={() => setIsConfirmOpen(true)}
+            disabled={saving || !hasChanges}
+            className="cursor-pointer"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" /> Update Location
+              </>
+            )}
+          </Button>
+        </div>
+      </main>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleUpdate}
+        title="Confirm Update"
+        description="Are you sure you want to save these location changes?"
+        confirmText="Update Location"
+        cancelText="Cancel"
+        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+      />
     </div>
   );
 };

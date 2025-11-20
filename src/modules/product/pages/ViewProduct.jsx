@@ -96,7 +96,7 @@ const ViewProduct = () => {
     );
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100">
+    <div className="relative min-h-screen">
       {/* Saving Overlay */}
       {saving && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
@@ -141,7 +141,7 @@ const ViewProduct = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+      <main className="mx-auto py-4">
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <ProductCard
             index={0}
@@ -162,7 +162,7 @@ const ViewProduct = () => {
           />
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-4">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
