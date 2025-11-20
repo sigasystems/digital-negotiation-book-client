@@ -3,7 +3,7 @@ import apiClient from "@/utils/apiClient";
 
 class PlanService {
   constructor() {
-    this.usageCache = null; // cached plan usage data
+    this.usageCache = null;
   }
 
  

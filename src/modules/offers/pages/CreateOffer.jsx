@@ -15,6 +15,8 @@ import { businessOwnerService } from "@/modules/businessOwner/services/businessO
 import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { offerService } from "../services";
 import { locationServices } from "@/modules/location/service";
+import planUsageService from "@/services/planUsageService";
+import { useToast } from "@/app/hooks/useToast";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -50,7 +52,7 @@ const CreateOffer = () => {
     grandTotal: "",
     destination: "",
     products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
-  }), [user]);
+  }), [user]); 
 
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,8 @@ const CreateOffer = () => {
   const [offerName, setOfferName] = useState("");
   const [buyers, setBuyers] = useState([]);
   const [locations, setLocations] = useState([]);
+ const [remainingOffers, setRemainingOffers] = useState(0);
+ const {showToast} = useToast();
 
   const fetchProductDetails = async (productId) => {
     try {
@@ -192,6 +196,20 @@ const CreateOffer = () => {
     setConfirmOpen(true);
   };
 
+      // Fetch plan usage on mount
+      useEffect(() => {
+        const fetchPlanUsage = async () => {
+          try {
+            await planUsageService.fetchUsage(user.id);
+            const remaining = planUsageService.getRemainingCredits("offers");
+            setRemainingOffers(remaining);
+          } catch (err) {
+            console.error("Failed to fetch plan usage:", err);
+            showToast("error", "Failed to load plan info.");
+          }
+        };
+        fetchPlanUsage();
+      }, [user.id]);
   const confirmCreate = async () => {
     setConfirmOpen(false);
     setCreating(true);
@@ -222,6 +240,12 @@ const CreateOffer = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8">
 
       <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
+
+      <div>
+
+        Remaining Credits For Create Offer : {remainingOffers}
+
+      </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">

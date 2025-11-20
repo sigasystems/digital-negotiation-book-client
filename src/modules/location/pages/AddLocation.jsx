@@ -24,7 +24,7 @@ const AddLocation = () => {
 
 
   
-      const [ setRemainingLocations] = useState(0);
+      const [ remainingLocations, setRemainingLocations] = useState(0);
     
         // Fetch plan usage on mount
         useEffect(() => {
@@ -225,11 +225,14 @@ const handleSubmit = async () => {
         {/* Location Cards */}
       <div className="space-y-6">
         {form.map((loc, i) => (
-          <div
+          <div 
             key={i}
             className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-6">
+              <div>
+          Remaining Credits : {remainingLocations}
+        </div>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-50 rounded-lg">
                     <Flag size={20} className="text-blue-600" />
