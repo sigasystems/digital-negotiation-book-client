@@ -24,7 +24,7 @@ const AddLocation = () => {
 
 
   
-      const [remainingLocations, setRemainingLocations] = useState(0);
+      const [ setRemainingLocations] = useState(0);
     
         // Fetch plan usage on mount
         useEffect(() => {
@@ -140,11 +140,6 @@ const handleSubmit = async () => {
         trimmed.countryName = loc.countryName.trim();
         trimmed.countryCode = loc.countryCode.trim().toUpperCase();
       }
-<<<<<<< Updated upstream
-      // If selected from dropdown → DO NOT SEND countryId, send countryName+countryCode
-=======
-
->>>>>>> Stashed changes
       if (!loc.manualCountry && loc.countryId) {
         const selected = countries.find((c) => c.id === loc.countryId);
         if (selected) {
@@ -186,10 +181,6 @@ const handleSubmit = async () => {
   }
 };
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-4 py-8">
 
@@ -208,15 +199,6 @@ const handleSubmit = async () => {
         </div>
       )}
 
-<<<<<<< Updated upstream
-<div>
-          Remaining Credits : {remainingLocations}
-        </div>
-      <div className="flex items-center gap-3 mb-2">
-        
-        <div className="p-2 rounded-xl">
-          <Flag size={24} className="text-blue-600" />
-=======
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <button
@@ -237,7 +219,6 @@ const handleSubmit = async () => {
                 Add up to 5 locations including country, city, state and location code
               </p>
             </div>
->>>>>>> Stashed changes
         </div>
       </div>
 

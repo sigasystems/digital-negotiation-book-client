@@ -145,12 +145,11 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                   onClick={() => onClose && onClose()}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none",
+                      "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none cursor-pointer",
                       collapsed ? "justify-center p-2" : "gap-3 px-4 py-2",
                       isActive
                         ? "bg-indigo-100 text-indigo-700 font-semibold"
                         : "text-gray-700 hover:text-indigo-700 hover:bg-indigo-50",
-                      "cursor-pointer"
                     )
                   }
                   title={collapsed ? name : undefined}

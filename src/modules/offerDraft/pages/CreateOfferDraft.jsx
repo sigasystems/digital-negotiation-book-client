@@ -4,7 +4,7 @@ import { format, isBefore, startOfDay, parseISO } from "date-fns";
 import { FileText, Sparkles } from "lucide-react";
 import { offerDraftService } from "../services";
 import { productService } from "@/modules/product/services";
-
+import { useToast } from "@/app/hooks/useToast";
 import Header from "../components/Header";
 import Section from "../components/Section";
 import ReadOnlyField from "../components/ReadOnlyField";
@@ -27,8 +27,9 @@ const EMPTY_PRODUCT = {
 
 const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const { showToast } = useToast();
 
-    const [remainingOffers, setRemainingOffers] = useState(0);
+    const [, setRemainingOffers] = useState(0);
   
       // Fetch plan usage on mount
       useEffect(() => {
@@ -229,40 +230,37 @@ const CreateOfferDraft = () => {
 }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-4 py-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-8">
-        <Header onBack={() => (window.location.href = "/dashboard")} />
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+   <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
+      <div className="max-w-5xl mx-auto px-6 py-4">
 
-<<<<<<< Updated upstream
+        <div className="flex items-center gap-5">
 
-      <div>
+          <Header onBack={() => (window.location.href = "/dashboard")} />
 
-        Remaining Credits For Create Offer : {remainingOffers}
-
-      </div>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden"
-=======
-        <div className="mt-6 flex items-center gap-4">
             <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg">
               <FileText size={32} className="text-white" />
             </div>
-            <div>
+            <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create Offer Draft</h1>
-                <Sparkles size={24} className="text-yellow-500" />
-              </div>
-              <p className="text-gray-600 mt-1">Generate professional offer drafts for your clients</p>
+                <h1 className="text-xl font-bold text-gray-900">
+                  Create Offer Draft
+                </h1>
+                <Sparkles size={20} className="text-yellow-500" />
             </div>
+            <p className="text-sm text-gray-600 mt-0.5">
+              Generate professional offer drafts for your clients
+            </p>
           </div>
         </div>
 
-        {/* Main Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
->>>>>>> Stashed changes
-        >
+      </div>
+    </header>
+    <main className="mx-auto py-6">
+
+      <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+
+        <form onSubmit={handleSubmit}>
 
              <Section title="Draft Details">
             <div className="grid sm:grid-cols-2 gap-6">
@@ -307,19 +305,24 @@ const CreateOfferDraft = () => {
 
           <Section title="Dates">
             <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker 
-                label="Offer Validity Date" 
-                value={formData.offerValidityDate} 
-                onSelect={(d) => handleDateSelect("offerValidityDate", d)} 
-                open={openPicker.validity} 
-                setOpen={(v) => setOpenPicker(prev => ({ ...prev, validity: v }))} 
+              <DatePicker
+                label="Offer Validity Date"
+                value={formData.offerValidityDate}
+                onSelect={(d) => handleDateSelect("offerValidityDate", d)}
+                open={openPicker.validity}
+                setOpen={(v) =>
+                  setOpenPicker((prev) => ({ ...prev, validity: v }))
+                }
               />
-              <DatePicker 
-                label="Shipment Date" 
-                value={formData.shipmentDate} 
-                onSelect={(d) => handleDateSelect("shipmentDate", d)} 
-                open={openPicker.shipment} 
-                setOpen={(v) => setOpenPicker(prev => ({ ...prev, shipment: v }))} 
+
+              <DatePicker
+                label="Shipment Date"
+                value={formData.shipmentDate}
+                onSelect={(d) => handleDateSelect("shipmentDate", d)}
+                open={openPicker.shipment}
+                setOpen={(v) =>
+                  setOpenPicker((prev) => ({ ...prev, shipment: v }))
+                }
               />
             </div>
           </Section>
@@ -370,13 +373,14 @@ const CreateOfferDraft = () => {
 
           <Footer loading={loading} />
         </form>
+      </div>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             All fields marked with an asterisk (*) are required. Please ensure all information is accurate before submitting.
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -66,7 +66,7 @@ const BuyerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -104,7 +104,7 @@ const BuyerPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto py-4">
         <div className="space-y-8">
           {Object.entries(config.sections).map(([sectionKey, section]) => (
             <div
