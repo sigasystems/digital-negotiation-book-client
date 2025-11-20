@@ -10,6 +10,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const userRole = user?.userRole || "guest";
 
   const handleLogout = () => {
     logout();
@@ -20,16 +21,14 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   };
 
   const navLinks = useMemo(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && userRole !== "buyer") {
       return [
-        // { label: "Home", path: "/" },
-        // { label: "Plans", path: "/#plans" },
         { label: "Onboard-process", path: "/onboard-process" },
          { label: "Contact", path: "/contact" },
       ];
     }
 
-    if (user?.userRole === "super_admin") {
+    if (userRole === "super_admin") {
       return [
         { label: "Dashboard", path: "/dashboard" },
         { label: "Business Owners", path: "/users" },
@@ -37,7 +36,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
       ];
     }
 
-    if (user?.userRole === "business_owner") {
+    if (userRole === "business_owner") {
       return [
         { label: "Dashboard", path: "/dashboard" },
         { label: "Buyers", path: "/users" },
@@ -45,15 +44,12 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
       ];
     }
 
-    return [{ label: "Dashboard", path: "/dashboard" }];
-  }, [isAuthenticated, user]);
+    return [];
+  }, [isAuthenticated, userRole]);
 
   const handleDashboardCTA = () => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    } else {
-      navigate("/login");
-    }
+    if (isAuthenticated) navigate("/dashboard");
+    else navigate("/login");
     setMobileMenuOpen(false);
   };
 
@@ -64,10 +60,33 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
   const businessName = user?.businessName || "";
 
+  if (userRole === "buyer") {
+    return (
+      <header className="fixed top-0 left-0 w-full z-30 bg-white shadow-sm border-b border-gray-200">
+        <div className="flex items-center justify-end px-4 h-16">
+          <button
+            onClick={() => setLogoutOpen(true)}
+            className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+
+        <LogoutDialog
+          isOpen={logoutOpen}
+          onClose={() => setLogoutOpen(false)}
+          onLogout={() => {
+            logout();
+            navigate("/login");
+          }}
+        />
+      </header>
+    );
+  }
   return (
     <header className="fixed top-0 left-0 w-full z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 max-w-[1920px] mx-auto">
-        {/* Left Side - Logo & Sidebar Toggle */}
         <div className="flex items-center gap-3 sm:gap-4">
           {showSidebarButton && (
             <button
@@ -84,14 +103,13 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
             className="text-base sm:text-lg md:text-xl font-semibold text-indigo-600 tracking-tight hover:text-indigo-700 transition whitespace-nowrap"
           >
             <span className="hidden sm:inline sm:ml-[15rem]">Digital Negotiation Book</span>
-
             <span className="sm:hidden">
-              DNB <span className="text-black">{businessName ? `|  ${businessName}` : ""}</span>
+              DNB <span className="text-black">{businessName ? `| ${businessName}` : ""}</span>
             </span>
           </Link>
         </div>
 
-        {/* Right Side - Desktop Menu */}
+        {/* DESKTOP MENU */}
         <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navLinks.map((link) => (
             <Link
@@ -152,16 +170,18 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
               </button>
             )
           ) : (
+            userRole !== "buyer" && (
             <button
               onClick={handleDashboardCTA}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
             >
               Login
             </button>
+            )
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* MOBILE MENU BUTTON */}
         <button
           className="lg:hidden text-gray-700 hover:text-indigo-600 transition p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -171,7 +191,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
           <nav className="px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
@@ -221,7 +241,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         </div>
       )}
 
-      {/* Logout Modal */}
+      {/* LOGOUT MODAL */}
       <LogoutDialog
         isOpen={logoutOpen}
         onClose={() => setLogoutOpen(false)}

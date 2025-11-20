@@ -10,9 +10,7 @@ export default function ProtectedRoute({
   const location = useLocation();
   const { isAuthenticated, user, loading } = useAuth();
 
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
 
   if (!isAuthenticated) {
     return (
@@ -22,6 +20,14 @@ export default function ProtectedRoute({
         state={{ from: location.pathname }}
       />
     );
+  }
+
+  if (user?.userRole === "buyer") {
+    const isNegotiationRoute = location.pathname.startsWith("/negotiation/");
+    if (!isNegotiationRoute) {
+      return <Navigate to="/negotiation/unauthorized" replace />;
+    }
+    return children;
   }
 
   if (
