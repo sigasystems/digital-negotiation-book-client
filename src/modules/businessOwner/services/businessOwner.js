@@ -42,7 +42,7 @@ export const businessOwnerService = {
       if (filters.page !== undefined) query.page = filters.page;
     if (filters.limit !== undefined) query.limit = filters.limit;
 
-    return api.get(`/business-owner/${ownerId}/buyers/search`, { params: query });
+    return api.get(`/business-owner/${ownerId}/buyers/search`, { query });
   },
 
   getPaymentById : (paymentId) =>

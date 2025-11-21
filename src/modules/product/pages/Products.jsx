@@ -84,7 +84,6 @@ export default function Products() {
         setPageSize={setPageSize}
         totalItems={totalItems}
         searchFields={[
-          { name: "code", label: "Code", type: "text" },
           { name: "productName", label: "Product Name", type: "text" },
           { name: "species", label: "Species", type: "text" },
           { name: "size", label: "Size", type: "text", placeholder: "Comma-separated sizes" },

@@ -25,9 +25,9 @@ export default function Offers() {
         response = await offerService.getAllOffers({ pageIndex, pageSize });
       }
 
-      const { data, totalItems } = response?.data?.data || {};
-      setOffers(data || []);
-      setTotalItems(totalItems || 0);
+      const { data, totalItems, offers, total } = response?.data?.data || {};
+      setOffers(data || offers || []);
+      setTotalItems(totalItems || total || 0);
     } catch (err) {
       console.error("Failed to fetch offers:", err);
       setOffers([]);
