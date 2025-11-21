@@ -23,6 +23,8 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const navLinks = useMemo(() => {
     if (!isAuthenticated && userRole !== "buyer") {
       return [
+        // { label: "Home", path: "/" },
+        // { label: "Plans", path: "/#plans" },
         { label: "Onboard-process", path: "/onboard-process" },
          { label: "Contact", path: "/contact" },
       ];
