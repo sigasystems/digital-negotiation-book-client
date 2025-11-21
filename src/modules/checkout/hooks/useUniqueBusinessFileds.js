@@ -31,15 +31,16 @@ export default function useUniqueBusinessField() {
       setChecking((prev) => ({ ...prev, [field]: true }));
 
       try {
-        const res = await businessOwnerService.checkUnique({ [field]: trimmedValue });
-        const { data } = res;
-        lastCheckedValues.current[field] = trimmedValue;
+       const res = await businessOwnerService.checkUnique({ [field]: trimmedValue });
+const backend = res.data; // axios wrapper
+lastCheckedValues.current[field] = trimmedValue;
 
-        if (data?.data?.exists) {
-          setErrors((prev) => ({ ...prev, [field]: "Already exists. Please use another.", }));
-        } else {
-          setErrors((prev) => ({ ...prev, [field]: "" }));
-        }
+const fieldResult = backend?.data?.[field]; // email/businessName/registrationNumber
+if (fieldResult?.exists) {
+  setErrors((prev) => ({...prev,[field]: fieldResult.message || "Already exists. Please use another.", }));
+} else {
+  setErrors((prev) => ({ ...prev, [field]: "" }));
+}
       } catch (err) {
         const msg =
           err.response?.data?.message ||

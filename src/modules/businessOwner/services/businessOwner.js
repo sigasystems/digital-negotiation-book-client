@@ -25,7 +25,7 @@ export const businessOwnerService = {
       ...filters,
     }),
 
-    getBuyersList: () => {
+  getBuyersList: () => {
       return api.get("/business-owner/get-buyers-list");
     },
 

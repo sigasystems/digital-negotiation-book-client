@@ -18,6 +18,10 @@ export const upgradePlan = async (data) => {
   const res = await apiClient.post("/plans/upgrade", data);
   return res.data;
 };
+export const getPaymentById = async (paymentId) => {
+  if (!paymentId) throw new Error("Payment ID is required");
+  return apiClient.get(`/payments/${paymentId}`); 
+}
 export const createCheckoutSession = async (data) => {
   const res = await apiClient.post("/payments/checkout", data);
   return res.data;

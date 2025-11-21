@@ -83,6 +83,8 @@ function AppContent() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/onboard-process" element={<ProcessInstructions />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/onboard-process" element={<ProcessInstructions />} />
         <Route path="/success" element={<PaymentSuccess />} />
         <Route path="/negotiation/unauthorized" element={<UnauthorizedNegotiation />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
