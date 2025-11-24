@@ -19,24 +19,35 @@ export default function useUniqueBusinessField() {
   });
   const timeoutRefs = useRef({});
   const checkUniqueField = useCallback(async (field, value) => {
-    if (timeoutRefs.current[field]) clearTimeout(timeoutRefs.current[field]);
+    if (!field) return;
+    // Clear previous debounce timer
+    if (timeoutRefs.current[field]) {
+      clearTimeout(timeoutRefs.current[field]);
+    }
     const trimmedValue = value?.trim();
+    // Empty input → clear error and stop
     if (!trimmedValue) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
       return;
     }
-    // skip duplicate checks
+    // Skip duplicate checks (same value entered again)
     if (lastCheckedValues.current[field] === trimmedValue) return;
     timeoutRefs.current[field] = setTimeout(async () => {
       setChecking((prev) => ({ ...prev, [field]: true }));
 
       try {
-        const res = await businessOwnerService.checkUnique({ [field]: trimmedValue });
-        const { data } = res;
+        const res = await businessOwnerService.checkUnique({
+          [field]: trimmedValue,
+        });
+        const responseData = res?.data?.data?.[field];
         lastCheckedValues.current[field] = trimmedValue;
 
-        if (data?.data?.exists) {
-          setErrors((prev) => ({ ...prev, [field]: "Already exists. Please use another.", }));
+        // Expected: responseData = { exists: false, field: "email", message: "..." }
+        if (responseData?.exists) {
+          setErrors((prev) => ({
+            ...prev,
+            [field]: responseData?.message || "Already exists. Please use another.",
+          }));
         } else {
           setErrors((prev) => ({ ...prev, [field]: "" }));
         }
@@ -48,7 +59,7 @@ export default function useUniqueBusinessField() {
       } finally {
         setChecking((prev) => ({ ...prev, [field]: false }));
       }
-    }, 600); // debounce: 600ms
+    }, 600); // debounce 600ms
   }, []);
 
   return { checking, errors, setErrors, checkUniqueField };

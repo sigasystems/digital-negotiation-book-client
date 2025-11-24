@@ -80,10 +80,6 @@ export default function Layout({ children }) {
           showSidebarButton={shouldShowSidebar}
         />
 
-        {/* ✅ Conditional padding:
-            - No padding for login/landing
-            - Minimal padding on mobile for internal pages
-            - Full padding on desktop */}
         <main
           className={cn(
             "flex-1",

@@ -111,65 +111,6 @@ export default function Users({ userRole }) {
     ];
   }
 
-  // return (
-  //   <div className="w-full space-y-8">
-  //     <div>
-  //       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-  //         {userRole === "super_admin"
-  //           ? "All Business Owners"
-  //           : "All Buyers"}
-  //       </h1>
-  //     </div>
-
-  //     <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-  //       {/* <div className="lg:hidden p-4 space-y-4">
-  //         {data.length > 0 ? (
-  //           data.map((item) => (
-  //             <MobileCard
-  //               key={item.id}
-  //               item={item}
-  //               isSelected={rowSelection[item.id]}
-  //               onSelect={(checked) =>
-  //                 setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
-  //               }
-  //               actions={
-  //                 <ActionsCell
-  //                   row={{ original: item }}
-  //                   refreshData={fetchUsers}
-  //                   userActions={userActions}
-  //                 />
-  //               }
-  //             />
-  //           ))
-  //         ) : (
-  //           <div className="text-center py-12">
-  //             <p className="text-gray-500 text-sm font-medium">No results found</p>
-  //             <p className="text-gray-400 text-xs mt-1">Try adjusting your filters</p>
-  //           </div>
-  //         )}
-  //       </div> */}
-
-  //       {/* Desktop view */}
-  //       <div className="hidden lg:block">
-  //         <DashboardTable
-  //           data={data}
-  //           rowSelection={rowSelection}
-  //           setRowSelection={setRowSelection}
-  //           fetchOwners={fetchUsers}
-  //           userActions={userActions}
-  //           pageIndex={pageIndex}
-  //           pageSize={pageSize}
-  //           setPageIndex={setPageIndex}
-  //           setPageSize={setPageSize}
-  //           totalItems={totalItems}
-  //           onSearch={handleSearch}
-  //           searchFields={searchFields}
-  //         />
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
-
   return (
   <div className="w-full space-y-8">
     <div>
