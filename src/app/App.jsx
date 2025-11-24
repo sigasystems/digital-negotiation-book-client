@@ -34,15 +34,13 @@ import Offers from "@/modules/offers/pages/Offers";
 import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
 import Negotiation from "@/modules/negotiation/pages/Negotiation";
-import AddCountry from "@/modules/country/pages/AddCountry";
 import ProcessInstructions from "@/modules/landing/components/ProcessInstructions";
 import Contact from "@/modules/landing/components/Contact";
-import Country from "@/modules/country/pages/Country";
-import CountryPage from "@/modules/country/pages/CountryPage";
 import AddLocation from "@/modules/location/pages/AddLocation";
 import Locations from "@/modules/location/pages/Locations";
 import LocationPage from "@/modules/location/pages/LocationPage";
 import UnauthorizedNegotiation from "@/modules/landing/pages/UnauthorizedNegotiation";
+import OfferNegotiation from "@/modules/buyer/pages/OfferNegotiation";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -265,6 +263,7 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+      <Route path="/latest-negotiation/:id" element={<OfferNegotiation />}/>
       </Routes>
     </Layout>
   );

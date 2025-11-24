@@ -11,7 +11,7 @@ export default function Users({ userRole }) {
   const [pageSize, setPageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState({});
-  const [setTotalPages] = useState(1);
+  const [totalPages , setTotalPages] = useState(1);
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
 

@@ -79,7 +79,7 @@ export default function AddBuyerForm() {
     if (res?.status === 201) {
       toast.success("Buyer added successfully!");
       setFormData(initialData);
-        setTimeout(() => navigate(-1), 1000);
+        setTimeout(() => navigate("/users"), 1000);
     } else {
         toast.error(res?.message || "Failed to add buyer");
     }
