@@ -40,6 +40,7 @@ import AddLocation from "@/modules/location/pages/AddLocation";
 import Locations from "@/modules/location/pages/Locations";
 import LocationPage from "@/modules/location/pages/LocationPage";
 import UnauthorizedNegotiation from "@/modules/landing/pages/UnauthorizedNegotiation";
+import Profile from "@/modules/dashboard/components/Profile";
 import OfferNegotiation from "@/modules/buyer/pages/OfferNegotiation";
 
 function AppContent() {
@@ -116,6 +117,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <UpgradePlanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

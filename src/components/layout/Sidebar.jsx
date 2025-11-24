@@ -13,12 +13,13 @@ import {
   MoveLeft,
   FileEdit,
   ClipboardList,
-  ShoppingCart,
   CreditCard,
   Tag,
-  ArrowUp,
   Globe,
   MapPin,
+  PowerOffIcon,
+  PanelsTopLeftIcon,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -65,7 +66,8 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Offers", icon: Tag, path: "/offers" },
           { name: "Location", icon: Globe, path: "/location" },
           { name: "Add Location", icon: MapPin, path: "/add-location" },
-          { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
+          // { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
+          { name: "Profile", icon: User , path: "/profile" },
           // { name: "Upgrade Plan", icon: ArrowUp, path: "/upgrade-plan" },
         ]
       : []),
@@ -149,7 +151,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                       "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none cursor-pointer",
                       collapsed ? "justify-center p-2" : "gap-3 px-4 py-2",
                       isActive
-                        ? "bg-indigo-100 text-indigo-700 font-semibold"
+                        ? "bg-indigo-100 text-gray-700 font-semibold"
                         : "text-gray-700 hover:text-indigo-700 hover:bg-indigo-50",
                     )
                   }
