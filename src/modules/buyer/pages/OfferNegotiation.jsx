@@ -9,11 +9,12 @@ import ProductSection from "@/modules/offerDraft/components/ProductSection";
 import toast from "react-hot-toast";
 
 const OfferNegotiation = () => {
-  const { id } = useParams(); // this is used as draftId when creating an offer
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [negotiations, setNegotiations] = useState([]);
+  const [rawOffer, setRawOffer] = useState(null);
   const [error, setError] = useState("");
 
   const [productsList, setProductsList] = useState([]);
@@ -122,10 +123,24 @@ const OfferNegotiation = () => {
         }
 
         const res = await buyerService.latestNegotiation(id, { signal });
-        const list = res?.data?.data || [];
+        const raw = res?.data?.data;
+
+        if (!raw) {
+          setNegotiations([]);
+          setRawOffer(null);
+          return;
+        }
+
+        setRawOffer(raw.offer || null);
+
+        const list =
+          Array.isArray(raw.history) && raw.history.length > 0
+            ? raw.history
+            : raw.latestVersion
+            ? [raw.latestVersion]
+            : [];
 
         const normalized = normalizeNegotiations(list);
-        if (!mountedRef.current) return;
 
         setNegotiations(normalized);
       } catch (err) {
@@ -210,9 +225,6 @@ const OfferNegotiation = () => {
     [productsList, speciesMap, fetchProductDetails]
   );
 
-  // ---------------------------
-  // handleSave -> createOffer
-  // ---------------------------
   const handleSave = useCallback(async () => {
     if (saving) return;
     if (!negotiations.length) {
@@ -220,31 +232,15 @@ const OfferNegotiation = () => {
       return;
     }
 
+    const latest = negotiations[negotiations.length - 1];
+
     setSaving(true);
     try {
-      const latest = negotiations[negotiations.length - 1];
-
-      if (!latest.fromParty?.toString().trim()) {
-        toast.error("From Party is required");
-        setSaving(false);
-        return;
-      }
-      if (!latest.toParty?.toString().trim()) {
-        toast.error("To Party is required");
-        setSaving(false);
-        return;
-      }
-      if (!Array.isArray(latest.products) || latest.products.length === 0) {
-        toast.error("Product details missing");
-        setSaving(false);
-        return;
-      }
-
       const normalizedProducts = latest.products.map((p) => ({
         productId: p.productId || "",
         productName: p.productName || "",
         species: p.species || "",
-        packing: p.packing || p.packing || "",
+        packing: p.packing || "",
         sizeDetails: p.sizeDetails || "",
         breakupDetails: p.breakupDetails || "",
         priceDetails: p.priceDetails || "",
@@ -252,6 +248,9 @@ const OfferNegotiation = () => {
       }));
 
       const payload = {
+        offerName: rawOffer?.offerName || "",
+        origin: latest.origin || rawOffer?.origin || "",
+        destination: rawOffer?.destination || "", 
         fromParty: latest.fromParty || "",
         toParty: latest.toParty || "",
         productName: latest.productName || "",
@@ -269,16 +268,14 @@ const OfferNegotiation = () => {
       const res = await offerService.createOffer(id, payload);
 
       toast.success(res?.data?.message || "Offer created & sent successfully");
-      setTimeout(() => {
-        navigate("/offers");
-      }, 700);
+      setTimeout(() => navigate("/offers"), 700);
     } catch (err) {
       console.error("Failed to create offer:", err);
       toast.error(err?.response?.data?.message || "Failed to create offer");
     } finally {
       if (mountedRef.current) setSaving(false);
     }
-  }, [negotiations, id, navigate, saving]);
+  }, [negotiations, id, saving, navigate]);
 
   if (loading) {
     return (
@@ -313,12 +310,49 @@ const OfferNegotiation = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32">
-      {/* HEADER — NO SAVE BUTTON */}
       <header className="sticky top-0 bg-white shadow p-4 flex justify-between items-center z-20">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5 mr-2" /> Back
         </Button>
       </header>
+      {rawOffer && (
+        <section className="max-w-6xl mx-auto bg-white border shadow rounded-xl p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Offer Summary</h2>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { label: "Offer Name", value: rawOffer.offerName },
+              { label: "Business Name", value: rawOffer.businessName },
+              { label: "From Party", value: rawOffer.fromParty },
+              { label: "To Party", value: rawOffer.toParty },
+              { label: "Origin", value: rawOffer.origin },
+              { label: "Destination", value: rawOffer.destination },
+              { label: "Brand", value: rawOffer.brand },
+              { label: "Origin", field: "origin" },
+              { label: "Processor", value: rawOffer.processor },
+              { label: "Plant Approval", value: rawOffer.plantApprovalNumber },
+              {
+                label: "Offer Validity",
+                value: rawOffer.offerValidityDate?.split("T")[0],
+              },
+              {
+                label: "Shipment Date",
+                value: rawOffer.shipmentDate?.split("T")[0],
+              },
+              { label: "Grand Total", value: rawOffer.grandTotal },
+            ].map(({ label, value }, idx) => (
+              <div key={idx}>
+                <label className="text-sm font-semibold text-gray-500">
+                  {label}
+                </label>
+                <div className="border rounded-lg px-3 py-2 bg-gray-100 text-gray-700">
+                  {value || "-"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <main className="max-w-6xl mx-auto p-6 space-y-10">
         {negotiations.map((item, negIndex) => (
