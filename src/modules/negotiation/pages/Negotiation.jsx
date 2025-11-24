@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import negotiationServices from "../services";
 
 const Negotiation = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [negotiation, setNegotiation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -34,20 +35,37 @@ const Negotiation = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-40 text-gray-500">
-        Loading negotiations...
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <div className="text-gray-600 font-medium">Loading negotiations...</div>
+        </div>
       </div>
     );
 
   if (error)
     return (
-      <div className="text-center text-red-500 font-medium py-6">{error}</div>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-4">
+          <div className="text-red-500 text-center">
+            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="font-semibold text-lg">{error}</p>
+          </div>
+        </div>
+      </div>
     );
 
   if (!negotiation || !negotiation.history?.length)
     return (
-      <div className="text-center text-gray-500 py-6">
-        No negotiation history found.
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-4 text-center">
+          <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-gray-600 font-medium">No negotiation history found.</p>
+        </div>
       </div>
     );
 
@@ -63,6 +81,16 @@ const Negotiation = () => {
 
   const handleNext = () =>
     setCurrentPage((p) => (p < history.length - 1 ? p + 1 : 0));
+
+  const handleAccept = () => {
+  };
+
+  const handleReject = () => {
+  };
+
+  const handleNegotiate = () => {
+    navigate(`/latest-negotiation/${id}`);
+  };
 
   const leftFields = [
     { label: "Offer Name", key: "offerName", source: "offer" },
@@ -81,59 +109,114 @@ const Negotiation = () => {
   ];
 
   return (
-    <div className="max-w-full mx-auto p-4 sm:p-6 bg-gray-50">
+    <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="max-w-[1920px] mx-auto p-3 sm:p-6 lg:p-8">
+        
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 text-center lg:text-left">
+            Negotiation Details
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base text-center lg:text-left">
+            Review and manage your negotiation versions
+          </p>
+        </div>
 
-      {/* Navigation */}
-      <div className="flex gap-3 mb-6 justify-center">
+        <div className="sticky top-0 z-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pb-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+            <button
+              onClick={handleAccept}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Accept
+            </button>
+
+            <button
+              onClick={handleReject}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Reject
+            </button>
+
+            <button
+              onClick={handleNegotiate}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Negotiate
+            </button>
+          </div>
+
+          <div className="flex items-center justify-center gap-4 mt-4">
         <button
           onClick={handlePrev}
-          className="px-5 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-lg"
+          className="flex items-center justify-center w-12 h-12 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200"
         >
-          ←
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
         </button>
+            
+            <div className="px-6 py-2 bg-white rounded-full shadow-md">
+              <span className="text-sm font-semibold text-gray-700">
+                Version {version.versionNo} of {history.length}
+              </span>
+            </div>
+            
         <button
           onClick={handleNext}
-          className="px-5 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-lg"
+          className="flex items-center justify-center w-12 h-12 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200"
         >
-          →
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
         </button>
+          </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
-        {/* LEFT SUBJECT COLUMN */}
-        <div className="w-full lg:w-64 bg-white shadow rounded border border-gray-300">
-          <div className="bg-blue-600 text-white text-sm font-bold px-4 py-3 rounded-t">
+          <div className="hidden lg:block w-64 shrink-0">
+        <div className="sticky top-48 bg-white shadow-xl rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-4 py-4">
             SUBJECT
           </div>
 
           {leftFields.map((field) => (
-            <div key={field.key} className="border-b border-gray-200 p-3">
+            <div key={field.key} className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
               <div className="font-semibold text-sm text-gray-800">
                 {field.label}
               </div>
             </div>
           ))}
 
-          <div className="border-b border-gray-200 p-3 font-semibold text-sm text-gray-800">
+          <div className="border-b border-gray-200 p-4 font-semibold text-sm text-gray-800 hover:bg-gray-50 transition-colors">
             Size/Grades
           </div>
 
-          <div className="border-b border-gray-200 p-3 font-semibold text-sm text-gray-800">
+          <div className="border-b border-gray-200 p-4 font-semibold text-sm text-gray-800 hover:bg-gray-50 transition-colors">
             Units/Remarks
           </div>
 
           {version.sizeBreakups?.map((row, idx) => (
-            <div key={idx} className="border-b border-gray-200 p-3">
+            <div key={idx} className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
               <div className="font-semibold text-sm text-gray-900">
                 {row.size}
               </div>
             </div>
           ))}
-        </div>
+            </div>
+          </div>
 
-        {/* RIGHT SIDE — NEGOTIATION COLUMNS */}
-        <div className="flex gap-6 overflow-x-auto pb-4">
+          <div className="flex-1 overflow-x-auto">
+            <div className="flex gap-4 pb-4 min-w-min">
 
           {history.map((neg, idx) => {
             const isSelected = idx === currentPage;
@@ -141,17 +224,65 @@ const Negotiation = () => {
             return (
               <div
                 key={idx}
-                className={`w-72 sm:w-80 shrink-0 shadow rounded border border-gray-300 bg-white transition-all ${
-                  isSelected ? "ring-2 ring-blue-500" : ""
+                className={`w-full sm:w-96 lg:w-[420px] shrink-0 shadow-xl rounded-2xl border-2 bg-white transition-all duration-300 ${
+                  isSelected 
+                        ? "border-blue-500 ring-4 ring-blue-200 transform scale-[1.02]" 
+                        : "border-gray-200 hover:border-blue-300"
                 }`}
               >
-                <div className="bg-blue-600 text-white text-sm font-bold px-4 py-3 text-center rounded-t">
+                <div className={`text-white text-base font-bold px-5 py-4 text-center rounded-t-xl ${
+                      isSelected 
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600" 
+                        : "bg-gradient-to-r from-gray-600 to-gray-700"
+                    }`}>
                   {neg.fromParty || "Offer"}
+                      {isSelected && (
+                        <div className="text-xs font-normal mt-1 opacity-90">
+                          Current Version
+                        </div>
+                      )}
                 </div>
 
+                    <div className="lg:hidden">
                 {leftFields.map((field) => {
                   const source = field.source === "offer" ? offer : neg;
 
+                        const value = field.key.toLowerCase().includes("date")
+                          ? formatDate(source[field.key])
+                          : source[field.key] || "-";
+
+                        return (
+                          <div key={field.key} className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                            <div className="text-xs font-semibold text-gray-600 mb-1">
+                              {field.label}
+                            </div>
+                            <div className="text-sm text-gray-900 font-medium">
+                              {value}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <div className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                        <div className="text-xs font-semibold text-gray-600 mb-1">
+                          Size/Grades
+                        </div>
+                        <div className="text-sm text-gray-900">-</div>
+                      </div>
+
+                      <div className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                        <div className="text-xs font-semibold text-gray-600 mb-1">
+                          Units/Remarks
+                        </div>
+                        <div className="text-sm text-gray-900 font-medium">
+                          {neg.quantity || "-"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="hidden lg:block">
+                      {leftFields.map((field) => {
+                        const source = field.source === "offer" ? offer : neg;
                   const value = field.key.toLowerCase().includes("date")
                     ? formatDate(source[field.key])
                     : source[field.key] || "-";
@@ -159,81 +290,87 @@ const Negotiation = () => {
                   return (
                     <div
                       key={field.key}
-                      className="border-b border-gray-200 p-3 text-sm text-gray-800"
+                      className="border-b border-gray-200 p-4 text-sm text-gray-900 font-medium hover:bg-gray-50 transition-colors"
                     >
                       {value}
                     </div>
                   );
                 })}
 
-                <div className="border-b border-gray-200 p-3 text-sm text-gray-800">
+                <div className="border-b border-gray-200 p-4 text-sm text-gray-900">
                   -
                 </div>
 
-                <div className="border-b border-gray-200 p-3 text-sm text-gray-800">
+                <div className="border-b border-gray-200 p-4 text-sm text-gray-900 font-medium">
                   {neg.quantity || "-"}
                 </div>
 
-                {/* RESPONSIVE SIZEBREAKUP TABLE */}
-                <div className="border-b border-gray-200 overflow-x-auto">
-                  <div className="min-w-[300px]">
+                    </div>
 
-                    {/* Header Row */}
-                    <div className="grid grid-cols-4 bg-gray-100 text-[11px] font-semibold border-b border-gray-300 text-gray-700">
-                      <div className="py-2 px-1 text-center border-r">
-                        Breakup
-                        <div className="text-[10px] mt-1 text-gray-500 font-normal">
-                          {productMeta.breakupDetails || ""}
+                <div className="border-t-2 border-gray-300 mt-2">
+                      <div className="overflow-x-auto">
+                  <div className="min-w-[340px]">
+
+                          <div className="grid grid-cols-4 bg-gradient-to-r from-gray-100 to-gray-200 text-[11px] sm:text-xs font-bold border-b-2 border-gray-300 text-gray-700">
+                      <div className="py-3 px-2 text-center border-r border-gray-300">
+                              <div>Breakup</div>
+                              {productMeta.breakupDetails && (
+                        <div className="text-[10px] mt-1 text-gray-600 font-normal">
+                          {productMeta.breakupDetails}
                         </div>
+                              )}
                       </div>
 
-                      <div className="py-2 px-1 text-center border-r">
+                      <div className="py-3 px-2 text-center border-r border-gray-300">
                         Condition
                       </div>
 
-                      <div className="py-2 px-1 text-center border-r">
-                        Price
-                        <div className="text-[10px] mt-1 text-gray-500 font-normal">
-                          {productMeta.priceDetails || ""}
+                      <div className="py-3 px-2 text-center border-r border-gray-300">
+                              <div>Price</div>
+                              {productMeta.priceDetails && (
+                        <div className="text-[10px] mt-1 text-gray-600 font-normal">
+                          {productMeta.priceDetails}
                         </div>
+                              )}
                       </div>
 
-                      <div className="py-2 px-1 text-center">
+                      <div className="py-3 px-2 text-center">
                         Packing
                       </div>
                     </div>
 
-                    {/* Body Rows */}
                     {neg.sizeBreakups?.map((row, i) => (
                       <div
                         key={i}
-                        className="grid grid-cols-4 text-sm border-b border-gray-200"
+                        className={`grid grid-cols-4 text-xs sm:text-sm border-b border-gray-200 ${
+                                i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              } hover:bg-blue-50 transition-colors`}
                       >
-                        <div className="py-2 px-1 text-center border-r">
+                        <div className="py-3 px-2 text-center border-r border-gray-200 font-medium">
                           {row.breakup}
                         </div>
-                        <div className="py-2 px-1 text-center border-r">
+                        <div className="py-3 px-2 text-center border-r border-gray-200">
                           {row.condition}
                         </div>
-                        <div className="py-2 px-1 text-center border-r">
+                        <div className="py-3 px-2 text-center border-r border-gray-200 font-semibold text-green-700">
                           {row.price}
                         </div>
-                        <div className="py-2 px-1 text-center">
+                        <div className="py-3 px-2 text-center">
                           {productMeta.packing || "-"}
                         </div>
                       </div>
                     ))}
+                        </div>
                   </div>
                 </div>
               </div>
             );
           })}
 
+            </div>
         </div>
       </div>
 
-      <div className="text-center text-sm mt-4 text-gray-600">
-        Version {version.versionNo} of {history.length}
       </div>
     </div>
   );

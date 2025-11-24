@@ -263,7 +263,7 @@ const CreateOffer = () => {
                 <FilePlus2 className="text-white w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Create Offer</h1>
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Create & Send Offer</h1>
                 <p className="text-xs sm:text-sm text-slate-500">From Draft #{formData.draftNo}</p>
                 </div>
               </div>
@@ -468,11 +468,11 @@ const CreateOffer = () => {
             >
               {creating ? (
                 <>
-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2" />Creating Offer...
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2" />Sending Offer...
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />Create Offer
+                  <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />Create & Send Offer
                 </>
               )}
             </Button>
