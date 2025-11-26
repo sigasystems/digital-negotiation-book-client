@@ -1,32 +1,14 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useCallback, useEffect } from "react";
 import SelectedPlanCard from "../components/SelectedPlanCard";
 import OrderSummary from "../components/OrderSummary";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  User,
-  Mail,
-  Phone,
-  Building2,
-  MapPin,
-  EyeOff,
-  Eye,
-} from "lucide-react";
+import { User, Mail, Phone, Building2, MapPin, EyeOff, Eye } from "lucide-react";
 import toast from "react-hot-toast";
-import {
-  validateCheckoutForm,
-  validateSingleField,
-} from "../utils/validateCheckoutForm";
-import useUniqueBusinessField from "../hooks/useUniqueBusinessFileds";
+import { validateCheckoutForm, validateSingleField } from "../utils/validateCheckoutForm";
+import { useCheckUniqueFieldQuery } from "../hooks/checkUniqueFiledQuery";
 
 export default function CheckoutPage() {
   const { state } = useLocation();
@@ -37,9 +19,6 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const { errors: uniqueErrors, checkUniqueField, setErrors: setUniqueErrors } =
-    useUniqueBusinessField();
-
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -57,6 +36,18 @@ export default function CheckoutPage() {
     website: "",
   });
 
+  // React Query checks for unique fields
+  const emailCheck = useCheckUniqueFieldQuery("email", formData.email);
+  const businessCheck = useCheckUniqueFieldQuery("businessName", formData.businessName);
+  const regCheck = useCheckUniqueFieldQuery("registrationNumber", formData.registrationNumber);
+
+  // map server error to field errors
+  const uniqueErrors = {
+    email: emailCheck.data?.exists ? emailCheck.data.message : "",
+    businessName: businessCheck.data?.exists ? businessCheck.data.message : "",
+    registrationNumber: regCheck.data?.exists ? regCheck.data.message : "",
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -66,34 +57,21 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const handleChange = useCallback(
-    async (e) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-      const fieldError = validateSingleField(name, value);
-      setErrors((prev) => ({ ...prev, [name]: fieldError }));
-
-      if (uniqueErrors[name]) {
-        setUniqueErrors((prev) => ({ ...prev, [name]: "" }));
-      }
-
-      if (
-        ["email", "businessName", "registrationNumber"].includes(name) &&
-        value.trim() &&
-        !fieldError
-      ) {
-        checkUniqueField(name, value);
-      }
-    },
-    [checkUniqueField, uniqueErrors, setUniqueErrors]
-  );
+    // local validation
+    const fieldError = validateSingleField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: fieldError }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formValidationErrors = validateCheckoutForm(formData);
     const combinedErrors = { ...formValidationErrors, ...uniqueErrors };
+
     setErrors(combinedErrors);
 
     if (Object.values(combinedErrors).some((err) => err)) {
@@ -117,11 +95,11 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
           <div className="lg:col-span-2 space-y-6">
-            {/* Selected plan */}
+
             <SelectedPlanCard selectedPlan={selectedPlan} billingCycle={billingCycle} />
 
-            {/* Personal Information */}
             <Card className="shadow-md border-slate-200">
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -136,6 +114,8 @@ export default function CheckoutPage() {
               </CardHeader>
 
               <CardContent className="space-y-4">
+                
+                {/* FIRST NAME / LAST NAME */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label className="m-1" htmlFor="first_name">First Name *</Label>
@@ -147,9 +127,7 @@ export default function CheckoutPage() {
                       placeholder="John"
                       className={errors.first_name ? "border-red-500" : ""}
                     />
-                    {errors.first_name && (
-                      <p className="text-xs text-red-500">{errors.first_name}</p>
-                    )}
+                    {errors.first_name && <p className="text-xs text-red-500">{errors.first_name}</p>}
                   </div>
                   <div>
                     <Label className="m-1" htmlFor="last_name">Last Name *</Label>
@@ -161,12 +139,11 @@ export default function CheckoutPage() {
                       placeholder="Doe"
                       className={errors.last_name ? "border-red-500" : ""}
                     />
-                    {errors.last_name && (
-                      <p className="text-xs text-red-500">{errors.last_name}</p>
-                    )}
+                    {errors.last_name && <p className="text-xs text-red-500">{errors.last_name}</p>}
                   </div>
                 </div>
 
+                {/* EMAIL / PHONE */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label className="m-1" htmlFor="email">Email *</Label>
@@ -185,6 +162,7 @@ export default function CheckoutPage() {
                       </p>
                     )}
                   </div>
+
                   <div>
                     <Label className="m-1" htmlFor="phoneNumber">Phone Number *</Label>
                     <Input
@@ -201,6 +179,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
+                {/* PASSWORD */}
                 <div>
                   <Label className="m-1" htmlFor="password">Password *</Label>
                   <div className="relative">
@@ -221,32 +200,32 @@ export default function CheckoutPage() {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-xs text-red-500">{errors.password}</p>
-                  )}
+                  {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
                 </div>
+
               </CardContent>
             </Card>
 
-            {/* Business Information */}
-            <Card className="shadow-md border-slate-200">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <Building2 className="w-4 h-4 text-indigo-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Business Information</CardTitle>
-                    <CardDescription>Provide your business details</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+            {/* BUSINESS CARD AND ADDRESS CARDS CONTINUE... (unchanged) */}
 
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-                  <div>
-                    <Label className="m-1" htmlFor="businessName"  >Business Name *</Label>
-                    <Input
+{/* Business Information */}
+             <Card className="shadow-md border-slate-200">
+               <CardHeader>
+                 <div className="flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                     <Building2 className="w-4 h-4 text-indigo-600" />
+                   </div>
+                   <div>
+                     <CardTitle className="text-lg">Business Information</CardTitle>
+                     <CardDescription>Provide your business details</CardDescription>
+                   </div>
+                 </div>
+               </CardHeader>
+               <CardContent className="space-y-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+                   <div>
+                     <Label className="m-1" htmlFor="businessName"  >Business Name *</Label>
+                     <Input
                       id="businessName"
                       name="businessName"
                       value={formData.businessName}
@@ -398,7 +377,7 @@ export default function CheckoutPage() {
             </Card>
           </div>
 
-          {/* Right side: Order Summary */}
+
           <OrderSummary
             selectedPlan={selectedPlan}
             billingCycle={billingCycle}

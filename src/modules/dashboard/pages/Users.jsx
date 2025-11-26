@@ -119,7 +119,7 @@ export default function Users({ userRole }) {
       </h1>
     </div>
 
-    <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div className=" rounded-lg overflow-hidden">
       {/* Table visible on all screens */}
       <div className="p-4">
         <DashboardTable

@@ -260,7 +260,7 @@ const CreateOfferDraft = () => {
 
       <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
 
-<div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+<div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 m-3 text-l ">
            Remaining Credits : {remainingOffers}
         </div>
         <form onSubmit={handleSubmit}>

@@ -41,6 +41,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         { label: "Dashboard", path: "/dashboard" },
         { label: "Buyers", path: "/users" },
         { label: "Products", path: "/products" },
+        { label: "Profile", path: "/profile" },
       ];
     }
 

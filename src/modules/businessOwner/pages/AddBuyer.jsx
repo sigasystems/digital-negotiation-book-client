@@ -139,9 +139,7 @@ export default function AddBuyerForm() {
               </div>
             </div>
 
-            <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-300 px-3 py-1.5 text-xs sm:text-sm font-medium w-fit">
-              New Registration
-            </Badge>
+      
           </div>
         </div>
       </header>
@@ -152,9 +150,9 @@ export default function AddBuyerForm() {
           
           {/* Company Information */}
           <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
-             <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
-           Remaining Credits : {remainingBuyers}
-        </div>
+            <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+                    Remaining Credits : {remainingBuyers}
+            </div>
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
               
               <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
@@ -247,13 +245,14 @@ export default function AddBuyerForm() {
                 />
               </div>
             </div>
+            
           </div>
-        </form>
-      </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-2xl z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-end gap-3">
+          
+        </form>
+        
+
+          <div className="flex flex-col sm:flex-row justify-start gap-3 m-3">
             <Button 
               type="button"
               variant="outline" 
@@ -284,8 +283,10 @@ export default function AddBuyerForm() {
               )}
             </Button>
           </div>
-        </div>
-      </div>
+  
+      </main>
+
+     
     </div>
   );
 }
