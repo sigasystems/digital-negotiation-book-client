@@ -255,6 +255,7 @@ const OfferNegotiation = () => {
         toParty: latest.toParty || "",
         productName: latest.productName || "",
         speciesName: latest.speciesName || "",
+        buyerId: rawOffer?.buyerId || latest.buyerId || "", 
         brand: latest.brand || "",
         plantApprovalNumber: latest.plantApprovalNumber || "",
         quantity: latest.quantity || "",

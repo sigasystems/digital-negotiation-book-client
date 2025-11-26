@@ -85,6 +85,7 @@ function AppContent() {
         <Route path="/success" element={<PaymentSuccess />} />
         <Route path="/negotiation/unauthorized" element={<UnauthorizedNegotiation />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
+        <Route path="/latest-negotiation/:id" element={<OfferNegotiation />}/>
         <Route path="*" element={<NotFound />} />
 
         {/* Protected routes */}
@@ -272,7 +273,6 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-      <Route path="/latest-negotiation/:id" element={<OfferNegotiation />}/>
       </Routes>
     </Layout>
   );
