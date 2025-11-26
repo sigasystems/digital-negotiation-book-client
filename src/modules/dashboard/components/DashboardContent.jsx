@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, Users, Activity, Calendar, Filter, Download, Ref
 import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
 import DashboardTable from "./DashboardTable";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
+import { useQuery } from "@tanstack/react-query";
 
 
 
@@ -47,6 +48,7 @@ export default function ResponsiveDashboard() {
   const [userGrowth, setUserGrowth] = useState(0);
   const [timeRange, setTimeRange] = useState("30d");
   const [showFilters, setShowFilters] = useState(false);
+  
 
   const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('user....',user)
@@ -54,58 +56,54 @@ export default function ResponsiveDashboard() {
   const userActions = [];
 
   useReloadOncePerSession("landingPageReloaded");
-  
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await roleBasedDataService.getDashboardData(userRole, {
-        pageIndex,
-        pageSize,
-      });
 
-      const {
-        data: fetchedData,
-        totalItems,
-        totalPages,
-        totalDeleted,
-        totalInactive,
-        totalActive,
-        totalPending,
-        revenueGrowth,
-        userGrowth
-      } = response || {};
+const {
+  data: dashboardResponse,
+  isLoading
+} = useQuery({
+  queryKey: ["dashboardData", userRole, pageIndex, pageSize],
+  queryFn: () =>
+    roleBasedDataService.getDashboardData(userRole, { pageIndex, pageSize }),
+});
 
-      setData(fetchedData || []);
-      setTotalItems(totalItems || 0);
-      setTotalPages(totalPages || 1);
-      setActiveUsers(totalActive || 0);
-      setInactiveUsers(totalInactive || 0);
-      setDeletedUsers(totalDeleted || 0);
-      setPendingUsers(totalPending || 0);
-      setRevenueGrowth(revenueGrowth || 0);
-      setUserGrowth(userGrowth || 0);
-    } catch (err) {
-      console.error("Failed to fetch dashboard data:", err);
-      setData([]);
-      setTotalItems(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  if (!dashboardResponse) return;
 
-  useEffect(() => {
-    fetchData();
-  }, [pageIndex, pageSize, userRole]);
+  const {
+    data: fetchedData,
+    totalItems,
+    totalPages,
+    totalDeleted,
+    totalInactive,
+    totalActive,
+    totalPending,
+    revenueGrowth,
+    userGrowth,
+  } = dashboardResponse;
 
-  const filteredData = useMemo(() => {
-    if (!emailFilter) return data;
-    return data.filter((item) =>
-      (item.email || item.contactEmail)
-        ?.toLowerCase()
-        .includes(emailFilter.toLowerCase())
-    );
-  }, [data, emailFilter]);
+  setData(fetchedData || []);
+  setTotalItems(totalItems || 0);
+  setTotalPages(totalPages || 1);
+  setActiveUsers(totalActive || 0);
+  setInactiveUsers(totalInactive || 0);
+  setDeletedUsers(totalDeleted || 0);
+  setPendingUsers(totalPending || 0);
+  setRevenueGrowth(revenueGrowth || 0);
+  setUserGrowth(userGrowth || 0);
+}, [dashboardResponse]);
+
+useEffect(() => {
+  setLoading(isLoading);
+}, [isLoading]);
+
+const filteredData = useMemo(() => {
+  if (!emailFilter) return data;
+  return data.filter((item) =>
+    (item.email || item.contactEmail)
+      ?.toLowerCase()
+      .includes(emailFilter.toLowerCase())
+  );
+}, [data, emailFilter]);
 
   const tableData = filteredData?.map((item) => ({
     id: item.id,
@@ -189,7 +187,6 @@ export default function ResponsiveDashboard() {
             </div>
             <div className="flex gap-2">
               <button 
-                onClick={fetchData}
                 className="flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors shadow-md"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -224,7 +221,7 @@ export default function ResponsiveDashboard() {
                     </span>
                   </div>
                   <h3 className="text-3xl sm:text-4xl font-bold text-white mb-1">
-                    {stat.value.toLocaleString()}
+                    {stat.value?.toLocaleString() || 0}
                   </h3>
                   <p className="text-white/90 text-sm font-medium">{stat.label}</p>
                 </div>
@@ -349,10 +346,6 @@ export default function ResponsiveDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">{userLabel} Management</h3>
               <p className="text-sm text-gray-500 mt-1">Manage and monitor all your {userLabel.toLowerCase()}</p>
             </div>
-            {/* <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
-              <Users className="w-4 h-4" />
-              Add New
-            </button> */}
           </div>
 
           {/* Mobile cards */}
@@ -383,7 +376,7 @@ export default function ResponsiveDashboard() {
               data={tableData}
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
-                  fetchOwners={fetchData}
+                  // fetchOwners={fetchData}
             userActions={userActions}
             filterKey="email"
               pageIndex={pageIndex}

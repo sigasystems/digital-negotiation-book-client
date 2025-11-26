@@ -176,7 +176,7 @@ const AddProduct = () => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           
             <div className="divide-y divide-slate-200">
-              <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+              <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 m-3 text-l ">
            Remaining Credits : {remainingProducts}
         </div>
             {products.map((p, i) => (
@@ -204,7 +204,7 @@ const AddProduct = () => {
             ))}
           </div>
 
-            <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
+            <div className="flex justify-start gap-3 p-4 bg-slate-50 border-t border-slate-200">
               <button
                 onClick={addProduct}
                 disabled={products.length >= 5}

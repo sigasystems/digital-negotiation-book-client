@@ -23,11 +23,11 @@ export const businessOwnerService = {
       pageIndex,
       pageSize,
       ...filters,
-    }),
+  }),
 
-    getBuyersList: () => {
+  getBuyersList: () => {
       return api.get("/business-owner/get-buyers-list");
-    },
+  },
 
   getBuyerById: (id) => {
     if (!id) throw new Error("Buyer ID is required");

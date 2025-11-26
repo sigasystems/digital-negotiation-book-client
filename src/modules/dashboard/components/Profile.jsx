@@ -227,20 +227,6 @@ const Profile = () => {
 
                   </div>
 
-                  {plan.features?.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">Plan Features</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {plan.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                </div>
-                  )}
-
                   <div>
                         <h3 className="text-lg font-semibold mb-4">Additional Features</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

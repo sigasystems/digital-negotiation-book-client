@@ -32,8 +32,8 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
   const hasActiveFilters = Object.values(filters).some(val => val !== "" && val !== undefined);
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200/60 bg-gradient-to-br from-white to-gray-50/30 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
- 
+   
+    <>
       <div className="px-6 py-5 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -142,7 +142,9 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
           )}
     </div>
   </div>
-    </div>
+
+    </>
+
   );
 };
 

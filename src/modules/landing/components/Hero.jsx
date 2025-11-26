@@ -1,7 +1,4 @@
-import { Button } from "@/components/ui/button";
 import {
-  ArrowRight,
-  Play,
   CheckCircle2,
   Sparkles,
   Star,
