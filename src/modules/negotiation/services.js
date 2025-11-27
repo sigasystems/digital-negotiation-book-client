@@ -20,7 +20,8 @@ const api = {
 };
 
 const negotiationServices = {
-    getNegotiationbyId : (id) => apiClient.get(`/offer/negotiation/${id}`),
+    getNegotiationbyId : (id) => api.get(`/offer/negotiation/${id}`),
+    offerResponse: (id, data) => api.post(`/offer/respond/${id}`, data),
 }
 
 export default negotiationServices

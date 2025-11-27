@@ -33,7 +33,7 @@ import CreateOffer from "@/modules/offers/pages/CreateOffer";
 import Offers from "@/modules/offers/pages/Offers";
 import OfferPage from "@/modules/offers/pages/OfferPage";
 import UpgradePlanPage from "@/modules/dashboard/components/upgradePlanPage";
-import Negotiation from "@/modules/negotiation/pages/Negotiation";
+import Negotiation from "@/modules/auth/pages/Negotiation";
 import ProcessInstructions from "@/modules/landing/components/ProcessInstructions";
 import Contact from "@/modules/landing/components/Contact";
 import AddLocation from "@/modules/location/pages/AddLocation";

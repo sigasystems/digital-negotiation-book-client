@@ -40,7 +40,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
   const toggleCollapse = () => setCollapsed(!collapsed);
 
   const userRole = user?.userRole || "guest";
-  if (userRole === "buyer") return null;
+  if (userRole === "buyer") {return <></>};
   const businessName = user?.businessName || "";
 
   const handleLogout = () => {
