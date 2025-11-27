@@ -83,33 +83,41 @@ const OfferNegotiation = () => {
   );
 
   const normalizeNegotiations = useCallback(
-    (rows) =>
-      rows.map((item) => {
+    (rows, productSection) => {
+      const productMeta = productSection?.[0] || {};
+
+      return rows.map((item) => {
         const inferred = findProductId(item.productName);
+
+        const mergeSizes = Array.isArray(item.sizeBreakups)
+          ? Object.values(
+              item.sizeBreakups.reduce((acc, s) => {
+                const key = `${s.size}-${s.breakup}-${s.price}-${s.condition}`;
+                if (!acc[key]) acc[key] = { ...s };
+                return acc;
+              }, {})
+            )
+          : [];
 
         return {
           ...item,
           products: [
             {
-              productId: item.productId || inferred || "",
-              productName: item.productName || "",
-              species: item.speciesName || "",
-              packing: item.packing || item.brand || "",
-              sizeDetails: item.sizeDetails || "",
-              breakupDetails: item.breakupDetails || "",
-              priceDetails: item.priceDetails || "",
-              sizeBreakups: Array.isArray(item.sizeBreakups)
-                ? item.sizeBreakups.map((s) => ({
-                    size: s.size ?? "",
-                    breakup: s.breakup ?? "",
-                    price: s.price ?? "",
-                    condition: s.condition ?? "",
-                  }))
-                : [{ size: "", breakup: "", price: "", condition: "" }],
+              productId:
+                productMeta.productId || item.productId || inferred || "",
+              productName:
+                productMeta.productName || item.productName || "",
+              species:
+                productMeta.species || item.speciesName || "",
+              packing: productMeta.packing || "",
+              sizeDetails: productMeta.sizeDetails || "",
+              breakupDetails: productMeta.breakupDetails || "",
+              priceDetails: productMeta.priceDetails || "",
+              sizeBreakups: mergeSizes,
             },
           ],
         };
-      }),
+      })},
     [findProductId]
   );
 
@@ -140,7 +148,7 @@ const OfferNegotiation = () => {
             ? [raw.latestVersion]
             : [];
 
-        const normalized = normalizeNegotiations(list);
+        const normalized = normalizeNegotiations(list, raw.products || []);
 
         setNegotiations(normalized);
       } catch (err) {
@@ -248,14 +256,14 @@ const OfferNegotiation = () => {
       }));
 
       const payload = {
-        offerName: rawOffer?.offerName || "",
+        offerName: latest.offerName || rawOffer?.offerName || "",
         origin: latest.origin || rawOffer?.origin || "",
-        destination: rawOffer?.destination || "", 
+        destination: rawOffer?.destination || "",
         fromParty: latest.fromParty || "",
         toParty: latest.toParty || "",
         productName: latest.productName || "",
         speciesName: latest.speciesName || "",
-        buyerId: rawOffer?.buyerId || latest.buyerId || "", 
+        buyerId: rawOffer?.buyerId || latest.buyerId || "",
         brand: latest.brand || "",
         plantApprovalNumber: latest.plantApprovalNumber || "",
         quantity: latest.quantity || "",
@@ -433,7 +441,6 @@ const OfferNegotiation = () => {
         ))}
       </main>
 
-      {/* FOOTER — SAVE & SEND + CANCEL */}
       <footer className="fixed bottom-0 left-0 w-full bg-white shadow-lg p-4 z-30">
         <div className="max-w-6xl mx-auto flex justify-end gap-4">
           <Button
