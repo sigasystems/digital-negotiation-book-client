@@ -277,7 +277,7 @@ const OfferNegotiation = () => {
       const res = await offerService.createOffer(id, payload);
 
       toast.success(res?.data?.message || "Offer created & sent successfully");
-      setTimeout(() => navigate("/offers"), 700);
+      setTimeout(() => navigate(-1), 700);
     } catch (err) {
       console.error("Failed to create offer:", err);
       toast.error(err?.response?.data?.message || "Failed to create offer");
