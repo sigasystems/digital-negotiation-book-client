@@ -4,13 +4,16 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "./Footer";
 import Sidebar from "@/components/layout/Sidebar";
 import { cn } from "@/lib/utils";
+import useAuth from "@/app/hooks/useAuth";
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const { user } = useAuth();
+  const userRole = user?.userRole || "guest";
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Routes where sidebar is hidden
   const noSidebarRoutes = [
     "/",
     "/checkout",
@@ -22,16 +25,19 @@ export default function Layout({ children }) {
     "/forgot-password",
   ];
 
-  const shouldShowSidebar = !noSidebarRoutes.includes(location.pathname);
+  const isBuyer = userRole === "buyer";
+
+  const shouldShowSidebar =
+    !isBuyer && !noSidebarRoutes.includes(location.pathname);
+
   const contentPadding = sidebarCollapsed ? "lg:pl-16" : "lg:pl-64";
 
-  // ✅ Apply padding only for internal pages (not login/landing)
+  
   const shouldHavePadding =
     shouldShowSidebar && !["/", "/login"].includes(location.pathname);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
       {shouldShowSidebar && (
         <div className="hidden lg:block">
           <Sidebar
@@ -41,7 +47,6 @@ export default function Layout({ children }) {
         </div>
       )}
 
-      {/* Mobile Sidebar */}
       {shouldShowSidebar && (
         <div
           className={cn(
