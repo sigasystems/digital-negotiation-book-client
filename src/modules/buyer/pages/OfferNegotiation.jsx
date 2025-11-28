@@ -3,31 +3,46 @@ import { useParams, useNavigate } from "react-router-dom";
 import { buyerService } from "@/modules/buyer/service";
 import { productService } from "@/modules/product/services";
 import { offerService } from "@/modules/offers/services";
-import { Loader2, ArrowLeft, History, Save, Package } from "lucide-react";
+import { ArrowLeft, FileText, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProductSection from "@/modules/offerDraft/components/ProductSection";
+import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+
+// Import reusable components
+import { LoadingState } from "./components/LoadingState";
+import { ErrorState } from "./components/ErrorState";
+import { EmptyState } from "./components/EmptyState";
+import { OfferSummary } from "./components/OfferSummary";
+import { VersionNavigation } from "./components/VersionNavigation";
+import { NegotiationVersion } from "./components/NegotiationVersion";
 
 const OfferNegotiation = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [negotiations, setNegotiations] = useState([]);
-  const [rawOffer, setRawOffer] = useState(null);
-  const [error, setError] = useState("");
+  const [state, setState] = useState({
+    loading: true,
+    negotiations: [],
+    rawOffer: null,
+    error: "",
+    saving: false,
+    activeVersion: 0
+  });
 
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
-
-  const [saving, setSaving] = useState(false);
-
   const mountedRef = useRef(true);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
+  }, []);
+
+  // State updater helper
+  const updateState = useCallback((updates) => {
+    setState(prev => ({ ...prev, ...updates }));
   }, []);
 
   const loadAllProducts = useCallback(async () => {
@@ -42,7 +57,6 @@ const OfferNegotiation = () => {
       list.forEach((p) => {
         map[p.id] = p.species || [];
       });
-
       setSpeciesMap(map);
     } catch (err) {
       console.error("Failed to load products:", err);
@@ -71,19 +85,15 @@ const OfferNegotiation = () => {
     }
   }, []);
 
-  const findProductId = useCallback(
-    (productName) => {
+  const findProductId = useCallback((productName) => {
       if (!productName) return "";
       const match = productsList.find(
         (p) => p.productName?.toLowerCase() === productName?.toLowerCase()
       );
       return match?.id || "";
-    },
-    [productsList]
-  );
+    }, [productsList]);
 
-  const normalizeNegotiations = useCallback(
-    (rows, productSection) => {
+  const normalizeNegotiations = useCallback((rows, productSection) => {
       const productMeta = productSection?.[0] || {};
 
       return rows.map((item) => {
@@ -103,12 +113,9 @@ const OfferNegotiation = () => {
           ...item,
           products: [
             {
-              productId:
-                productMeta.productId || item.productId || inferred || "",
-              productName:
-                productMeta.productName || item.productName || "",
-              species:
-                productMeta.species || item.speciesName || "",
+              productId: productMeta.productId || item.productId || inferred || "",
+              productName: productMeta.productName || item.productName || "",
+              species: productMeta.species || item.speciesName || "",
               packing: productMeta.packing || "",
               sizeDetails: productMeta.sizeDetails || "",
               breakupDetails: productMeta.breakupDetails || "",
@@ -117,16 +124,13 @@ const OfferNegotiation = () => {
             },
           ],
         };
-      })},
-    [findProductId]
-  );
+      });
+  }, [findProductId]);
 
-  const fetchLatestNegotiation = useCallback(
-    async (signal) => {
+  const fetchLatestNegotiation = useCallback(async (signal) => {
       try {
         if (!id) {
-          setError("Invalid Offer ID");
-          setLoading(false);
+        updateState({ error: "Invalid Offer ID", loading: false });
           return;
         }
 
@@ -134,33 +138,26 @@ const OfferNegotiation = () => {
         const raw = res?.data?.data;
 
         if (!raw) {
-          setNegotiations([]);
-          setRawOffer(null);
+        updateState({ negotiations: [], rawOffer: null, loading: false });
           return;
         }
 
-        setRawOffer(raw.offer || null);
+      updateState({ rawOffer: raw.offer || null });
 
-        const list =
-          Array.isArray(raw.history) && raw.history.length > 0
+        const list = Array.isArray(raw.history) && raw.history.length > 0
             ? raw.history
-            : raw.latestVersion
-            ? [raw.latestVersion]
-            : [];
+            : raw.latestVersion ? [raw.latestVersion] : [];
 
         const normalized = normalizeNegotiations(list, raw.products || []);
-
-        setNegotiations(normalized);
+        updateState({ negotiations: normalized, loading: false });
       } catch (err) {
         if (err?.name === "AbortError") return;
 
         toast.error("Failed to load negotiation history");
-        setError("Failed to load negotiation history");
-      } finally {
-        if (mountedRef.current) setLoading(false);
+      updateState({ error: "Failed to load negotiation history", loading: false });
       }
     },
-    [id, normalizeNegotiations]
+    [id, normalizeNegotiations, updateState]
   );
 
   useEffect(() => {
@@ -173,15 +170,17 @@ const OfferNegotiation = () => {
   }, [fetchLatestNegotiation, productsList.length]);
 
   const updateField = useCallback((negIndex, field, value) => {
-    setNegotiations((prev) =>
-      prev.map((n, i) => (i === negIndex ? { ...n, [field]: value } : n))
-    );
+    setState(prev => ({
+      ...prev,
+      negotiations: prev.negotiations.map((n, i) => 
+        i === negIndex ? { ...n, [field]: value } : n
+      )
+    }));
   }, []);
 
-  const makeSetFormDataForNegotiation = useCallback(
-    (negIndex) => (arg) => {
-      setNegotiations((prev) => {
-        const copy = [...prev];
+  const makeSetFormDataForNegotiation = useCallback((negIndex) => (arg) => {
+      setState(prev => {
+        const copy = [...prev.negotiations];
         const current = copy[negIndex] || { products: [] };
 
         if (typeof arg === "function") {
@@ -196,16 +195,13 @@ const OfferNegotiation = () => {
           return prev;
         }
 
-        return copy;
-      });
-    },
-    []
-  );
+        return { ...prev, negotiations: copy };
+    });
+    }, []);
 
-  const handleProductSelectFactory = useCallback(
-    (negIndex) => async (pIndex, productId) => {
-      setNegotiations((prev) => {
-        const copy = [...prev];
+  const handleProductSelectFactory = useCallback((negIndex) => async (pIndex, productId) => {
+      setState(prev => {
+        const copy = [...prev.negotiations];
         const n = copy[negIndex];
         if (!n) return prev;
 
@@ -223,7 +219,8 @@ const OfferNegotiation = () => {
         updated[pIndex] = updatedProduct;
 
         copy[negIndex] = { ...n, products: updated };
-        return copy;
+
+        return { ...prev, negotiations: copy };
       });
 
       if (!speciesMap[productId]) {
@@ -234,15 +231,14 @@ const OfferNegotiation = () => {
   );
 
   const handleSave = useCallback(async () => {
-    if (saving) return;
-    if (!negotiations.length) {
-      toast.error("No negotiation data to send.");
+    if (state.saving || !state.negotiations.length) {
+      if (!state.negotiations.length) toast.error("No negotiation data to send.");
       return;
     }
 
-    const latest = negotiations[negotiations.length - 1];
+    const latest = state.negotiations[state.negotiations.length - 1];
+    updateState({ saving: true });
 
-    setSaving(true);
     try {
       const normalizedProducts = latest.products.map((p) => ({
         productId: p.productId || "",
@@ -256,14 +252,14 @@ const OfferNegotiation = () => {
       }));
 
       const payload = {
-        offerName: latest.offerName || rawOffer?.offerName || "",
-        origin: latest.origin || rawOffer?.origin || "",
-        destination: rawOffer?.destination || "",
+        offerName: latest.offerName || state.rawOffer?.offerName || "",
+        origin: latest.origin || state.rawOffer?.origin || "",
+        destination: state.rawOffer?.destination || "",
         fromParty: latest.fromParty || "",
         toParty: latest.toParty || "",
         productName: latest.productName || "",
         speciesName: latest.speciesName || "",
-        buyerId: rawOffer?.buyerId || latest.buyerId || "",
+        buyerId: state.rawOffer?.buyerId || latest.buyerId || "",
         brand: latest.brand || "",
         plantApprovalNumber: latest.plantApprovalNumber || "",
         quantity: latest.quantity || "",
@@ -282,193 +278,102 @@ const OfferNegotiation = () => {
       console.error("Failed to create offer:", err);
       toast.error(err?.response?.data?.message || "Failed to create offer");
     } finally {
-      if (mountedRef.current) setSaving(false);
+      if (mountedRef.current) updateState({ saving: false });
     }
-  }, [negotiations, id, saving, navigate]);
+  }, [state, id, navigate, updateState]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-      </div>
-    );
-  }
+  const handleVersionChange = useCallback((index) => {
+    updateState({ activeVersion: index });
+  }, [updateState]);
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <p className="text-red-600 font-semibold">{error}</p>
-        <Button onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Button>
-      </div>
-    );
-  }
-
-  if (!negotiations.length) {
-    return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <History className="w-10 h-10 text-gray-500" />
-        <p>No negotiation history found</p>
-        <Button onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Button>
-      </div>
-    );
-  }
+  if (state.loading) return <LoadingState />;
+  if (state.error) return <ErrorState error={state.error} onBack={() => navigate(-1)} />;
+  if (!state.negotiations.length) return <EmptyState onBack={() => navigate(-1)} />;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
-      <header className="sticky top-0 bg-white shadow p-4 flex justify-between items-center z-20">
-        <Button variant="ghost" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5 mr-2" /> Back
-        </Button>
-      </header>
-      {rawOffer && (
-        <section className="max-w-6xl mx-auto bg-white border shadow rounded-xl p-6 mt-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Offer Summary</h2>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { label: "Offer Name", value: rawOffer.offerName },
-              { label: "Business Name", value: rawOffer.businessName },
-              { label: "From Party", value: rawOffer.fromParty },
-              { label: "To Party", value: rawOffer.toParty },
-              { label: "Origin", value: rawOffer.origin },
-              { label: "Destination", value: rawOffer.destination },
-              { label: "Brand", value: rawOffer.brand },
-              { label: "Origin", field: "origin" },
-              { label: "Processor", value: rawOffer.processor },
-              { label: "Plant Approval", value: rawOffer.plantApprovalNumber },
-              {
-                label: "Offer Validity",
-                value: rawOffer.offerValidityDate?.split("T")[0],
-              },
-              {
-                label: "Shipment Date",
-                value: rawOffer.shipmentDate?.split("T")[0],
-              },
-              { label: "Grand Total", value: rawOffer.grandTotal },
-            ].map(({ label, value }, idx) => (
-              <div key={idx}>
-                <label className="text-sm font-semibold text-gray-500">
-                  {label}
-                </label>
-                <div className="border rounded-lg px-3 py-2 bg-gray-100 text-gray-700">
-                  {value || "-"}
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
+      <header className="sticky top-15 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-40 mb-15">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-slate-600 hover:text-slate-800 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back
+              </Button>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <FileText className="w-5 h-5 text-white" />
               </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <main className="max-w-6xl mx-auto p-6 space-y-10">
-        {negotiations.map((item, negIndex) => (
-          <div
-            key={item.id || negIndex}
-            className="bg-white rounded-xl border shadow-lg overflow-hidden"
-          >
-            <div className="bg-blue-600 px-6 py-4 text-white flex justify-between">
-              <h2 className="font-bold flex items-center gap-2">
-                <Package /> Version {item.versionNo}
-              </h2>
-              <span className="text-sm">{new Date(item.createdAt).toLocaleString()}</span>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900">Offer Negotiation</h1>
+                <p className="text-sm text-slate-500">Manage and review negotiation versions</p>
+              </div>
             </div>
+            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+              {state.negotiations.length} Version{state.negotiations.length > 1 ? 's' : ''}
+            </Badge>
+          </div>
+        </div>
+      </header>
 
-            <div className="p-6 space-y-6">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { label: "From Party", field: "fromParty" },
-                  { label: "To Party", field: "toParty" },
-                  { label: "Product Name", field: "productName" },
-                  { label: "Species Name", field: "speciesName" },
-                  { label: "Brand", field: "brand" },
-                  { label: "Plant Approval", field: "plantApprovalNumber" },
-                  { label: "Quantity", field: "quantity" },
-                  { label: "Tolerance", field: "tolerance" },
-                  { label: "Payment Terms", field: "paymentTerms" },
-                ].map(({ label, field }) => (
-                  <div key={field} className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-600">{label}</label>
-                    <input
-                      value={item[field] ?? ""}
-                      onChange={(e) => updateField(negIndex, field, e.target.value)}
-                      className="border rounded-lg px-3 py-2 w-full"
-                    />
-                  </div>
-                ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <OfferSummary offer={state.rawOffer} />
+        
+        <VersionNavigation
+          negotiations={state.negotiations}
+          activeVersion={state.activeVersion}
+          onVersionChange={handleVersionChange}
+        />
 
-                <div>
-                  <label className="text-sm font-semibold text-gray-600">Grand Total</label>
-                  <input
-                    value={item.grandTotal ?? ""}
-                    onChange={(e) => updateField(negIndex, "grandTotal", e.target.value)}
-                    className="border rounded-lg px-3 py-2 w-full bg-green-50 font-bold text-green-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-600">Shipment Date</label>
-                  <input
-                    type="date"
-                    value={(item.shipmentDate && item.shipmentDate.split?.("T")?.[0]) || ""}
-                    onChange={(e) => updateField(negIndex, "shipmentDate", e.target.value)}
-                    className="border rounded-lg px-3 py-2 w-full"
-                  />
-                </div>
-
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <label className="text-sm font-semibold text-gray-600">Remark</label>
-                  <textarea
-                    rows={3}
-                    value={item.remark ?? ""}
-                    onChange={(e) => updateField(negIndex, "remark", e.target.value)}
-                    className="border rounded-lg px-3 py-2 w-full"
-                  />
-                </div>
-              </div>
-
-              <ProductSection
-                productsData={item.products}
+        <div className="space-y-6">
+          {state.negotiations.map((item, negIndex) => (
+            <NegotiationVersion
+              key={item.id || negIndex}
+              item={item}
+              index={negIndex}
+              isActive={state.activeVersion === negIndex}
+              totalVersions={state.negotiations.length}
+              onFieldUpdate={(field, value) => updateField(negIndex, field, value)}
+              onProductSelect={handleProductSelectFactory(negIndex)}
                 setFormData={makeSetFormDataForNegotiation(negIndex)}
                 productsList={productsList}
                 speciesMap={speciesMap}
-                onProductSelect={(pIndex, productId) => handleProductSelectFactory(negIndex)(pIndex, productId)}
               />
-            </div>
+          ))}
           </div>
-        ))}
-      </main>
+        </div>
 
-      <footer className="fixed bottom-0 left-0 w-full bg-white shadow-lg p-4 z-30">
-        <div className="max-w-6xl mx-auto flex justify-end gap-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-2xl z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
           <Button
-            variant="ghost"
-            className="border border-gray-300"
+            variant="outline"
             onClick={() => navigate(-1)}
-            disabled={saving}
+            disabled={state.saving}
+              className="w-full sm:w-auto cursor-pointer border-slate-300 hover:bg-slate-50 transition-colors"
           >
             Cancel
           </Button>
-
           <Button
             onClick={handleSave}
-            className="bg-green-600 text-white shadow"
-            disabled={saving}
+            disabled={state.saving}
+              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer"
           >
-            {saving ? (
+            {state.saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending...
+                Sending Offer...
               </>
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                Save & Send
+                Save & Send Offer
               </>
             )}
           </Button>
+          </div>
         </div>
       </footer>
     </div>
