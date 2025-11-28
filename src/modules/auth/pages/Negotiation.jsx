@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import negotiationServices from "../../negotiation/services";
 import toast from "react-hot-toast";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 const Negotiation = () => {
   const { id } = useParams();
@@ -10,6 +11,8 @@ const Negotiation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   useEffect(() => {
     if (!id) return;
@@ -34,23 +37,61 @@ const Negotiation = () => {
     fetchNegotiations();
   }, [id]);
 
-  const handleRespond = async (action) => {
+  const handleRespond = (action) => {
+    setPendingAction(action);
+    setConfirmOpen(true);
+  };
+
+  const confirmRespond = async () => {
+    if (!pendingAction) return;
+    
+    setConfirmOpen(false);
   try {
     const payload = {
       buyerId: negotiation?.offer?.buyerId,
-      action,
+      action: pendingAction,
     };
 
     const res = await negotiationServices.offerResponse(id, payload);
 
-    toast.success(res?.data?.message || `Offer ${action}ed successfully`);
+    toast.success(res?.data?.message || `Offer ${pendingAction}ed successfully`);
 
     navigate("/offers");
   } catch (err) {
     console.error(err);
     toast.error(err?.response?.data?.message || "Failed to respond to offer.");
-  }
-};
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
+  const getModalContent = () => {
+    switch (pendingAction) {
+      case "accept":
+        return {
+          title: "Accept Offer",
+          description: "Are you sure you want to accept this offer? This action cannot be undone.",
+          confirmText: "Accept Offer",
+          confirmButtonColor: "bg-emerald-600 hover:bg-emerald-700"
+        };
+      case "reject":
+        return {
+          title: "Reject Offer",
+          description: "Are you sure you want to reject this offer? This action cannot be undone.",
+          confirmText: "Reject Offer", 
+          confirmButtonColor: "bg-rose-600 hover:bg-rose-700"
+        };
+      default:
+        return {
+          title: "Confirm Action",
+          description: "Are you sure you want to proceed?",
+          confirmText: "Confirm",
+          confirmButtonColor: "bg-blue-600 hover:bg-blue-700"
+        };
+    }
+  };
+
+  const modalContent = getModalContent();
 
   if (loading)
     return (
@@ -132,7 +173,7 @@ const Negotiation = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8">
 
-        <div className="sticky top-0 z-30 bg-gradient-to-br from-slate-50/95 via-blue-50/95 to-indigo-100/95 backdrop-blur-sm pb-6 mb-6">
+        <div className="sticky top-10 z-30 pb-6">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center mb-4">
             <button
@@ -377,6 +418,20 @@ const Negotiation = () => {
       </div>
 
       </div>
+
+      <ConfirmationModal
+        isOpen={confirmOpen}
+        onClose={() => {
+          setConfirmOpen(false);
+          setPendingAction(null);
+        }}
+        onConfirm={confirmRespond}
+        title={modalContent.title}
+        description={modalContent.description}
+        confirmText={modalContent.confirmText}
+        cancelText="Cancel"
+        confirmButtonColor={modalContent.confirmButtonColor}
+      />
     </div>
   );
 };
