@@ -139,6 +139,11 @@ const Negotiation = () => {
   const productMeta = products?.[0] || {};
   const version = history[currentPage];
 
+  const isOfferEditable = offer?.status?.toLowerCase() === "open" || offer?.status?.toLowerCase() === "close";
+  
+  const lastNegotiation = history[history.length - 1];
+  const isLastVersion = currentPage === history.length - 1;
+
   const formatDate = (date) =>
     date ? new Date(date).toISOString().split("T")[0] : "-";
 
@@ -203,7 +208,12 @@ const Negotiation = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleRespond("accept")}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
+              disabled={!isOfferEditable}
+              className={`px-5 py-2 text-white text-sm font-medium rounded-md shadow-sm transition-colors ${
+                isOfferEditable 
+                  ? "bg-emerald-600 hover:bg-emerald-700 cursor-pointer" 
+                  : "bg-emerald-400 cursor-not-allowed"
+              }`}
             >
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +225,12 @@ const Negotiation = () => {
 
             <button
             onClick={() => handleRespond("reject")}
-                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
+              disabled={!isOfferEditable}
+              className={`px-5 py-2 text-white text-sm font-medium rounded-md shadow-sm transition-colors ${
+                isOfferEditable 
+                  ? "bg-rose-600 hover:bg-rose-700 cursor-pointer" 
+                  : "bg-rose-400 cursor-not-allowed"
+              }`}
             >
                 <span className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +242,12 @@ const Negotiation = () => {
 
             <button
               onClick={handleNegotiate}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
+              disabled={!isOfferEditable}
+              className={`px-5 py-2 text-white text-sm font-medium rounded-md shadow-sm transition-colors ${
+                isOfferEditable 
+                  ? "bg-blue-600 hover:bg-blue-700 cursor-pointer" 
+                  : "bg-blue-400 cursor-not-allowed"
+              }`}
             >
                 <span className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,6 +314,15 @@ const Negotiation = () => {
 
           {history.map((neg, idx) => {
             const selected = idx === currentPage;
+              const isLastColumn = idx === history.length - 1;
+              
+              let columnHeader = neg.fromParty || "Offer";
+              let headerBgColor = selected ? "bg-blue-600" : "bg-gray-700";
+              
+              if (isLastColumn && !isOfferEditable && offer?.status) {
+                columnHeader = offer.status.toUpperCase();
+                headerBgColor = selected ? "bg-amber-600" : "bg-amber-700";
+              }
 
             return (
               <div
@@ -301,16 +330,13 @@ const Negotiation = () => {
                 className={`rounded-lg overflow-hidden transition-all duration-200 flex flex-col shadow-sm ${
                     selected
                         ? "bg-white border-2 border-blue-500 shadow-lg"
-                      : "bg-white border border-gray-200"                }`}              >                <div className={`px-4 py-2.5 text-center text-white font-semibold text-xs shrink-0 ${
-                    selected 
-                        ? "bg-blue-600" 
-                        : "bg-gray-700"
-                    }`}>
-                                            <div className="flex items-center justify-center gap-2">
+                      : "bg-white border border-gray-200"}`}>                
+                      <div className={`px-4 py-2.5 text-center text-white font-semibold text-xs shrink-0 ${headerBgColor}`}>
+                      <div className="flex items-center justify-center gap-2">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span className="truncate">{neg.fromParty || "Offer"}</span>
+                        <span className={`truncate ${isLastColumn && !isOfferEditable && offer?.status ? "font-bold" : ""}`}>{columnHeader}</span>
                       </div>
                       </div>
 
@@ -399,11 +425,10 @@ const Negotiation = () => {
               </div>
             );
           })}
-
+          </div>
         </div>
       </div>
 
-      </div>
 
       <ConfirmationModal
         isOpen={confirmOpen}
