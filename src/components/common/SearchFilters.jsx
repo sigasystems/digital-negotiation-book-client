@@ -117,7 +117,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
         onClick={handleSearch}
         className="group relative flex-1 sm:flex-none bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:via-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer transform hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
       >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <div className="absolute inset-0 bg-white/20 duration-300"></div>
         <Search className="w-5 h-5 relative z-10" />
             <span className="relative z-10">Search Results</span>
       </button>
