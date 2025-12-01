@@ -235,7 +235,6 @@ const filteredData = useMemo(() => {
           })}
         </div>
 
-        {/* Time Range Filter & Search */}
         <div className="bg-white rounded-xl shadow-md p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">
@@ -267,6 +266,54 @@ const filteredData = useMemo(() => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
               />
             </div>
+          </div>
+        </div>
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{userLabel} Management</h3>
+              <p className="text-sm text-gray-500 mt-1">Manage and monitor all your {userLabel.toLowerCase()}</p>
+            </div>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="lg:hidden p-4 space-y-4">
+            {tableData.length > 0 ? (
+              tableData.map((item) => (
+                <MobileCard
+                  key={item.id}
+                  item={item}
+                  isSelected={rowSelection[item.id]}
+                  onSelect={(checked) =>
+                    setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
+                  }
+                />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium">No {userLabel.toLowerCase()} found</p>
+                <p className="text-gray-400 text-xs mt-1">Try adjusting your filters or search query</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden lg:block">
+            <DashboardTable
+              data={tableData}
+              rowSelection={rowSelection}
+              setRowSelection={setRowSelection}
+                  // fetchOwners={fetchData}
+            userActions={userActions}
+            filterKey="email"
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              setPageIndex={setPageIndex}
+              setPageSize={setPageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+            />
           </div>
         </div>
 
@@ -339,55 +386,6 @@ const filteredData = useMemo(() => {
           </div>
         </div>
 
-        {/* Main Data Table */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">{userLabel} Management</h3>
-              <p className="text-sm text-gray-500 mt-1">Manage and monitor all your {userLabel.toLowerCase()}</p>
-            </div>
-          </div>
-
-          {/* Mobile cards */}
-          <div className="lg:hidden p-4 space-y-4">
-            {tableData.length > 0 ? (
-              tableData.map((item) => (
-                <MobileCard
-                  key={item.id}
-                  item={item}
-                  isSelected={rowSelection[item.id]}
-                  onSelect={(checked) =>
-                    setRowSelection((prev) => ({ ...prev, [item.id]: checked }))
-                  }
-                />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 text-sm font-medium">No {userLabel.toLowerCase()} found</p>
-                <p className="text-gray-400 text-xs mt-1">Try adjusting your filters or search query</p>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop table */}
-          <div className="hidden lg:block">
-            <DashboardTable
-              data={tableData}
-              rowSelection={rowSelection}
-              setRowSelection={setRowSelection}
-                  // fetchOwners={fetchData}
-            userActions={userActions}
-            filterKey="email"
-              pageIndex={pageIndex}
-              pageSize={pageSize}
-              setPageIndex={setPageIndex}
-              setPageSize={setPageSize}
-              totalItems={totalItems}
-              totalPages={totalPages}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );
