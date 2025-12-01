@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // Mock service (replace with your actual service)
 
-const MobileCard = ({ item, isSelected, onSelect }) => (
+const MobileCard = ({ item }) => (
   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
     <div className="flex items-start justify-between mb-3">
       <div className="flex-1">
@@ -47,11 +47,9 @@ export default function ResponsiveDashboard() {
   const [revenueGrowth, setRevenueGrowth] = useState(0);
   const [userGrowth, setUserGrowth] = useState(0);
   const [timeRange, setTimeRange] = useState("30d");
-  const [showFilters, setShowFilters] = useState(false);
   
 
   const user = JSON.parse(sessionStorage.getItem("user"));
-  console.log('user....',user)
   const  userRole = user?.userRole || "guest";
   const userActions = [];
 

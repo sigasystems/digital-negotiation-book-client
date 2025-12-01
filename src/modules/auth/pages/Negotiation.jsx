@@ -177,7 +177,7 @@ const Negotiation = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handlePrev}
-              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 rounded-md transition-colors"
+              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 rounded-md transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -192,7 +192,7 @@ const Negotiation = () => {
             
             <button
               onClick={handleNext}
-              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 rounded-md transition-colors"
+              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 rounded-md transition-colors cursor-pointer"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -203,7 +203,7 @@ const Negotiation = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleRespond("accept")}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@ const Negotiation = () => {
 
             <button
             onClick={() => handleRespond("reject")}
-                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
             >
                 <span className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +227,7 @@ const Negotiation = () => {
 
             <button
               onClick={handleNegotiate}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors cursor-pointer"
             >
                 <span className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
