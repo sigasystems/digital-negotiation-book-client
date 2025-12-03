@@ -181,7 +181,7 @@ const ViewOfferDraft = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8 px-[34.5px]">
 
   <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

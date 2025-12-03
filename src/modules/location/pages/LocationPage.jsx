@@ -193,7 +193,7 @@ const LocationPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-50">
+    <div className="relative min-h-screen bg-slate-50 px-[34.5px]">
       {saving && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
           <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
@@ -202,7 +202,7 @@ const LocationPage = () => {
       )}
 
       <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div className="px-6 py-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
@@ -226,7 +226,7 @@ const LocationPage = () => {
           {hasChanges && (
             <Badge
               variant="outline"
-              className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-2"
+              className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-2 cursor-pointer"
             >
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               Unsaved Changes

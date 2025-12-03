@@ -189,7 +189,7 @@ const ProductSection = ({
                     type="text"
                     value={product.breakupDetails || ""}
                     onChange={(e) => updateProductField(pIndex, "breakupDetails", e.target.value)}
-                    placeholder="Breakup details"
+                    placeholder="Breakup Details"
                     className="border rounded px-2 py-1 w-full font-semibold text-sm"
                   />
                 </td>

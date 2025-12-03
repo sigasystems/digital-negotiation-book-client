@@ -153,6 +153,14 @@ export default function DashboardTable({
               const status = row.getValue(key);
 
               const STATUS_COLORS = {
+                "inactive": {
+                  text: "text-red-600",
+                  dot: "fill-red-500"
+                },
+                "active": {
+                  text: "text-green-600",
+                  dot: "fill-green-500"
+                },
                 "open": {
                   text: "text-green-600",
                   dot: "fill-green-500"
@@ -266,7 +274,7 @@ export default function DashboardTable({
   const totalPages = Math.ceil(totalItems / pageSize);
 
   return (
-    <div className="overflow-x-auto bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl">
+    <div className="overflow-x-auto bg-white">
       {searchFields.length > 0 && (
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
