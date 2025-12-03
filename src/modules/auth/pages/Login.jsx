@@ -58,9 +58,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
-      <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-16 py-10 bg-gray-100">
+      <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-80 py-10 bg-gray-100">
         <div className="w-full max-w-md sm:max-w-lg">
-          <h1 className="text-3xl font-bold mb-4 text-gray-800 text-center p-4">
+          <h1 className="tex-2xl font-bold mb-4 text-gray-800 text-center p-4">
             Login to your account!
           </h1>
 

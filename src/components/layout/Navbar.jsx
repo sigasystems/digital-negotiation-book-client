@@ -4,8 +4,9 @@ import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "@/app/hooks/useAuth";
 import BuyerNavbar from "./BuyerNavbar";
+import { cn } from "@/lib/utils";
 
-export default function Navbar({ onMenuClick, showSidebarButton = true }) {
+export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSidebarRoute = false }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -51,8 +52,11 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
     return <BuyerNavbar />;
   }
   return (
-    <header className="w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="w-full h-full mx-auto px-4 sm:px-6 lg:px-13 flex items-center justify-between">
+    <header className={cn(
+      "w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100",
+      isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-13"
+    )}>
+      <div className="w-full h-full mx-auto flex items-center justify-between">
         
         {/* LEFT */}
         <div className="flex items-center">
@@ -67,7 +71,10 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
           <Link
             to="/"
-            className="text-xl font-semibold text-gray-800 whitespace-nowrap"
+            className={cn(
+              "text-xl font-semibold text-gray-800 whitespace-nowrap",
+              isNoSidebarRoute ? "ml-0" : "ml-2 lg:ml-0"
+            )}
           >
             Digital Negotiation Book
           </Link>
@@ -112,7 +119,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
               {/* Dropdown */}
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-40 py-3">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-60 py-3">
                   <div className="flex flex-col items-center px-2">
                     <Link 
                       to="/profile" 

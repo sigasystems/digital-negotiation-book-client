@@ -31,9 +31,11 @@ export default function Layout({ children }) {
 
   const contentPadding = sidebarCollapsed ? "lg:pl-16" : "lg:pl-64";
 
-  
+
   const shouldHavePadding =
     shouldShowSidebar && !["/", "/login"].includes(location.pathname);
+
+  const isNoSidebarRoute = noSidebarRoutes.includes(location.pathname);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -82,6 +84,7 @@ export default function Layout({ children }) {
         <Navbar
           onMenuClick={() => setMobileSidebarOpen(true)}
           showSidebarButton={shouldShowSidebar}
+          isNoSidebarRoute={isNoSidebarRoute}
         />
 
         <main
