@@ -171,7 +171,7 @@ export default function ResponsiveDashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className=" mx-auto px-4 sm:px-4 lg:px-8 py-8 space-y-6">
+      <div className=" mx-auto px-4 sm:px-2 lg:px-8 py-8 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat) => {

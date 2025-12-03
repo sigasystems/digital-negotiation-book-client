@@ -141,9 +141,6 @@ const Negotiation = () => {
 
   const isOfferEditable = offer?.status?.toLowerCase() === "open" || offer?.status?.toLowerCase() === "close";
   
-  const lastNegotiation = history[history.length - 1];
-  const isLastVersion = currentPage === history.length - 1;
-
   const formatDate = (date) =>
     date ? new Date(date).toISOString().split("T")[0] : "-";
 

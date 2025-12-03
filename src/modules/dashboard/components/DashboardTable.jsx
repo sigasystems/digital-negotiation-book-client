@@ -279,7 +279,7 @@ export default function DashboardTable({
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
-          <div className="px-4">
+          <div className="px-6">
       <Table containerClassName="rounded-[5px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
