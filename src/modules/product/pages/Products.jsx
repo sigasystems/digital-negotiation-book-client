@@ -68,7 +68,7 @@ export default function Products() {
 
   return (
     <div className="space-y-6 px-[34.5px]">
-      <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
+      <h1 className="text-2xl font-bold text-gray-800 pl-1">All Products</h1>
 
       <DashboardTable
         data={products}

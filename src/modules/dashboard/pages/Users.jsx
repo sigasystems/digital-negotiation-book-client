@@ -112,14 +112,14 @@ export default function Users({ userRole }) {
   }
 
   return (
-  <div className="w-full px-4">
-    <div className="px-5">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+  <div className="w-full">
+    <div className="px-9 pb-6">
+      <h1 className="text-2xl font-bold text-gray-800">
         {userRole === "super_admin" ? "All Business" : "All Buyers"}
       </h1>
     </div>
 
-    <div className=" rounded-lg overflow-hidden">
+    <div className=" rounded-lg overflow-hidden mx-8">
       {/* Table visible on all screens */}
       <div className="bg-white">
         <DashboardTable
