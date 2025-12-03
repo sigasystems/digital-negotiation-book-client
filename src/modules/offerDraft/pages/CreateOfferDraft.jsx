@@ -240,7 +240,7 @@ const CreateOfferDraft = () => {
 }, []);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-[34.5px]">
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-[24.5px]">
    <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
       <div className=" mx-auto px-6 py-4">
 

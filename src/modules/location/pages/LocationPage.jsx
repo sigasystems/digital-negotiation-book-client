@@ -193,7 +193,7 @@ const LocationPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-50 px-[34.5px]">
+    <div className="relative min-h-screen bg-slate-50 px-[24.5px]">
       {saving && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
           <Spinner className="w-8 h-8 text-indigo-600 mb-3" />

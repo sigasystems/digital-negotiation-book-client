@@ -52,7 +52,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
           isMobileOpen ? "block" : "hidden md:block"
         } transition-all duration-300 ease-in-out`}
       >
-        <div className="p-6 space-y-6">
+        <div className="px-4 pb-4 space-y-6">
           {/* Filter Fields Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {fields.map((field) => {

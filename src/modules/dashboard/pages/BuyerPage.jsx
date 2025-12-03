@@ -66,7 +66,7 @@ const BuyerPage = () => {
   };
 
   return (
-    <div className="min-h-screen px-[34.5px]">
+    <div className="min-h-screen px-[24.5px]">
       {/* Header */}
       <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm rounded-xl">
         <div className="p-4">

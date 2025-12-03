@@ -274,12 +274,12 @@ export default function DashboardTable({
   const totalPages = Math.ceil(totalItems / pageSize);
 
   return (
-    <div className="overflow-x-auto bg-white">
+    <div className="overflow-x-auto">
       {searchFields.length > 0 && (
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
-          <div className="px-6">
+          <div className="px-4">
       <Table containerClassName="rounded-[5px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

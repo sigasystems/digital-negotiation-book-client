@@ -103,7 +103,6 @@ export default function Users({ userRole }) {
         label: "Status",
         type: "select",
         options: [
-          { value: "", label: "All" },
           { value: "active", label: "Active" },
           { value: "inactive", label: "Inactive" },
         ],
@@ -119,9 +118,9 @@ export default function Users({ userRole }) {
       </h1>
     </div>
 
-    <div className=" rounded-lg overflow-hidden mx-8">
+    <div className=" rounded-lg overflow-hidden mx-[20px]">
       {/* Table visible on all screens */}
-      <div className="bg-white">
+      <div>
         <DashboardTable
           data={data}
           rowSelection={rowSelection}

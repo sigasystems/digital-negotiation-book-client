@@ -96,7 +96,7 @@ const ViewProduct = () => {
     );
 
   return (
-    <div className="relative min-h-screen px-[34.5px]">
+    <div className="relative min-h-screen px-[24.5px]">
       {/* Saving Overlay */}
       {saving && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">

@@ -91,7 +91,7 @@ export default function AddBuyerForm() {
   };
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-8 px-[34.5px]">
+    <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px]">
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map((t) => (
           <div

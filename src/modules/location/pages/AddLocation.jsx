@@ -182,7 +182,7 @@ const handleSubmit = async () => {
 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 py-8 px-[34.5px]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 py-8 px-[24.5px]">
 
       {toast && (
         <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top">
