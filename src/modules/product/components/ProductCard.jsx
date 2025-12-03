@@ -6,7 +6,7 @@ import DynamicInputList from "./DynamicInputList";
 const ProductCard = memo(({ index, product, onChange, onRemove, onSpeciesChange, onAddSpecies, onRemoveSpecies, onSizeChange, onAddSize, onRemoveSize }) => {
   return (
     <div className="border-b border-gray-200 last:border-b-0">
-      <div className="flex items-center justify-between px-4 py-4 bg-gray-50">
+      <div className="flex items-center justify-between px-9 py-4">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="p-2 sm:p-3 bg-indigo-50 rounded-lg text-indigo-600">
             <Package size={18} className="sm:w-[22px] sm:h-[22px]" />

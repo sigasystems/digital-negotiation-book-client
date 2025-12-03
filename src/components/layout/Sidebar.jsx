@@ -77,7 +77,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           { name: "Payment List", icon: CreditCard, path: "/payments-list" },
         ]
       : []),
-    { name: "Back to Home", icon: MoveLeft, path: "/" },
+    // { name: "Back to Home", icon: MoveLeft, path: "/" },
   ];
 
   return (
@@ -90,7 +90,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 h-16 border-b select-none">
+          <div className="flex items-center justify-between px-[0.8rem] h-16 border-b select-none">
             {!collapsed && (
               <div className="flex flex-col max-w-[180px] truncate">
                 <h2 className="text-2xl font-extrabold text-indigo-600 truncate">DNB</h2>
@@ -149,7 +149,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                   className={({ isActive }) =>
                     cn(
                       "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none cursor-pointer",
-                      collapsed ? "justify-center p-2" : "gap-3 px-4 py-2",
+                      collapsed ? "justify-center p-2" : "gap-3 px-[11.5px] py-2",
                       isActive
                         ? "bg-indigo-100 text-gray-700 font-semibold"
                         : "text-gray-700 hover:text-indigo-700 hover:bg-indigo-50",
@@ -165,12 +165,12 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               return collapsed ? (
                 <Tooltip key={name} delayDuration={150}>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  <TooltipContent
+                  {/* <TooltipContent
                     side="right"
                     className="bg-indigo-900 text-white text-sm px-3 py-1 rounded-md shadow-lg select-none"
                   >
                     {name}
-                  </TooltipContent>
+                  </TooltipContent> */}
                 </Tooltip>
               ) : (
                 link

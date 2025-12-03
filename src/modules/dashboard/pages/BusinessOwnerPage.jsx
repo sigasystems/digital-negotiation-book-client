@@ -62,7 +62,6 @@ const BusinessOwnerPage = () => {
               onClick={() => navigate(-1)}
               className="hover:bg-slate-100 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Back</span>
             </Button>
             <div className="h-8 w-px bg-slate-300 hidden sm:block" />

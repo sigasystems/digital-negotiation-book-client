@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { format, isBefore, startOfDay, parseISO } from "date-fns";
 import { FileText, Sparkles } from "lucide-react";
@@ -14,6 +15,7 @@ import ProductSection from "../components/ProductSection";
 import Footer from "../components/Footer";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
 import planUsageService from "@/services/planUsageService";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -30,8 +32,8 @@ const CreateOfferDraft = () => {
   const { showToast } = useToast();
 
     const [ remainingOffers, setRemainingOffers] = useState(0);
-  
-      // Fetch plan usage on mount
+      const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+      const navigate = useNavigate();
       useEffect(() => {
         const fetchPlanUsage = async () => {
           try {
@@ -81,7 +83,7 @@ const CreateOfferDraft = () => {
       const product = res.data?.data?.products?.[0];
 
       if (product) {
-        setSpeciesMap(prev => ({
+        setSpeciesMap((prev) => ({
       ...prev,
           [productId]: product.species || [],
         }));
@@ -93,16 +95,16 @@ const CreateOfferDraft = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
-    setFormData(prev => ({ ...prev, [key]: format(date, "yyyy-MM-dd") }));
+    setFormData((prev) => ({ ...prev, [key]: format(date, "yyyy-MM-dd") }));
 
-    setOpenPicker(prev => ({
+    setOpenPicker((prev) => ({
       ...prev,
       [key === "offerValidityDate" ? "validity" : "shipment"]: false,
     }));
@@ -152,8 +154,8 @@ const CreateOfferDraft = () => {
   const formatPayload = () => ({
     ...formData,
     grandTotal: +formData.grandTotal,
-   products: formData.products.map(p => {
-  const productInfo = productsList.find(x => x.id === p.productId);
+   products: formData.products.map((p) => {
+  const productInfo = productsList.find((x) => x.id === p.productId);
 
   return {
     productId: p.productId,
@@ -163,7 +165,7 @@ const CreateOfferDraft = () => {
     breakupDetails: p.breakupDetails || "",
     priceDetails: p.priceDetails || "",
     packing: p.packing || "",
-    sizeBreakups: p.sizeBreakups.map(s => ({
+    sizeBreakups: p.sizeBreakups.map((s) => ({
       size: s.size,
       breakup: +s.breakup,
       condition: s.condition || "",
@@ -174,11 +176,7 @@ const CreateOfferDraft = () => {
 
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const error = validateForm();
-    if (error) return toast.error(error);
+  const submitDraft = async () => {
 
     setLoading(true);
     try {
@@ -188,7 +186,7 @@ const CreateOfferDraft = () => {
       if (res?.status === 201 || res?.data?.success) {
         toast.success("Draft created successfully");
         setFormData(initialForm);
-        window.location.reload()
+        navigate("/offer-draft")
       } else {
         toast.error("Failed to create draft");
       }
@@ -197,6 +195,18 @@ const CreateOfferDraft = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCreateClick = (e) => {
+    e.preventDefault();
+    const error = validateForm();
+    if (error) return toast.error(error);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmCreate = async () => {
+    setIsConfirmOpen(false);
+    await submitDraft();
   };
 
   useEffect(() => {
@@ -216,7 +226,7 @@ const CreateOfferDraft = () => {
     try {
       const res = await offerDraftService.getLatestDraftNo();
       const lastDraftNo = res.data?.lastDraftNo || 0;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         draftName: `Offer Draft ${lastDraftNo + 1}`,
       }));
@@ -230,8 +240,8 @@ const CreateOfferDraft = () => {
 }, []);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-   <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-[34.5px]">
+   <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
       <div className=" mx-auto px-6 py-4">
 
         <div className="flex items-center gap-5">
@@ -260,11 +270,11 @@ const CreateOfferDraft = () => {
 
       <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
 
-<div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 m-3 text-l ">
+<div className="rounded-lg text-l pt-3 px-6 text-red-700 font-bold">
            Remaining Credits : {remainingOffers}
         </div>
-        <form onSubmit={handleSubmit}>
 
+          <form onSubmit={handleCreateClick}>
              <Section title="Draft Details">
             <div className="grid sm:grid-cols-2 gap-6">
               <ReadOnlyField label="Draft Name" value={formData.draftName} />
@@ -273,6 +283,7 @@ const CreateOfferDraft = () => {
                 label="Quantity (MT)" 
                 name="quantity" 
                 value={formData.quantity} 
+                  placeholder="25"
                 onChange={handleChange} 
               />
               <InputField 
@@ -280,6 +291,7 @@ const CreateOfferDraft = () => {
                 label="Tolerance (%)" 
                 name="tolerance" 
                 value={formData.tolerance} 
+                  placeholder="+/- 10"
                 onChange={handleChange} 
               />
               <InputField 
@@ -287,6 +299,7 @@ const CreateOfferDraft = () => {
                 label="Payment Terms" 
                 name="paymentTerms" 
                 value={formData.paymentTerms} 
+                  placeholder="LC at sight, 30% advance"
                 onChange={handleChange} 
               />
               <InputField 
@@ -294,6 +307,7 @@ const CreateOfferDraft = () => {
                 label="Remarks" 
                 name="remark" 
                 value={formData.remark} 
+                  placeholder="Optional notes or conditions"
                 onChange={handleChange} 
               />
               <InputField 
@@ -301,6 +315,7 @@ const CreateOfferDraft = () => {
                 label="Grand Total (USD)" 
                 name="grandTotal" 
                 value={formData.grandTotal} 
+                  placeholder="12500"
                 onChange={handleChange} 
               />
             </div>
@@ -311,21 +326,19 @@ const CreateOfferDraft = () => {
               <DatePicker
                 label="Offer Validity Date"
                 value={formData.offerValidityDate}
+                  placeholder="Select validity date"
                 onSelect={(d) => handleDateSelect("offerValidityDate", d)}
                 open={openPicker.validity}
-                setOpen={(v) =>
-                  setOpenPicker((prev) => ({ ...prev, validity: v }))
-                }
+                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, validity: v }))}
               />
 
               <DatePicker
                 label="Shipment Date"
                 value={formData.shipmentDate}
+                placeholder="Select shipment date"
                 onSelect={(d) => handleDateSelect("shipmentDate", d)}
                 open={openPicker.shipment}
-                setOpen={(v) =>
-                  setOpenPicker((prev) => ({ ...prev, shipment: v }))
-                }
+                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, shipment: v }))}
               />
             </div>
           </Section>
@@ -338,6 +351,7 @@ const CreateOfferDraft = () => {
                 label="Origin" 
                 name="origin" 
                 value={formData.origin} 
+                  placeholder="Brazil"
                 onChange={handleChange}
               />
               <InputField 
@@ -345,6 +359,7 @@ const CreateOfferDraft = () => {
                 label="Processor" 
                 name="processor" 
                 value={formData.processor} 
+                  placeholder="Company or facility name"
                 onChange={handleChange} 
               />
               <InputField 
@@ -352,6 +367,7 @@ const CreateOfferDraft = () => {
                 label="Plant Approval Number" 
                 name="plantApprovalNumber" 
                 value={formData.plantApprovalNumber} 
+                  placeholder="ABC-12345"
                 onChange={handleChange}
               />
               <InputField 
@@ -359,6 +375,7 @@ const CreateOfferDraft = () => {
                 label="Brand" 
                 name="brand" 
                 value={formData.brand} 
+                  placeholder="Product brand name"
                 onChange={handleChange} 
               />
             </div>
@@ -384,6 +401,17 @@ const CreateOfferDraft = () => {
           </p>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmCreate}
+        title="Confirm Offer Draft Creation"
+        description="Are you sure you want to create this offer draft? This will save the draft with the details you’ve entered."
+        confirmText="Create Draft"
+        cancelText="Cancel"
+        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+      />
     </div>
   );
 };

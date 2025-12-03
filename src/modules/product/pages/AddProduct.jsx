@@ -20,6 +20,7 @@ const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [remainingProducts , setRemainingProducts] = useState(0);
+  const MAX_PRODUCTS = 5;
 
   useEffect(() => {
     const fetchPlanUsage = async () => {
@@ -69,10 +70,11 @@ const AddProduct = () => {
     );
   }, []);
 
-  const addProduct = () => {    if (remainingProducts !== null && products.length >= remainingProducts) {
+  const addProduct = () => {
+    if (products.length >= MAX_PRODUCTS) {
       return showToast(
         "error",
-        `You can only add up to ${remainingProducts} products based on your plan.`
+        `You can only add up to ${MAX_PRODUCTS} products at once.`
       );
     }
 
@@ -130,7 +132,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-50">
+    <div className="relative min-h-screen bg-slate-50 px-[34.5px]">
       {loading && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
           <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
@@ -144,7 +146,7 @@ const AddProduct = () => {
         ))}
       </div>
 
-      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
+      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
         <div className="mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -172,11 +174,9 @@ const AddProduct = () => {
       </header>
 
       <main className="mx-auto py-6">
-        
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
-          
-            <div className="divide-y divide-slate-200">
-              <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 m-3 text-l ">
+          <div>
+            <div className="text-l text-red-700 px-9 pt-4 font-bold font-bold ">
            Remaining Credits : {remainingProducts}
         </div>
             {products.map((p, i) => (
@@ -207,15 +207,15 @@ const AddProduct = () => {
             <div className="flex justify-start gap-3 p-4 bg-slate-50 border-t border-slate-200">
               <button
                 onClick={addProduct}
-                disabled={products.length >= 5}
+                disabled={products.length >= MAX_PRODUCTS}
                 className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${
-                  products.length >= 5
+                  products.length >= MAX_PRODUCTS
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-white hover:text-indigo-700"
                 }`}
               >
                 <Plus className="w-4 h-4" />
-                Add Product ({products.length}/5)
+                Add Another Product ({products.length}/{MAX_PRODUCTS})
               </button>
 
               <button

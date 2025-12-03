@@ -238,19 +238,20 @@ export default function DashboardTable({
   const totalPages = Math.ceil(totalItems / pageSize);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 overflow-x-auto">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
       {searchFields.length > 0 && (
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
-      <Table className="min-w-[900px] border-collapse border border-gray-300">
+          <div className="px-6">
+      <Table className="min-w-[900px] border-collapse border border-gray-300 rounded-xl">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
               className="bg-indigo-50"
             >
-              {headerGroup.headers.map((header) => (
+              {headerGroup.headers.slice(1).map((header) => (
                 <TableHead
                   key={header.id}
                   className="border border-gray-300 px-4 py-2 text-left select-none font-semibold text-gray-700"
@@ -269,7 +270,7 @@ export default function DashboardTable({
                 key={row.id}
                 className="even:bg-gray-50 hover:bg-indigo-50 transition-colors cursor-default"
               >
-                {row.getAllCells().map((cell) => (
+                {row.getAllCells().slice(1).map((cell) => (
                   <TableCell
                     key={cell.id}
                     className="border border-gray-300 px-4 py-2 select-text"
@@ -282,13 +283,14 @@ export default function DashboardTable({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={columns.length - 1} className="text-center py-6 text-gray-500">
                 No results found
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+          </div>
 
       <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <Pagination

@@ -112,8 +112,8 @@ export default function Users({ userRole }) {
   }
 
   return (
-  <div className="w-full space-y-8">
-    <div>
+  <div className="w-full px-4">
+    <div className="px-5">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
         {userRole === "super_admin" ? "All Business Owners" : "All Buyers"}
       </h1>

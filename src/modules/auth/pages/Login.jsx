@@ -60,12 +60,9 @@ export default function Login() {
     <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
       <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-16 py-10 bg-gray-100">
         <div className="w-full max-w-md sm:max-w-lg">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-800 text-center">
-            Welcome 👋
+          <h1 className="text-3xl font-bold mb-4 text-gray-800 text-center p-4">
+            Login to your account!
           </h1>
-          <p className="text-gray-700 mb-8 text-center text-base sm:text-lg">
-            Please login to your account
-          </p>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -126,21 +123,21 @@ export default function Login() {
             </form>
           </Form>
 
-          <div className="flex justify-center mt-6 text-sm text-gray-700 font-medium">
+          <div className="flex justify-center items-center gap-4 mt-6 text-sm font-medium">
             <Link
               to="/forgot-password"
-              className="hover:text-blue-600"
+              className="text-blue-600 underline hover:text-blue-800 transition"
             >
               Forgot password?
             </Link>
-          </div>
 
           <Link
             to="/"
-            className="mt-8 block w-full text-center bg-blue-100 hover:bg-blue-300 text-blue-800 font-medium py-2 rounded-lg transition"
+            className="text-blue-600 underline hover:text-blue-800 transition"
           >
             Back to Home
           </Link>
+          </div>
         </div>
       </div>
 

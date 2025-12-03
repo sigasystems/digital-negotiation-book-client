@@ -73,7 +73,7 @@ export default function OfferDrafts() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-[34.5px]">
       <h1 className="text-2xl font-bold text-gray-800">Offer Drafts</h1>
 
       <DashboardTable

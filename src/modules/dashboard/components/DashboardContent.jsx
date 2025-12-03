@@ -46,7 +46,6 @@ export default function ResponsiveDashboard() {
   const [pendingUsers, setPendingUsers] = useState(0);
   const [revenueGrowth, setRevenueGrowth] = useState(0);
   const [userGrowth, setUserGrowth] = useState(0);
-  const [timeRange, setTimeRange] = useState("30d");
   
 
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -131,7 +130,7 @@ const filteredData = useMemo(() => {
       changeType: "positive"
     },
     { 
-      label: `Pending ${userLabel}`, 
+      label: `Pending Approvals`, 
       value: pendingUsers, 
       color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
       icon: TrendingUp,
@@ -166,12 +165,10 @@ const filteredData = useMemo(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-     
-
-      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="min-h-screen">
+      <div className=" mx-auto px-4 sm:px-4 lg:px-8 py-8 space-y-6">
         {/* Welcome Section with Quick Actions */}
-        <div className="bg-gradient-to-r from-indigo-400 to-indigo-400 rounded-2xl shadow-xl p-6 sm:p-8 text-white">
+        {/* <div className="bg-gradient-to-r from-indigo-400 to-indigo-400 rounded-2xl shadow-xl p-6 sm:p-8 text-white">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">Welcome back, {user.businessName}! 👋</h2>
@@ -196,7 +193,7 @@ const filteredData = useMemo(() => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -223,11 +220,6 @@ const filteredData = useMemo(() => {
                   </h3>
                   <p className="text-white/90 text-sm font-medium">{stat.label}</p>
                 </div>
-                <div className="px-4 py-3 bg-gray-50">
-                  <p className="text-xs text-gray-600">
-                    {stat.changeType === 'positive' ? '↑' : '↓'} vs last period
-                  </p>
-                </div>
               </div>
             );
           })}
@@ -235,25 +227,6 @@ const filteredData = useMemo(() => {
 
         <div className="bg-white rounded-xl shadow-md p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex items-center gap-2 flex-wrap">
-              <button className="flex items-center gap-2 text-sm text-gray-700 hover:text-indigo-600 transition-colors">
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
-              {['7d', '30d', '90d', '1y'].map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setTimeRange(range)}
-                  className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                    timeRange === range
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {range === '7d' ? 'Last 7 days' : range === '30d' ? 'Last 30 days' : range === '90d' ? 'Last 90 days' : 'Last year'}
-                </button>
-              ))}
-            </div>
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -269,8 +242,7 @@ const filteredData = useMemo(() => {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{userLabel} Management</h3>
-              <p className="text-sm text-gray-500 mt-1">Manage and monitor all your {userLabel.toLowerCase()}</p>
+              <h3 className="text-lg font-semibold text-gray-900">{userLabel}</h3>
             </div>
           </div>
 

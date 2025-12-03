@@ -91,7 +91,7 @@ export default function AddBuyerForm() {
   };
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-8">
+    <div className="min-h-screen pb-24 lg:pb-8 px-[34.5px]">
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map((t) => (
           <div
@@ -115,7 +115,7 @@ export default function AddBuyerForm() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
+      <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-xl">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -149,8 +149,8 @@ export default function AddBuyerForm() {
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           
           {/* Company Information */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
-            <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 rounded-lg p-3 text-l ">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-6">
+            <div className="max-w-sm rounded-lg text-l mb-3 text-red-700 font-bold">
                     Remaining Credits : {remainingBuyers}
             </div>
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
@@ -180,7 +180,7 @@ export default function AddBuyerForm() {
           </div>
 
           {/* Contact Information */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-6">
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <UserCircle2 className="w-5 h-5 text-blue-600" />
@@ -206,7 +206,7 @@ export default function AddBuyerForm() {
           </div>
 
           {/* Address Information */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-6">
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
               <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-5 h-5 text-green-600" />
@@ -241,7 +241,7 @@ export default function AddBuyerForm() {
                 onChange={updateField}
                 rows="4"
                   placeholder="Enter complete street address..."
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer text-sm sm:text-base resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer text-sm sm:text-base resize-none"
                 />
               </div>
             </div>
@@ -260,7 +260,6 @@ export default function AddBuyerForm() {
               disabled={loading}
               className="w-full sm:w-auto cursor-pointer hover:bg-slate-100 border-slate-300 transition-colors h-11 sm:h-12 text-sm sm:text-base font-medium"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
               Cancel
             </Button>
 
