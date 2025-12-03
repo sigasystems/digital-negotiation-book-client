@@ -151,20 +151,48 @@ export default function DashboardTable({
             header: "Status",
             cell: ({ row }) => {
               const status = row.getValue(key);
-              const isOpen = status === "active" || status === "open";
+
+              const STATUS_COLORS = {
+                "open": {
+                  text: "text-green-600",
+                  dot: "fill-green-500"
+                },
+                "close": {
+                  text: "text-gray-600",
+                  dot: "fill-gray-500"
+                },
+                "Business Owner Accepted": {
+                  text: "text-blue-600",
+                  dot: "fill-blue-500"
+                },
+                "Business Owner Rejected": {
+                  text: "text-red-600",
+                  dot: "fill-red-500"
+                },
+                "Buyer Accepted": {
+                  text: "text-emerald-600",
+                  dot: "fill-emerald-500"
+                },
+                "Buyer Rejected": {
+                  text: "text-orange-600",
+                  dot: "fill-orange-500"
+                }
+              };
+
+              const color = STATUS_COLORS[status] || {
+                text: "text-gray-600",
+                dot: "fill-gray-500"
+              };
+
               return (
                 <span
-                  className={`flex items-center gap-2 font-semibold select-none ${
-                    isOpen ? "text-green-600" : "text-red-600"
-                  }`}
+                  className={`flex items-center gap-2 font-semibold select-none ${color.text}`}
                 >
                   <Circle
-                    className={`w-3 h-3 ${
-                      isOpen ? "fill-green-500" : "fill-red-500"
-                    }`}
+                    className={`w-3 h-3 ${color.dot}`}
                     aria-hidden="true"
                   />
-                  {String(status)}
+                  {String(status).charAt(0).toUpperCase() + String(status).slice(1)}
                 </span>
               );
             },
@@ -238,13 +266,13 @@ export default function DashboardTable({
   const totalPages = Math.ceil(totalItems / pageSize);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+    <div className="overflow-x-auto bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl">
       {searchFields.length > 0 && (
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
           <div className="px-6">
-      <Table className="min-w-[900px] border-collapse border border-gray-300 rounded-xl">
+      <Table containerClassName="rounded-[5px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow

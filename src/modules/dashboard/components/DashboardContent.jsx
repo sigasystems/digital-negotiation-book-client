@@ -225,7 +225,14 @@ const filteredData = useMemo(() => {
           })}
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-4">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            
+          <div className="px-6 py-2 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{userLabel}</h3>
+            </div>
+          </div>
+           <div className="px-6 pb-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -234,18 +241,13 @@ const filteredData = useMemo(() => {
                 placeholder="Search by email..."
                 value={emailFilter}
                 onChange={(e) => setEmailFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
               />
             </div>
-          </div>
-        </div>
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">{userLabel}</h3>
             </div>
           </div>
 
+          <div className="bg-white rounded-xl shadow-md overflow-hidden"></div>
           {/* Mobile cards */}
           <div className="lg:hidden p-4 space-y-4">
             {tableData.length > 0 ? (

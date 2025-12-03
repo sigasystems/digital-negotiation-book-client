@@ -81,11 +81,13 @@ export default function Layout({ children }) {
           shouldShowSidebar && contentPadding
         )}
       >
+        {location.pathname !== "/" && (
         <Navbar
           onMenuClick={() => setMobileSidebarOpen(true)}
           showSidebarButton={shouldShowSidebar}
           isNoSidebarRoute={isNoSidebarRoute}
         />
+      )}
 
         <main
           className={cn(

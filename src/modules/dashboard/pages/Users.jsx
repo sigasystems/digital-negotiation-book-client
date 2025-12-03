@@ -115,13 +115,13 @@ export default function Users({ userRole }) {
   <div className="w-full px-4">
     <div className="px-5">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-        {userRole === "super_admin" ? "All Business Owners" : "All Buyers"}
+        {userRole === "super_admin" ? "All Business" : "All Buyers"}
       </h1>
     </div>
 
     <div className=" rounded-lg overflow-hidden">
       {/* Table visible on all screens */}
-      <div className="p-4">
+      <div className="bg-white">
         <DashboardTable
           data={data}
           rowSelection={rowSelection}

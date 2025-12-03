@@ -34,18 +34,8 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
   return (
    
     <>
-      <div className="px-6 py-5 border-b border-gray-100">
+      <div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <Search className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 tracking-tight">Search Filters</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Refine your search results</p>
-            </div>
-          </div>
-          
 
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -69,7 +59,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
         if (field.type === "select") {
           return (
               <div key={field.name} className="group">
-                <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2.5 transition-colors duration-200 group-hover:text-blue-600">
+                <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-1 transition-colors duration-200 group-hover:text-blue-600">
                   {field.label}
                 </label>
                   <div className="relative">
@@ -96,7 +86,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
 
         return (
             <div key={field.name} className="group">
-              <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2.5 transition-colors duration-200 group-hover:text-blue-600">
+              <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-1 transition-colors duration-200 group-hover:text-blue-600">
                 {field.label}
               </label>
           <Input
@@ -112,7 +102,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
         </div>
 
         {/* Action Buttons */}
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4 border-t border-gray-100">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
       <button
         onClick={handleSearch}
         className="group relative flex-1 sm:flex-none bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:via-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer transform hover:scale-[1.02] active:scale-[0.98] overflow-hidden"

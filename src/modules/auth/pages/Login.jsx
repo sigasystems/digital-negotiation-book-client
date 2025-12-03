@@ -135,7 +135,7 @@ export default function Login() {
             to="/"
             className="text-blue-600 underline hover:text-blue-800 transition"
           >
-            Back to Home
+            Back to home
           </Link>
           </div>
         </div>

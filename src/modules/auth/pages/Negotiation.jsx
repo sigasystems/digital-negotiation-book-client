@@ -175,9 +175,9 @@ const Negotiation = () => {
   ];
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
+    <div>
 
-      <div className="px-6 py-3 bg-white border-b border-gray-200 shrink-0 shadow-sm">
+      <div className="px-8 py-3">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -261,7 +261,7 @@ const Negotiation = () => {
           </div>
 
         <div className="flex-1 overflow-x-auto overflow-y-hidden bg-gray-50">
-        <div className="h-full px-6 py-4">
+        <div className="h-full px-8 py-4">
           <div
             className="grid gap-3 h-full"
             style={{

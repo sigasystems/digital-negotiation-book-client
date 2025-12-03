@@ -86,7 +86,7 @@ export default function Products() {
         searchFields={[
           { name: "productName", label: "Product Name", type: "text" },
           { name: "species", label: "Species", type: "text" },
-          { name: "size", label: "Size", type: "text", placeholder: "Comma-separated sizes" },
+          { name: "size", label: "Size", type: "text", placeholder: "50kg" },
         ]}
       />
     </div>
