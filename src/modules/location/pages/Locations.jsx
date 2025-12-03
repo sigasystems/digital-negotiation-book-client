@@ -61,7 +61,7 @@ const Locations = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-[34.5px]">
       <h1 className="text-2xl font-bold text-gray-800">Locations</h1>
 
       <DashboardTable

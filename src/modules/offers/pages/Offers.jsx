@@ -68,7 +68,7 @@ export default function Offers() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-[34.5px]">
       <h1 className="text-2xl font-bold text-gray-800">All Offers</h1>
 
       <DashboardTable

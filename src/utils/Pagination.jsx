@@ -32,7 +32,7 @@ export const Pagination = ({
   const pages = getPageNumbers(pageIndex, totalPages || 1);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4 px-6">
       <div className="flex items-center gap-2">
         <span className="text-xs sm:text-sm text-gray-700 font-medium">
           Rows per page:

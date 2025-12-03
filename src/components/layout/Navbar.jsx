@@ -16,35 +16,16 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
   const userRole = user?.userRole || "guest";
   const isBuyer = userRole === "buyer";
 
-  // Always call hooks
   const navLinks = useMemo(() => {
     if (!isAuthenticated) {
       return [
-        { label: "Onboard-process", path: "/onboard-process" },
+        { label: "Onboard Process", path: "/onboard-process" },
         { label: "Contact", path: "/contact" },
       ];
     }
 
-    switch (userRole) {
-      case "super_admin":
-        return [
-          { label: "Dashboard", path: "/dashboard" },
-          { label: "Business Owners", path: "/users" },
-          { label: "Payment List", path: "/payments-list" },
-        ];
-
-      case "business_owner":
-        return [
-          { label: "Dashboard", path: "/dashboard" },
-          { label: "Buyers", path: "/users" },
-          { label: "Products", path: "/products" },
-          { label: "Profile", path: "/profile" },
-        ];
-
-      default:
         return [];
-    }
-  }, [isAuthenticated, userRole]);
+    }, [isAuthenticated]);
 
   const handleLogout = () => {
     logout();
@@ -64,18 +45,17 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
       ? `${user.first_name} ${user.last_name || ""}`.trim()
       : user?.name || "";
 
-  const businessName = user?.businessName || "";
 
   // ---- Render phase ----
   if (isBuyer) {
     return <BuyerNavbar />;
   }
   return (
-    <header className="fixed top-0 left-0 w-full z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="w-full h-full mx-auto px-4 sm:px-6 lg:px-13 flex items-center justify-between">
         
         {/* LEFT */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
           {showSidebarButton && (
             <button
               className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
@@ -107,7 +87,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
         </nav>
 
         {/* RIGHT – User Section */}
-        <div className="">
+        <div className="flex items-center gap-4">
           {!isAuthenticated ? (
             <button
               onClick={handleDashboardCTA}
@@ -132,20 +112,26 @@ export default function Navbar({ onMenuClick, showSidebarButton = true }) {
 
               {/* Dropdown */}
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-40">
-                  {businessName && (
-                    <div className="px-4 py-2 text-xs text-gray-500 border-b">
-                      {businessName}
-                    </div>
-                  )}
-
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-40 py-3">
+                  <div className="flex flex-col items-center px-2">
+                    <Link 
+                      to="/profile" 
+                      className="w-full flex justify-center items-center gap-3 px-4 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150 cursor-pointer rounded-lg"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="text-sm font-medium">Profile</span>
+                    </Link>
+                    
+                    <div className="w-11/12 border-t border-gray-100 my-1"></div>
+                    
                   <button
                     onClick={() => setLogoutOpen(true)}
-                    className="w-full text-left px-4 py-2 flex items-center gap-2 text-red-600 hover:bg-red-50 cursor-pointer"
+                    className="w-full flex justify-center items-center gap-3 px-4 text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer rounded-lg"
                   >
                     <LogOut className="w-4 h-4" />
-                    Logout
+                      <span className="text-sm font-medium">Logout</span>
                   </button>
+                  </div>
                 </div>
               )}
             </div>

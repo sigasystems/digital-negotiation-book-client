@@ -182,7 +182,7 @@ const handleSubmit = async () => {
 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 py-8 px-[34.5px]">
 
       {toast && (
         <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top">
@@ -229,7 +229,7 @@ const handleSubmit = async () => {
             key={i}
             className="bg-white rounded-2xl p-4 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300"
           >
-            <div className="bg-amber-100 max-w-sm border border-r-4 border-l-4 m-3 rounded-lg p-3 text-l ">
+            <div className="max-w-sm rounded-lg text-l mb-3 text-red-700 font-bold">
            Remaining Credits : {remainingLocations}
         </div>
             <div className="flex items-center justify-between mb-6">

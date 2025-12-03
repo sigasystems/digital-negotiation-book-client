@@ -247,7 +247,7 @@ export default function Plans() {
                             : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                         }`}
                       >
-                        {isActive ? "Current Plan" : `Choose ${plan.name}`}
+                        {isActive ? "Current Plan" : `Choose ${plan.name} Plan`}
                       </Button>
                     </CardFooter>
                   </Card>

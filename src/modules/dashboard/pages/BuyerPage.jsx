@@ -66,10 +66,10 @@ const BuyerPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen px-[34.5px]">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm rounded-xl">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
