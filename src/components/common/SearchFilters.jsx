@@ -143,13 +143,6 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
               <span className="font-semibold">
                 {Object.values(filters).filter(v => v !== "" && v !== undefined).length} filter(s) active
               </span>
-              <button
-                type="button"
-                onClick={handleReset}
-                className="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Clear all
-              </button>
             </div>
           )}
     </div>
