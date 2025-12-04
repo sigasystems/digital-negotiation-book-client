@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 import { productService } from "../services";
@@ -12,9 +12,10 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       let response;
@@ -25,22 +26,45 @@ export default function Products() {
         response = await productService.getAllProducts({ pageIndex, pageSize });
       }
 
-      const { products, totalItems } = response?.data?.data || {};
-      setProducts(products || []);
-      setTotalItems(totalItems || 0);
+      let productsData = [];
+      let items = 0;
+      
+      if (response && response.data) {
+        if (response.data.data && response.data.data.products) {
+          productsData = response.data.data.products || [];
+          items = response.data.data.totalItems || 0;
+        } 
+        else if (response.data.products) {
+          productsData = response.data.products || [];
+          items = response.data.totalItems || 0;
+        }
+        else if (Array.isArray(response.data)) {
+          productsData = response.data || [];
+          items = response.totalItems || response.data.length || 0;
+        }
+        else {
+          productsData = response.data.rows || response.data.data || [];
+          items = response.data.totalItems || response.data.total || productsData.length || 0;
+        }
+      }
+
+      setProducts(productsData);
+      setTotalItems(items);
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setProducts([]);
       setTotalItems(0);
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, [filters, pageIndex, pageSize]);
 
-  const handleSearch = (queryFilters) => {
+  const handleSearch = useCallback((queryFilters) => {
+    setIsSearching(true);
     setFilters(queryFilters);
     setPageIndex(0);
-  };
+  }, []);
 
   const handleView = async (productId) => {
     try {
@@ -56,12 +80,17 @@ export default function Products() {
 
   useEffect(() => {
     fetchProducts();
-  }, [pageIndex, pageSize, filters]);
+  }, [fetchProducts]);
 
-  if (loading) {
+  const showFullPageLoading = loading && !isSearching;
+
+  if (showFullPageLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <p>Loading products...</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700">Loading products...</p>
+        </div>
       </div>
     );
   }
@@ -69,7 +98,7 @@ export default function Products() {
   return (
     <div className="px-[25.6px]">
       {/* Header + Add Product */}
-      <div className="pb-4 flex items-center justify-between flex-wrap gap-3">
+      <div className=" flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
 
         <div className="mt-[24PX]">
@@ -89,17 +118,19 @@ export default function Products() {
         fetchOwners={fetchProducts}
         userActions={["view", "edit", "delete"]}
         onView={(row) => handleView(row.id)}
-        onSearch={handleSearch}
         pageIndex={pageIndex}
         pageSize={pageSize}
         setPageIndex={setPageIndex}
         setPageSize={setPageSize}
         totalItems={totalItems}
+        onSearch={handleSearch}
         searchFields={[
           { name: "productName", label: "Product Name", type: "text" },
           { name: "species", label: "Species", type: "text" },
           { name: "size", label: "Size", type: "text", placeholder: "50kg" },
         ]}
+        isLoading={loading}
+        isSearching={isSearching}
       />
     </div>
   );

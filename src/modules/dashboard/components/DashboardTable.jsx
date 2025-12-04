@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback  } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -20,6 +20,19 @@ import { Circle } from "lucide-react";
 import { Pagination } from "@/utils/Pagination";
 import { SearchFilters } from "@/components/common/SearchFilters";
 import { formatHeader } from "@/utils/formateDate";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const TableRowSkeleton = ({ columnsCount }) => {
+  return (
+    <TableRow>
+      {Array.from({ length: columnsCount }).map((_, index) => (
+        <TableCell key={index} className="border border-gray-300 px-4 py-3">
+          <Skeleton className="h-4 w-full rounded" />
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+};
 
 export default function DashboardTable({
   data = [],
@@ -35,6 +48,8 @@ export default function DashboardTable({
   onSearch,
   searchFields = [],
   columnsOverride = null,
+  isLoading = false,
+  isSearching = false
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -81,6 +96,10 @@ export default function DashboardTable({
     "offerDraftId",
     "buyerId",
   ];
+
+  const handleSearch = useCallback((searchFilters) => {
+    onSearch?.(searchFilters);
+  }, [onSearch]);
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -272,11 +291,12 @@ export default function DashboardTable({
   });
 
   const totalPages = Math.ceil(totalItems / pageSize);
+  const columnCount = columns.length > 0 ? columns.length - 1 : 6;
 
   return (
     <div className="overflow-x-auto">
       {searchFields.length > 0 && (
-        <SearchFilters fields={searchFields} onSearch={onSearch} />
+        <SearchFilters fields={searchFields} onSearch={handleSearch} />
       )}
 
           <div>
@@ -300,7 +320,11 @@ export default function DashboardTable({
         </TableHeader>
 
         <TableBody>
-          {table.getRowModel().rows.length > 0 ? (
+            {isLoading || isSearching ? (
+              Array.from({ length: pageSize }).map((_, index) => (
+                <TableRowSkeleton key={index} columnsCount={columnCount} />
+              ))
+            ) : table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
@@ -319,7 +343,7 @@ export default function DashboardTable({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length - 1} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={columnCount} className="text-center py-6 text-gray-500">
                 No results found
               </TableCell>
             </TableRow>
@@ -336,6 +360,7 @@ export default function DashboardTable({
           onPageChange={setPageIndex}
           onPageSizeChange={setPageSize}
           className="cursor-pointer"
+          isLoading={isLoading || isSearching}
         />
       </div>
     </div>

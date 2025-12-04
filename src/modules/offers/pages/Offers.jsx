@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 import { offerService } from "../services";
@@ -12,9 +12,10 @@ export default function Offers() {
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const fetchOffers = async () => {
+  const fetchOffers = useCallback(async () => {
     setLoading(true);
     try {
       let response;
@@ -25,22 +26,51 @@ export default function Offers() {
         response = await offerService.getAllOffers({ pageIndex, pageSize });
       }
 
-      const { data, totalItems, offers, total } = response?.data?.data || {};
-      setOffers(data || offers || []);
-      setTotalItems(totalItems || total || 0);
+      let offersData = [];
+      let items = 0;
+      
+      if (response && response.data) {
+        if (response.data.data) {
+          if (response.data.data.offers) {
+            offersData = response.data.data.offers || [];
+            items = response.data.data.totalItems || response.data.data.total || 0;
+          } 
+          else if (Array.isArray(response.data.data)) {
+            offersData = response.data.data || [];
+            items = response.data.totalItems || response.data.total || offersData.length || 0;
+          }
+          else {
+            offersData = response.data.data.data || response.data.data.rows || [];
+            items = response.data.data.totalItems || response.data.data.total || offersData.length || 0;
+          }
+        }
+        else if (Array.isArray(response.data)) {
+          offersData = response.data || [];
+          items = response.totalItems || response.total || offersData.length || 0;
+        }
+        else {
+          offersData = response.data?.offers || [];
+          items = response.data?.totalItems || response.data?.total || 0;
+        }
+      }
+
+      setOffers(offersData);
+      setTotalItems(items);
     } catch (err) {
       console.error("Failed to fetch offers:", err);
       setOffers([]);
       setTotalItems(0);
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, [filters, pageIndex, pageSize]);
 
-  const handleSearch = (queryFilters) => {
+  const handleSearch = useCallback((queryFilters) => {
+    setIsSearching(true);
     setFilters(queryFilters);
     setPageIndex(0);
-  };
+  }, []);
 
   const handleView = async (offerId) => {
     try {
@@ -57,12 +87,17 @@ export default function Offers() {
 
   useEffect(() => {
     fetchOffers();
-  }, [pageIndex, pageSize, filters]);
+    }, [fetchOffers]);
 
-  if (loading) {
+    const showFullPageLoading = loading && !isSearching;
+
+  if (showFullPageLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <p>Loading offers...</p>
+      <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-700">Loading offers...</p>
+          </div>
       </div>
     );
   }
@@ -89,8 +124,8 @@ export default function Offers() {
         totalItems={totalItems}
         searchFields={[
           { name: "offerName", label: "Offer Name", type: "text", placeholder: "Enter offer name" },
-          { name: "businessName", label: "Business Name", type: "text" },
-          { name: "productName", label: "Product Name", type: "text" },
+          { name: "businessName", label: "Business Name", type: "text", placeholder: "Enter business name" },
+          { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product name" },
           {
             name: "status",
             label: "Status",
@@ -98,9 +133,14 @@ export default function Offers() {
             options: [
               { label: "Open", value: "open" },
               { label: "Close", value: "close" },
+              { label: "Pending", value: "pending" },
+              { label: "Accepted", value: "accepted" },
+              { label: "Rejected", value: "rejected" },
             ],
           },
         ]}
+        isLoading={loading}
+        isSearching={isSearching}
       />
     </div>
   );

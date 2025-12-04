@@ -1,5 +1,4 @@
-// Users.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import DashboardTable from "../components/DashboardTable";
 import { useNavigate } from "react-router-dom";
@@ -15,10 +14,11 @@ export default function Users({ userRole }) {
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState({});
   const [totalPages , setTotalPages] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const role =
@@ -40,11 +40,36 @@ export default function Users({ userRole }) {
       });
       }
 
-    const { data: rows, totalItems, totalPages } = response || {};
+      let rows = [];
+      let items = 0;
+      let pages = 1;
+      
+      if (response && response.data) {
+        if (response.data.data && response.data.data.buyers) {
+          rows = response.data.data.buyers || [];
+          items = response.data.data.totalItems || 0;
+          pages = response.data.data.totalPages || 1;
+        }
+        else if (response.data.buyers) {
+          rows = response.data.buyers || [];
+          items = response.data.totalItems || 0;
+          pages = response.data.totalPages || 1;
+        }
+        else if (Array.isArray(response.data)) {
+          rows = response.data || [];
+          items = response.totalItems || response.data.length || 0;
+          pages = response.totalPages || 1;
+        }
+        else {
+          rows = response.data.rows || response.data.users || response.data.data || [];
+          items = response.data.totalItems || response.data.total || rows.length || 0;
+          pages = response.data.totalPages || Math.ceil(items / pageSize) || 1;
+        }
+      }
 
-    setData(rows || []);
-      setTotalItems(totalItems || 0);
-      setTotalPages(totalPages || 1);
+      setData(rows);
+      setTotalItems(items);
+      setTotalPages(pages);
     } catch (err) {
       console.error("Failed to fetch users:", err);
       setData([]);
@@ -52,19 +77,23 @@ export default function Users({ userRole }) {
       setTotalPages(1);
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, [userRole, filters, pageIndex, pageSize]);
 
-  const handleSearch = (searchFilters) => {
+  const handleSearch = useCallback((searchFilters) => {
+    setIsSearching(true);
     setFilters(searchFilters);
     setPageIndex(0);
-  };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
-  }, [pageIndex, pageSize, filters]);
+  }, [fetchUsers]);
 
-  if (loading) {
+  const showFullPageLoading = loading && !isSearching;
+
+  if (showFullPageLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
@@ -117,7 +146,7 @@ export default function Users({ userRole }) {
 
   return (
   <div className="w-full">
-    <div className="px-4 sm:px-6 pb-3 flex items-center justify-between flex-wrap gap-3">
+    <div className="px-4 sm:px-6 flex items-center justify-between flex-wrap gap-3">
       <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
 
         <div className="mt-[24PX]">
@@ -155,6 +184,8 @@ export default function Users({ userRole }) {
           totalItems={totalItems}
           onSearch={handleSearch}
           searchFields={searchFields}
+          isLoading={loading}
+          isSearching={isSearching}
         />
     </div>
   </div>

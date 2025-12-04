@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 import { countryServices } from "@/modules/country/service";
@@ -11,9 +11,10 @@ const Locations = () => {
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate()
 
-  const fetchLocations = async () => {
+  const fetchLocations = useCallback(async () => {
     setLoading(true);
     try {
       const hasFilters =
@@ -30,43 +31,65 @@ const Locations = () => {
         response = await countryServices.getAll({ pageIndex, pageSize });
       }
 
-      const payload = response?.data?.data;
-      const items = payload?.data || [];
-      const total = payload?.totalItems || 0;
+      let locationsData = [];
+      let items = 0;
+      
+      if (response && response.data) {
+        if (response.data.data) {
+          locationsData = response.data.data.data || response.data.data.rows || [];
+          items = response.data.data.totalItems || response.data.data.total || locationsData.length || 0;
+        }
+        else if (Array.isArray(response.data)) {
+          locationsData = response.data || [];
+          items = response.totalItems || response.total || locationsData.length || 0;
+        }
+        else {
+          const payload = response.data;
+          locationsData = payload?.data || [];
+          items = payload?.totalItems || payload?.total || 0;
+        }
+      }
 
-      setLocations(items);
-      setTotalItems(total);
+      setLocations(locationsData);
+      setTotalItems(items);
     } catch (err) {
       console.error("Failed to fetch locations:", err);
       setLocations([]);
       setTotalItems(0);
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, [filters, pageIndex, pageSize]);
 
-  const handleSearch = (query) => {
+  const handleSearch = useCallback((query) => {
+    setIsSearching(true);
     setFilters(query);
     setPageIndex(0);
-  };
+  }, []);
 
   useEffect(() => {
     fetchLocations();
-  }, [pageIndex, pageSize, filters]);
+  }, [fetchLocations]);
+  const showFullPageLoading = loading && !isSearching;
 
-  if (loading) {
+  if (showFullPageLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <p>Loading locations...</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700">Loading locations...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="px-[24.5px]">
-      <div className="px-1 pb-3 flex items-center justify-between">
-      <h1 className="text-2xl font-bold text-gray-800">Locations
-      </h1>
+      <div className="px-1 flex items-center justify-between">
+        <div>
+      <h1 className="text-2xl font-bold text-gray-800">Locations</h1>
+      </div>
         <button className="button-styling mt-[24px]" onClick={() => navigate("/create-offer-draft")}>
           Add Locations
         </button>
@@ -85,15 +108,17 @@ const Locations = () => {
         setPageSize={setPageSize}
         totalItems={totalItems}
         searchFields={[
-          { name: "city", label: "City", type: "text" },
-          { name: "state", label: "State", type: "text" },
-          { name: "country", label: "Country", type: "text" },
+          { name: "city", label: "City", type: "text", placeholder: "Enter city" },
+          { name: "state", label: "State", type: "text", placeholder: "Enter state" },
+          { name: "country", label: "Country", type: "text", placeholder: "Enter country" },
         ]}
         columnsOverride={[
           { key: "city", label: "City" },
           { key: "state", label: "State" },
           { key: "country.name", label: "Country" }
         ]}
+        isLoading={loading}
+        isSearching={isSearching}
       />
     </div>
   );
