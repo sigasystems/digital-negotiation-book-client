@@ -162,7 +162,7 @@ export default function Users({ userRole }) {
       <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
 
         <div className="mt-[24PX]">
-          {userRole === "buyer" && (
+          {userRole === "super_admin" && (
             <button
               onClick={() => navigate("/add-business-owner")}
               className="button-styling"
