@@ -13,10 +13,10 @@ export default function Offers() {
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPaginationLoading, setIsPaginationLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchOffers = useCallback(async () => {
-    setLoading(true);
     try {
       let response;
 
@@ -63,8 +63,14 @@ export default function Offers() {
     } finally {
       setLoading(false);
       setIsSearching(false);
+      setIsPaginationLoading(false);
     }
   }, [filters, pageIndex, pageSize]);
+
+  const handlePageChange = useCallback((newPageIndex) => {
+    setIsPaginationLoading(true);
+    setPageIndex(newPageIndex);
+  }, []);
 
   const handleSearch = useCallback((queryFilters) => {
     setIsSearching(true);
@@ -86,10 +92,18 @@ export default function Offers() {
   };
 
   useEffect(() => {
-    fetchOffers();
-    }, [fetchOffers]);
+    if (loading || isSearching) {
+      fetchOffers();
+    }
+  }, [loading, isSearching, fetchOffers]);
 
-    const showFullPageLoading = loading && !isSearching;
+  useEffect(() => {
+    if (!loading && !isSearching) {
+    fetchOffers();
+    }
+  }, [pageIndex, pageSize]);
+
+    const showFullPageLoading = loading && !isSearching && pageIndex === 0;
 
   if (showFullPageLoading) {
     return (
@@ -119,7 +133,7 @@ export default function Offers() {
         onSearch={handleSearch}
         pageIndex={pageIndex}
         pageSize={pageSize}
-        setPageIndex={setPageIndex}
+        setPageIndex={handlePageChange}
         setPageSize={setPageSize}
         totalItems={totalItems}
         searchFields={[
@@ -139,7 +153,7 @@ export default function Offers() {
             ],
           },
         ]}
-        isLoading={loading}
+        isLoading={isPaginationLoading || loading || isSearching}
         isSearching={isSearching}
       />
     </div>

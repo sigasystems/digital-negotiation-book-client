@@ -12,10 +12,10 @@ const Locations = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isPaginationLoading, setIsPaginationLoading] = useState(false);
   const navigate = useNavigate()
 
   const fetchLocations = useCallback(async () => {
-    setLoading(true);
     try {
       const hasFilters =
       filters &&
@@ -59,8 +59,14 @@ const Locations = () => {
     } finally {
       setLoading(false);
       setIsSearching(false);
+      setIsPaginationLoading(false);
     }
   }, [filters, pageIndex, pageSize]);
+
+  const handlePageChange = useCallback((newPageIndex) => {
+    setIsPaginationLoading(true);
+    setPageIndex(newPageIndex);
+  }, []);
 
   const handleSearch = useCallback((query) => {
     setIsSearching(true);
@@ -69,9 +75,18 @@ const Locations = () => {
   }, []);
 
   useEffect(() => {
-    fetchLocations();
-  }, [fetchLocations]);
-  const showFullPageLoading = loading && !isSearching;
+    if (loading || isSearching) {
+      fetchLocations();
+    }
+  }, [loading, isSearching, fetchLocations]);
+
+  useEffect(() => {
+    if (!loading && !isSearching) {
+      fetchLocations();
+    }
+  }, [pageIndex, pageSize]);
+
+  const showFullPageLoading = loading && !isSearching && pageIndex === 0;
 
   if (showFullPageLoading) {
     return (
@@ -104,7 +119,7 @@ const Locations = () => {
         onSearch={handleSearch}
         pageIndex={pageIndex}
         pageSize={pageSize}
-        setPageIndex={setPageIndex}
+        setPageIndex={handlePageChange}
         setPageSize={setPageSize}
         totalItems={totalItems}
         searchFields={[
@@ -117,7 +132,7 @@ const Locations = () => {
           { key: "state", label: "State" },
           { key: "country.name", label: "Country" }
         ]}
-        isLoading={loading}
+        isLoading={isPaginationLoading || loading || isSearching}
         isSearching={isSearching}
       />
     </div>

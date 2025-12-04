@@ -15,11 +15,11 @@ export default function Users({ userRole }) {
   const [filters, setFilters] = useState({});
   const [totalPages , setTotalPages] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPaginationLoading, setIsPaginationLoading] = useState(false);
 
   const userActions = ["view", "edit", "activate", "deactivate", "delete"];
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
     try {
       const role =
         typeof userRole === "object" && userRole?.userRole
@@ -43,7 +43,6 @@ export default function Users({ userRole }) {
       let rows = [];
       let items = 0;
       let pages = 1;
-      
       if (response && response.data) {
         if (response.data.data && response.data.data.buyers) {
           rows = response.data.data.buyers || [];
@@ -78,8 +77,14 @@ export default function Users({ userRole }) {
     } finally {
       setLoading(false);
       setIsSearching(false);
+      setIsPaginationLoading(false);
     }
   }, [userRole, filters, pageIndex, pageSize]);
+
+  const handlePageChange = useCallback((newPageIndex) => {
+    setIsPaginationLoading(true);
+    setPageIndex(newPageIndex);
+  }, []);
 
   const handleSearch = useCallback((searchFilters) => {
     setIsSearching(true);
@@ -88,10 +93,18 @@ export default function Users({ userRole }) {
   }, []);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    if (loading || isSearching) {
+      fetchUsers();
+    }
+  }, [loading, isSearching, fetchUsers]);
 
-  const showFullPageLoading = loading && !isSearching;
+  useEffect(() => {
+    if (!loading && !isSearching) {
+      fetchUsers();
+    }
+  }, [pageIndex, pageSize]);
+
+  const showFullPageLoading = loading && !isSearching && pageIndex === 0;
 
   if (showFullPageLoading) {
     return (
@@ -179,12 +192,12 @@ export default function Users({ userRole }) {
           userActions={userActions}
           pageIndex={pageIndex}
           pageSize={pageSize}
-          setPageIndex={setPageIndex}
+          setPageIndex={handlePageChange}
           setPageSize={setPageSize}
           totalItems={totalItems}
           onSearch={handleSearch}
           searchFields={searchFields}
-          isLoading={loading}
+          isLoading={isPaginationLoading || loading || isSearching}
           isSearching={isSearching}
         />
     </div>

@@ -13,10 +13,10 @@ export default function Products() {
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPaginationLoading, setIsPaginationLoading] = useState(false); // NEW: Separate state for pagination loading
   const navigate = useNavigate();
 
   const fetchProducts = useCallback(async () => {
-    setLoading(true);
     try {
       let response;
 
@@ -57,8 +57,14 @@ export default function Products() {
     } finally {
       setLoading(false);
       setIsSearching(false);
+      setIsPaginationLoading(false);
     }
   }, [filters, pageIndex, pageSize]);
+
+  const handlePageChange = useCallback((newPageIndex) => {
+    setIsPaginationLoading(true);
+    setPageIndex(newPageIndex);
+  }, []);
 
   const handleSearch = useCallback((queryFilters) => {
     setIsSearching(true);
@@ -79,10 +85,18 @@ export default function Products() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    if (loading || isSearching) {
+      fetchProducts();
+    }
+  }, [loading, isSearching, fetchProducts]);
 
-  const showFullPageLoading = loading && !isSearching;
+  useEffect(() => {
+    if (!loading && !isSearching) {
+      fetchProducts();
+    }
+  }, [pageIndex, pageSize]);
+
+  const showFullPageLoading = loading && !isSearching && pageIndex === 0;
 
   if (showFullPageLoading) {
     return (
@@ -120,7 +134,7 @@ export default function Products() {
         onView={(row) => handleView(row.id)}
         pageIndex={pageIndex}
         pageSize={pageSize}
-        setPageIndex={setPageIndex}
+        setPageIndex={handlePageChange}
         setPageSize={setPageSize}
         totalItems={totalItems}
         onSearch={handleSearch}
@@ -129,7 +143,7 @@ export default function Products() {
           { name: "species", label: "Species", type: "text" },
           { name: "size", label: "Size", type: "text", placeholder: "50kg" },
         ]}
-        isLoading={loading}
+        isLoading={isPaginationLoading || loading || isSearching}
         isSearching={isSearching}
       />
     </div>

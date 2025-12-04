@@ -13,10 +13,10 @@ export default function OfferDrafts() {
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPaginationLoading, setIsPaginationLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchOfferDrafts = useCallback(async () => {
-    setLoading(true);
     try {
       let response;
 
@@ -61,8 +61,14 @@ export default function OfferDrafts() {
     } finally {
       setLoading(false);
       setIsSearching(false);
+      setIsPaginationLoading(false);
     }
   }, [filters, pageIndex, pageSize]);
+
+  const handlePageChange = useCallback((newPageIndex) => {
+    setIsPaginationLoading(true);
+    setPageIndex(newPageIndex);
+  }, []);
 
   const handleSearch = useCallback((params) => {
     setIsSearching(true);
@@ -83,10 +89,18 @@ export default function OfferDrafts() {
   };
 
   useEffect(() => {
-    fetchOfferDrafts();
-  }, [fetchOfferDrafts]);
+    if (loading || isSearching) {
+      fetchOfferDrafts();
+    }
+  }, [loading, isSearching, fetchOfferDrafts]);
 
-  const showFullPageLoading = loading && !isSearching;
+  useEffect(() => {
+    if (!loading && !isSearching) {
+      fetchOfferDrafts();
+    }
+  }, [pageIndex, pageSize]);
+
+  const showFullPageLoading = loading && !isSearching && pageIndex === 0;
 
   if (showFullPageLoading) {
     return (
@@ -119,7 +133,7 @@ export default function OfferDrafts() {
         filterKey="draftName"
         pageIndex={pageIndex}
         pageSize={pageSize}
-        setPageIndex={setPageIndex}
+        setPageIndex={handlePageChange}
         setPageSize={setPageSize}
         totalItems={totalItems}
         searchFields={[
@@ -135,7 +149,7 @@ export default function OfferDrafts() {
             ],
           },
         ]}
-        isLoading={loading}
+        isLoading={isPaginationLoading || loading || isSearching}
         isSearching={isSearching}
       />
     </div>

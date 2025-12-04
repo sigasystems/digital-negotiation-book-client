@@ -1,6 +1,6 @@
 // src/utils/Pagination.jsx
 import React from "react";
-import { Circle, ChevronDown  } from "lucide-react";
+import { ChevronDown  } from "lucide-react";
 
 /**
  * Pagination (named export)
@@ -11,6 +11,7 @@ export const Pagination = ({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  isLoading = false,
 }) => {
   const getPageNumbers = (current, total) => {
     if (total <= 1) return [0];
@@ -31,6 +32,12 @@ export const Pagination = ({
 
   const pages = getPageNumbers(pageIndex, totalPages || 1);
 
+  const handlePageClick = (page) => {
+    if (!isLoading) {
+      onPageChange(page);
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-2 w-full">
       <div className="flex items-center gap-2">
@@ -40,8 +47,11 @@ export const Pagination = ({
       <div className="relative inline-block">
         <select
           value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="appearance-none border border-gray-300 rounded-lg pl-3 pr-8 py-1.5 text-xs sm:text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
+          onChange={(e) => !isLoading && onPageSizeChange(Number(e.target.value))}
+            disabled={isLoading}
+          className={`appearance-none border border-gray-300 rounded-lg pl-3 pr-8 py-1.5 text-xs sm:text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+              isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+            }`}
         >
           {[10, 20, 50].map((size) => (
             <option key={size} value={size}>
@@ -50,7 +60,9 @@ export const Pagination = ({
           ))}
         </select>
         <ChevronDown
-          className="w-4 h-4 text-gray-700 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+          className={`w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${
+              isLoading ? "text-gray-400" : "text-gray-700"
+            }`}
         />
       </div>
     </div>
@@ -63,12 +75,12 @@ export const Pagination = ({
 
       <div className="flex items-center gap-1 justify-end">
         <button
-          disabled={pageIndex <= 0 || totalPages <= 1}
-          onClick={() => onPageChange(pageIndex - 1)}
-          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-normal transition-all cursor-pointer ${
-            pageIndex <= 0 || totalPages <= 1
+          disabled={pageIndex <= 0 || totalPages <= 1 || isLoading}
+          onClick={() => handlePageClick(pageIndex - 1)}
+          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-normal transition-all ${
+            pageIndex <= 0 || totalPages <= 1 || isLoading
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
+              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95 cursor-pointer"
           }`}
         >
           Prev
@@ -83,8 +95,11 @@ export const Pagination = ({
             ) : (
               <button
                 key={idx}
-                onClick={() => onPageChange(p)}
-                className={`min-w-[36px] sm:min-w-[40px] h-8 sm:h-9 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                  onClick={() => handlePageClick(p)}
+                  disabled={isLoading || p === pageIndex}
+                className={`min-w-[36px] sm:min-w-[40px] h-8 sm:h-9 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                    isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                  } ${
                   p === pageIndex
                     ? "button-styling"
                     : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
@@ -101,77 +116,18 @@ export const Pagination = ({
         </div>
 
         <button
-          disabled={pageIndex >= totalPages - 1 || totalPages <= 1}
-          onClick={() => onPageChange(pageIndex + 1)}
-          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-normal transition-all cursor-pointer ${
-            pageIndex >= totalPages - 1 || totalPages <= 1
+          disabled={pageIndex >= totalPages - 1 || totalPages <= 1 || isLoading}
+          onClick={() => handlePageClick(pageIndex + 1)}
+          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-normal transition-all ${
+            pageIndex >= totalPages - 1 || totalPages <= 1 || isLoading
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95"
+              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95 cursor-pointer"
           }`}
         >
           Next
         </button>
       </div>
       </div>
-    </div>
-  );
-};
-
-export const MobileCard = ({ item, isSelected, onSelect, actions }) => {
-  return (
-    <div
-      className={`border rounded-lg p-4 transition-all ${
-        isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"
-      }`}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 text-sm">
-            {item.first_name} {item.last_name}
-          </h3>
-          <p className="text-xs text-gray-700 mt-1">{item.email}</p>
-        </div>
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={(e) => onSelect(e.target.checked)}
-          className="mt-1"
-        />
-      </div>
-
-      <div className="flex items-center gap-2 mb-3">
-        <Circle
-          className={`w-3 h-3 ${
-            item.status === "active" ? "fill-green-500 text-green-500" : "fill-red-500 text-red-500"
-          }`}
-        />
-        <span
-          className={`text-xs font-medium ${
-            item.status === "active" ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {item.status}
-        </span>
-      </div>
-
-      <div className="space-y-2 text-xs">
-        <div className="flex justify-between">
-          <span className="text-gray-500">Business:</span>
-          <span className="text-gray-900 font-medium">{item.businessName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Phone:</span>
-          <span className="text-gray-900">{item.phoneNumber}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Location:</span>
-          <span className="text-gray-900">
-            {item.city}, {item.state}
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-3">{actions}</div>
     </div>
   );
 };
