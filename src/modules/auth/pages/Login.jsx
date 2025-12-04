@@ -60,7 +60,7 @@ export default function Login() {
     <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
       <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-80 py-10 bg-gray-100">
         <div className="w-full max-w-md sm:max-w-lg">
-          <h1 className="tex-2xl font-bold mb-4 text-gray-800 text-center p-4">
+          <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center p-4">
             Login to your account!
           </h1>
 
@@ -115,7 +115,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition cursor-pointer"
+                className="w-full button-styling"
                 disabled={loading}
               >
                 {loading ? "Logging in..." : "Login"}

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { validateField } from "@/utils/validation";
@@ -60,7 +59,7 @@ export default function EmailForm({ setIsOtpSent, setEmail }) {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg cursor-pointer transition"
+            className="w-full button-styling"
             disabled={loading}
           >
             {loading ? "Sending..." : "Send OTP"}

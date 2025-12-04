@@ -170,7 +170,7 @@ export default function OtpAndPasswordForm({ email, navigate }) {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg cursor-pointer transition"
+            className="w-full button-styling"
             disabled={loading}
           >
             {loading ? "Processing..." : showPasswordFields ? "Reset Password" : "Verify OTP"}

@@ -132,18 +132,18 @@ export default function Plans() {
           </p>
 
           <div className="flex justify-center mb-10 mt-4">
-            <div className="bg-gray-100 border border-gray-200 rounded-full p-1 flex">
+            <div className="bg-gray-100 border border-gray-200 rounded-full p-1 flex cursor-pointer">
               <button
                 onClick={() => setBillingCycle("monthly")}
-                className={`px-5 py-2 rounded-full text-sm font-medium 
-                ${billingCycle === "monthly" ? "bg-blue-600 text-white" : "text-gray-700 hover:text-blue-600"}
+                className={`px-5 py-2 rounded-full text-sm font-medium cursor-pointer 
+                ${billingCycle === "monthly" ? "bg-[#16a34a] text-white cursor-pointer" : "text-gray-700 hover:text-[#16a34a] cursor-pointer"}
               `}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingCycle("yearly")}
-                className={`px-5 py-2 rounded-full text-sm font-medium ${billingCycle === "yearly" ? "bg-blue-600 text-white" : "text-gray-700 hover:text-blue-600"}
+                className={`px-5 py-2 rounded-full text-sm font-medium cursor-pointer ${billingCycle === "yearly" ? "bg-[#16a34a] text-white" : "text-gray-700 hover:text-[#16a34a]"}
               `}
               >
                 Yearly
@@ -244,7 +244,7 @@ export default function Plans() {
                         className={`w-full ${
                           isActive
                             ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                            : "bg-[#16a34a] hover:bg-green-700 text-white cursor-pointer"
                         }`}
                       >
                         {isActive ? "Current Plan" : `Choose ${plan.name} Plan`}

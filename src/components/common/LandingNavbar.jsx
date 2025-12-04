@@ -75,7 +75,7 @@ export default function LandingNavbar({
         <div className="flex items-center gap-4">
           <button
             onClick={handleLogin}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="button-styling"
           >
             Login
           </button>
