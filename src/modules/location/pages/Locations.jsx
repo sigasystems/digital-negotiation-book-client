@@ -64,14 +64,12 @@ const Locations = () => {
 
   return (
     <div className="px-[24.5px]">
-      <div className="pb-3 flex">
+      <div className="px-1 pb-3 flex items-center justify-between">
       <h1 className="text-2xl font-bold text-gray-800">Locations
       </h1>
-      <div className="ml-auto">
-        <button className="button-styling" onClick={() => navigate("/add-location")}>
-          Add Location
+        <button className="button-styling mt-[24px]" onClick={() => navigate("/create-offer-draft")}>
+          Add Locations
         </button>
-      </div>
     </div>
 
       <DashboardTable

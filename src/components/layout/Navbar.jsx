@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Menu, LogOut, X, ChevronDown, User } from "lucide-react";
 import LogoutDialog from "../common/LogoutModal";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +16,10 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
 
   const userRole = user?.userRole || "guest";
   const isBuyer = userRole === "buyer";
+
+  const userDropdownRef = useRef(null);
+  const userNameRef = useRef(null);
+  const [dropdownWidth, setDropdownWidth] = useState(null);
 
   const navLinks = useMemo(() => {
     if (!isAuthenticated) {
@@ -46,8 +50,30 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
       ? `${user.first_name} ${user.last_name || ""}`.trim()
       : user?.name || "";
 
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(e.target)
+      ) {
+        setUserDropdownOpen(false);
+      }
+    }
 
-  // ---- Render phase ----
+    if (userDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [userDropdownOpen]);
+
+  useEffect(() => {
+    if (userNameRef.current) {
+      const width = userNameRef.current.getBoundingClientRect().width;
+      setDropdownWidth(width);
+    }
+  }, [userDropdownOpen]);
+
   if (isBuyer) {
     return <BuyerNavbar />;
   }
@@ -57,7 +83,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
       isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-10"
     )}>
       <div className="w-full h-full mx-auto flex items-center justify-between">
-        
+
         {/* LEFT */}
         <div className="flex items-center">
           {showSidebarButton && (
@@ -80,7 +106,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
           </Link>
         </div>
 
-        {/* CENTER – Desktop links */}
+        {/* CENTER */}
         <nav className="hidden lg:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
@@ -103,8 +129,9 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
               Login
             </button>
           ) : (
-            <div className="relative">
+            <div className="relative" ref={userDropdownRef}>
               <button
+                ref={userNameRef}
                 onClick={() => setUserDropdownOpen((v) => !v)}
                 className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition cursor-pointer"
               >
@@ -119,18 +146,20 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
 
               {/* Dropdown */}
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-60 py-3">
+                <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-60 py-3"
+                  style={{ width: dropdownWidth || "auto" }}
+                >
                   <div className="flex flex-col items-center px-2">
-                    <Link 
-                      to="/profile" 
+                    <Link
+                      to="/profile"
                       className="w-full flex justify-center items-center gap-3 px-4 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150 cursor-pointer rounded-lg"
                     >
                       <User className="w-4 h-4" />
                       <span className="text-sm font-medium">Profile</span>
                     </Link>
-                    
+
                     <div className="w-11/12 border-t border-gray-100 my-1"></div>
-                    
+
                   <button
                     onClick={() => setLogoutOpen(true)}
                     className="w-full flex justify-center items-center gap-3 px-4 text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer rounded-lg"

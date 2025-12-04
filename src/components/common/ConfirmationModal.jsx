@@ -17,7 +17,7 @@ const ConfirmationModal = ({
   description = "Are you sure you want to proceed with this action? This change cannot be undone.",
   confirmText = "Confirm",
   cancelText = "Cancel",
-  confirmButtonColor = "bg-blue-600 hover:bg-blue-700",
+  confirmButtonColor = "bg-[#16a34a] hover:bg-green-700",
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

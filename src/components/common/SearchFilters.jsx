@@ -59,7 +59,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
         if (field.type === "select") {
           return (
               <div key={field.name} className="group">
-                <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-1 transition-colors duration-200 group-hover:text-blue-600">
+                <label className="block text-xs font-bold text-gray-700 tracking-wider mb-1 transition-colors duration-200 group-hover:text-[#16a34a]">
                   {field.label}
                 </label>
                   <div className="relative">
@@ -67,7 +67,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
               name={field.name}
               value={filters[field.name]}
               onChange={handleChange}
-              className="w-full h-[44px] appearance-none bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+              className="w-full h-[44px] appearance-none bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:border-[#16a34a] focus:outline-none focus:ring-4 focus:ring-[#16a34a] focus:border-[#16a34a] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
             >
               <option value="">{field.placeholder || `All ${field.label}`}</option>
               {field.options?.map((opt) => (
@@ -77,7 +77,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-                        <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-blue-500 transition-colors duration-200" />
+                        <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-[#16a34a] transition-colors duration-200" />
                     </div>
                   </div>
               </div>
@@ -86,7 +86,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
 
         return (
             <div key={field.name} className="group">
-              <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-1 transition-colors duration-200 group-hover:text-blue-600">
+              <label className="block text-xs font-bold text-gray-700 tracking-wider mb-1 transition-colors duration-200 group-hover:text-[#16a34a]">
                 {field.label}
               </label>
           <Input
@@ -95,7 +95,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
             placeholder={field.placeholder || field.label}
             value={filters[field.name]}
             onChange={handleChange}
-                className="h-[44px] rounded-xl border-2 border-gray-200 hover:border-blue-400 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md px-4 text-sm font-medium"
+                className="h-[44px] rounded-xl border-2 border-gray-200 hover:border-[#16a34a] focus:ring-4 focus:ring-[#16a34a] focus:border-[#16a34a] transition-all duration-200 shadow-sm hover:shadow-md px-4 text-sm font-medium"
           />
             </div>
         )      })}

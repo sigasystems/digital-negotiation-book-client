@@ -120,7 +120,7 @@ export default function Users({ userRole }) {
     <div className="px-4 sm:px-6 pb-3 flex items-center justify-between flex-wrap gap-3">
       <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
 
-        <div className="ml-auto">
+        <div className="mt-[24PX]">
           {userRole === "buyer" && (
             <button
               onClick={() => navigate("/add-business-owner")}

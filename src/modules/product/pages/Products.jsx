@@ -72,7 +72,7 @@ export default function Products() {
       <div className="pb-4 flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
 
-        <div className="ml-auto">
+        <div className="mt-[24PX]">
           <button
             onClick={() => navigate("/add-product")}
             className="button-styling"

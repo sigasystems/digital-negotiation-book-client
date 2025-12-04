@@ -74,13 +74,11 @@ export default function OfferDrafts() {
 
   return (
     <div className="px-[22.5px]">
-      <div  className="px-[1px] pb-3 flex ">
+      <div  className="px-1 pb-3 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Offer Drafts</h1>
-        <div className="ml-auto">
-          <button className="button-styling" onClick={() => navigate("/create-offer-draft")}>
+          <button className="button-styling mt-[22px]" onClick={() => navigate("/create-offer-draft")}>
             Create Offer Draft
           </button>
-        </div>
       </div>
 
       <DashboardTable
