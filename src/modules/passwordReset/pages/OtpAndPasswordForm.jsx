@@ -62,7 +62,7 @@ export default function OtpAndPasswordForm({ email, navigate }) {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-4 text-gray-800 text-center">Reset Password 🔐</h1>
+      <h1 className="text-4xl font-bold mb-4 text-gray-800 text-left">Reset Password</h1>
       <p className="text-gray-700 mb-8 text-center text-lg">
         {showPasswordFields ? "Enter your new password below." : "Enter the 6-digit OTP sent to your email."}
       </p>

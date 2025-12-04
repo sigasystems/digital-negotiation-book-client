@@ -105,10 +105,6 @@ const BusinessOwnerPage = () => {
                 <h2 className="text-base sm:text-lg font-semibold text-slate-900">
                   {section.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  {section.fields.length} field
-                  {section.fields.length !== 1 ? "s" : ""}
-                </p>
               </div>
 
               {/* Fields */}

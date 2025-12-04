@@ -305,12 +305,12 @@ export default function DashboardTable({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="bg-indigo-50"
+              className="bg-indigo-50 hover:bg-indigo-50"
             >
               {headerGroup.headers.slice(1).map((header) => (
                 <TableHead
                   key={header.id}
-                  className="border border-gray-300 px-4 py-2 text-left select-none font-semibold text-gray-700"
+                  className="border border-gray-300 px-4 py-2 text-left select-none font-semibold text-gray-700 hover:bg-inherit"
                 >
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>

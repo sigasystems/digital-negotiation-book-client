@@ -10,9 +10,9 @@ export default function ResetPassword() {
   const [email, setEmail] = useState("");
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="flex w-full md:w-1/2 justify-center items-center bg-gray-100 px-8 md:px-16 py-12">
-        <div className="w-full max-w-md">
+    <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
+      <div className="flex w-full md:w-1/2 justify-center items-center px-4 sm:px-8 lg:px-78 py-10 bg-gray-100">
+        <div className="w-full max-w-md sm:max-w-lg text-left">
           {!isOtpSent ? (
             <EmailForm
               setIsOtpSent={setIsOtpSent}

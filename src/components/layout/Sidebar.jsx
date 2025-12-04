@@ -90,7 +90,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-[0.8rem] h-16 border-b select-none">
+          <div className="flex items-center justify-between px-[0.8rem] h-16 border-b select-none shadow-sm">
             {!collapsed && (
               <div className="flex flex-col max-w-[180px] truncate">
                 <h2 className="text-2xl font-extrabold text-[#16a34a] truncate">DNB</h2>

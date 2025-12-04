@@ -58,9 +58,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col-reverse md:flex-row min-h-screen bg-white">
-      <div className="flex w-full md:w-1/2 justify-center items-center px-6 sm:px-10 lg:px-80 py-10 bg-gray-100">
-        <div className="w-full max-w-md sm:max-w-lg">
-          <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center p-4">
+      <div className="flex w-full md:w-1/2 justify-center items-center px-4 sm:px-8 lg:px-78 py-10 bg-gray-100">
+        <div className="w-full max-w-md sm:max-w-lg text-left">
+          <h1 className="text-2xl font-bold mb-4 text-gray-800 text-left">
             Login to your account!
           </h1>
 
@@ -123,7 +123,7 @@ export default function Login() {
             </form>
           </Form>
 
-          <div className="flex justify-center items-center gap-4 mt-6 text-sm font-medium">
+          <div className="flex justify-between items-center mt-6 text-sm font-medium">
             <Link
               to="/forgot-password"
               className="text-blue-600 underline hover:text-blue-800 transition"
