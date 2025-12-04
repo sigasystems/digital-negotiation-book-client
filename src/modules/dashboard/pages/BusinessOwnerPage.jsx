@@ -184,7 +184,7 @@ const BusinessOwnerPage = () => {
         description="Are you sure you want to save these changes? This will update the business owner's profile."
         confirmText="Save Changes"
         cancelText="Cancel"
-        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

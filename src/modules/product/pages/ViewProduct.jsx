@@ -106,7 +106,7 @@ const ViewProduct = () => {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
+      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
         <div className="px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className={`cursor-pointer`}>
@@ -192,7 +192,7 @@ const ViewProduct = () => {
         description="Are you sure you want to save these product changes?"
         confirmText="Save Changes"
         cancelText="Cancel"
-        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

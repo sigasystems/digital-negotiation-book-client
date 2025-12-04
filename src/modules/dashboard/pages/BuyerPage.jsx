@@ -68,7 +68,7 @@ const BuyerPage = () => {
   return (
     <div className="min-h-screen px-[24.5px]">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-slate-200 z-20 shadow-sm rounded-xl">
+      <header className="sticky top-17 bg-white border-b border-slate-200 z-20 shadow-sm rounded-xl">
         <div className="p-4">
           <div className="flex items-center gap-3">
             <Button
@@ -189,7 +189,7 @@ const BuyerPage = () => {
         description="Are you sure you want to save these changes? This will update the buyer’s profile information."
         confirmText="Save Changes"
         cancelText="Cancel"
-        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

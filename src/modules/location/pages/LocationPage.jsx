@@ -201,7 +201,7 @@ const LocationPage = () => {
         </div>
       )}
 
-      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
+      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
         <div className="px-6 py-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer">
@@ -216,9 +216,6 @@ const LocationPage = () => {
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Edit Location
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500">
-                  Location ID: {id}
-                </p>
               </div>
             </div>
           </div>
