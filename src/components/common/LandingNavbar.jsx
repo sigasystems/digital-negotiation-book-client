@@ -33,7 +33,7 @@ export default function LandingNavbar({
   return (
     <header
       className={cn(
-        "w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100",
+        "w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50",
         isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-13"
       )}
     >
@@ -60,22 +60,22 @@ export default function LandingNavbar({
           </Link>
         </div>
 
-        <nav className="hidden lg:flex items-center gap-6">
+    <div className="flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-6 mr-4">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className="text-gray-600 hover:text-gray-900 font-medium transition"
+              className="text-gray-600 hover:text-gray-900 font-medium transition whitespace-nowrap"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
           <button
             onClick={handleLogin}
-            className="button-styling"
+            className="button-styling whitespace-nowrap"
           >
             Login
           </button>
