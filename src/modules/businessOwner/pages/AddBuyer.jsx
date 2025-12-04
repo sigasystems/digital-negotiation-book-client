@@ -129,9 +129,9 @@ export default function AddBuyerForm() {
               </Button>
               
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg">
+                {/* <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg">
                   <UserPlus className="text-white w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
+                </div> */}
                 <div>
                   <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Add New Buyer</h1>
                   <p className="text-xs sm:text-sm text-slate-500">Register a new buyer to your business network</p>

@@ -136,3 +136,11 @@
 .animate-slideDown {
   animation: slideDown 0.2s ease-out;
 }
+
+.button-styling {
+  @apply bg-[#16a34a] text-white px-4 py-2 font-normal rounded-md hover:bg-green-700 transition cursor-pointer;
+}
+
+/* .white-button {
+  @apply px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer border-2 transform hover:scale-[1.02] active:scale-[0.98]bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg
+} */

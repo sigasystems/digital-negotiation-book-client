@@ -54,7 +54,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
   return (
     <header className={cn(
       "w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100",
-      isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-13"
+      isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-10"
     )}>
       <div className="w-full h-full mx-auto flex items-center justify-between">
         

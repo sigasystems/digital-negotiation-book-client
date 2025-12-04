@@ -106,24 +106,19 @@ const ViewProduct = () => {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
+        <div className="px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className={`cursor-pointer`}>
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
 
             <div className="flex items-center gap-3 ml-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md">
-                <Package className="w-5 h-5 text-white" />
-              </div>
+              <div className="h-8 w-px bg-slate-300 hidden sm:block" />
               <div>
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Product Details
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500">
-                  Product ID: {id}
-                </p>
               </div>
             </div>
           </div>
@@ -174,7 +169,7 @@ const ViewProduct = () => {
           <Button
             onClick={() => setIsConfirmOpen(true)}
             disabled={saving || !hasChanges}
-            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer"
+            className="button-styling"
           >
             {saving ? (
               <>

@@ -242,7 +242,7 @@ const Negotiation = () => {
               disabled={!isOfferEditable}
               className={`px-5 py-2 text-white text-sm font-medium rounded-md shadow-sm transition-colors ${
                 isOfferEditable 
-                  ? "bg-blue-600 hover:bg-blue-700 cursor-pointer" 
+                  ? "button-styling" 
                   : "bg-blue-400 cursor-not-allowed"
               }`}
             >

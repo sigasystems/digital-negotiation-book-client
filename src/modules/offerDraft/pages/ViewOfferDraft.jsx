@@ -183,8 +183,8 @@ const ViewOfferDraft = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8 px-[24.5px]">
 
-  <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
+    <div className="px-4 sm:px-6 lg:px-8 py-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button 
@@ -195,14 +195,10 @@ const ViewOfferDraft = () => {
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
-          
+          <div className="h-8 w-px bg-slate-300 hidden sm:block" />
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg">
-              <FileText className="text-white w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
             <div>
               <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">View Draft</h1>
-              <p className="text-xs sm:text-sm text-slate-500">Draft #{formData.draftNo}</p>
             </div>
           </div>
         </div>
@@ -219,7 +215,7 @@ const ViewOfferDraft = () => {
                 state: { draftId: id },
               })
             }
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white cursor-pointer shadow-lg hover:shadow-xl transition-all h-10 sm:h-11 text-sm sm:text-base font-semibold"
+            className="button-styling"
           >
             <FilePlus2 className="w-4 h-4 mr-2" />
             Create Offer
@@ -407,7 +403,7 @@ const ViewOfferDraft = () => {
                 variant="outline" 
                 onClick={() => navigate(-1)} 
                 disabled={saving}
-                className="w-full sm:w-auto cursor-pointer hover:bg-slate-100 border-slate-300 transition-colors h-11 sm:h-12 text-sm sm:text-base font-medium"
+                className="w-full sm:w-auto cursor-pointer hover:bg-slate-100 border-slate-300 transition-colors h-8 sm:h-9 text-sm sm:text-base font-medium"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Cancel
@@ -416,7 +412,7 @@ const ViewOfferDraft = () => {
               <Button
                 onClick={handleSave}
                 disabled={saving || !isChanged}
-                className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white cursor-pointer shadow-lg hover:shadow-xl transition-all h-11 sm:h-12 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="button-styling"
               >
                 {saving ? (
                   <>

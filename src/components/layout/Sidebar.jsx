@@ -58,14 +58,14 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       : []),
     ...(userRole === "business_owner"
       ? [
-          { name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
+          // { name: "Add Buyer", icon: UserPlus, path: "/add-buyer" },
           { name: "Products", icon: Fish, path: "/products" },
-          { name: "Add Product", icon: PlusCircle, path: "/add-product" },
+          // { name: "Add Product", icon: PlusCircle, path: "/add-product" },
           { name: "Offer Drafts", icon: ClipboardList, path: "/offer-draft" },
-          { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
+          // { name: "Create Offer Draft", icon: FileEdit, path: "/create-offer-draft" },
           { name: "Offers", icon: Tag, path: "/offers" },
           { name: "Location", icon: Globe, path: "/location" },
-          { name: "Add Location", icon: MapPin, path: "/add-location" },
+          // { name: "Add Location", icon: MapPin, path: "/add-location" },
           // { name: "Plan Purchase", icon: ShoppingCart, path: "/plan-purchase" },
           { name: "Profile", icon: User , path: "/profile" },
           // { name: "Upgrade Plan", icon: ArrowUp, path: "/upgrade-plan" },
@@ -73,7 +73,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
       : []),
     ...(userRole === "super_admin"
       ? [
-          { name: "Add Business Owner", icon: UserPlus, path: "/add-business-owner" },
+          // { name: "Add Business Owner", icon: UserPlus, path: "/add-business-owner" },
           { name: "Payment List", icon: CreditCard, path: "/payments-list" },
         ]
       : []),
@@ -93,7 +93,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
           <div className="flex items-center justify-between px-[0.8rem] h-16 border-b select-none">
             {!collapsed && (
               <div className="flex flex-col max-w-[180px] truncate">
-                <h2 className="text-2xl font-extrabold text-indigo-600 truncate">DNB</h2>
+                <h2 className="text-2xl font-extrabold text-[#16a34a] truncate">DNB</h2>
                 {businessName && (
                   <span className="text-sm font-semibold text-gray-700 truncate">
                     {businessName}
@@ -111,7 +111,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
             >
               <ChevronRight
                 className={cn(
-                  "w-5 h-5 text-indigo-600 transition-transform",
+                  "w-5 h-5 text-gray-700 transition-transform",
                   collapsed ? "rotate-0" : "rotate-180"
                 )}
                 strokeWidth={2.5}

@@ -85,9 +85,6 @@ const BuyerPage = () => {
               <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                 Buyer Profile
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Buyer ID: {id}
-              </p>
             </div>
           </div>
 
@@ -170,7 +167,7 @@ const BuyerPage = () => {
             <Button
               onClick={handleSaveClick}
               disabled={saving || !hasChanges}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer"
+              className=" button-styling"
             >
               {saving ? (
                 <>

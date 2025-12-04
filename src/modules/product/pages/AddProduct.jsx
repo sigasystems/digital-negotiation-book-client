@@ -204,7 +204,7 @@ const AddProduct = () => {
             ))}
           </div>
 
-            <div className="flex justify-start gap-3 p-4 bg-slate-50 border-t border-slate-200">
+            <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
               <button
                 onClick={addProduct}
                 disabled={products.length >= MAX_PRODUCTS}
@@ -221,7 +221,7 @@ const AddProduct = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium shadow hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50"
+                className="inline-flex items-center gap-2 button-styling"
               >
                 {loading ? (
                   <>

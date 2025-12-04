@@ -67,9 +67,19 @@ export default function Products() {
   }
 
   return (
-    <div className="px-[22.5px]">
-      <div  className="px-3 pb-6">
+    <div className="px-[25.6px]">
+      {/* Header + Add Product */}
+      <div className="pb-4 flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
+
+        <div className="ml-auto">
+          <button
+            onClick={() => navigate("/add-product")}
+            className="button-styling"
+          >
+            Add Product
+          </button>
+        </div>
       </div>
 
       <DashboardTable

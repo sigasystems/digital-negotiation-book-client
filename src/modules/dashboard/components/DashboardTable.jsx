@@ -154,36 +154,36 @@ export default function DashboardTable({
 
               const STATUS_COLORS = {
                 "inactive": {
-                  text: "text-red-600",
-                  dot: "fill-red-500"
+                  text: "text-[#f87171]",
+                  dot: "fill-[#f87171]"
                 },
                 "active": {
-                  text: "text-green-600",
-                  dot: "fill-green-500"
+                  text: "text-[#34d399]",
+                  dot: "fill-[#34d399]"
                 },
                 "open": {
-                  text: "text-green-600",
-                  dot: "fill-green-500"
+                  text: "text-[#34d399]",
+                  dot: "fill-[#34d399]"
                 },
                 "close": {
                   text: "text-gray-600",
                   dot: "fill-gray-500"
                 },
                 "Business Owner Accepted": {
-                  text: "text-blue-600",
-                  dot: "fill-blue-500"
+                  text: "text-[#0ea5e9]",
+                  dot: "fill-[#0ea5e9]"
                 },
                 "Business Owner Rejected": {
-                  text: "text-red-600",
-                  dot: "fill-red-500"
+                  text: "text-[#f87171]",
+                  dot: "fill-[#f87171]"
                 },
                 "Buyer Accepted": {
-                  text: "text-emerald-600",
-                  dot: "fill-emerald-500"
+                  text: "text-[#34d399]",
+                  dot: "fill-[#34d399]"
                 },
                 "Buyer Rejected": {
-                  text: "text-orange-600",
-                  dot: "fill-orange-500"
+                  text: "text-[#fb923c]",
+                  dot: "fill-[#fb923c]"
                 }
               };
 
@@ -214,9 +214,9 @@ export default function DashboardTable({
             header: "Verified",
             cell: ({ row }) =>
               row.getValue(key) ? (
-                <span className="text-green-600 font-semibold select-none">Yes</span>
+                <span>Yes</span>
               ) : (
-                <span className="text-red-600 font-semibold select-none">No</span>
+                <span>No</span>
               ),
           };
         }
@@ -279,7 +279,7 @@ export default function DashboardTable({
         <SearchFilters fields={searchFields} onSearch={onSearch} />
       )}
 
-          <div className="px-6">
+          <div>
       <Table containerClassName="rounded-[5px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

@@ -2,8 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import DashboardTable from "../components/DashboardTable";
+import { useNavigate } from "react-router-dom";
 
 export default function Users({ userRole }) {
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -110,17 +113,35 @@ export default function Users({ userRole }) {
     ];
   }
 
+  const pageTitle = userRole === "super_admin" ? "All Business" : "All Buyers";
+
   return (
   <div className="w-full">
-    <div className="px-9 pb-6">
-      <h1 className="text-2xl font-bold text-gray-800">
-        {userRole === "super_admin" ? "All Business" : "All Buyers"}
-      </h1>
+    <div className="px-4 sm:px-6 pb-3 flex items-center justify-between flex-wrap gap-3">
+      <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+
+        <div className="ml-auto">
+          {userRole === "buyer" && (
+            <button
+              onClick={() => navigate("/add-business-owner")}
+              className="button-styling"
+            >
+              Add Business Owner
+            </button>
+          )}
+
+          {userRole === "business_owner" && (
+            <button
+              onClick={() => navigate("/add-buyer")}
+              className="button-styling"
+            >
+              Add Buyer
+            </button>
+          )}
+        </div>
     </div>
 
-    <div className=" rounded-lg overflow-hidden mx-[20px]">
-      {/* Table visible on all screens */}
-      <div>
+    <div className="rounded-lg overflow-hidden mx-[20px]">
         <DashboardTable
           data={data}
           rowSelection={rowSelection}
@@ -135,7 +156,6 @@ export default function Users({ userRole }) {
           onSearch={handleSearch}
           searchFields={searchFields}
         />
-      </div>
     </div>
   </div>
 );

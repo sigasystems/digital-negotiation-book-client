@@ -69,7 +69,7 @@ export default function Offers() {
 
   return (
     <div className="px-[22.5px]">
-      <div className="px-3 pb-6">
+      <div className="pb-3">
       <h1 className="text-2xl font-bold text-gray-800">All Offers
       </h1>
     </div>

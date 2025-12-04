@@ -52,7 +52,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
           isMobileOpen ? "block" : "hidden md:block"
         } transition-all duration-300 ease-in-out`}
       >
-        <div className="px-4 pb-4 space-y-6">
+        <div className="pb-4 space-y-6">
           {/* Filter Fields Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {fields.map((field) => {
@@ -102,23 +102,22 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
         </div>
 
         {/* Action Buttons */}
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
       <button
         onClick={handleSearch}
-        className="group relative flex-1 sm:flex-none bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:via-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer transform hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
+        className="flex items-center justify-center gap-2.5 button-styling"
       >
-              <div className="absolute inset-0 bg-white/20 duration-300"></div>
         <Search className="w-5 h-5 relative z-10" />
             <span className="relative z-10">Search Results</span>
       </button>
 
       <button
         onClick={handleReset}
-        className={`group relative flex-1 sm:flex-none px-6 py-3 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer border-2 transform hover:scale-[1.02] active:scale-[0.98]bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg"
+        className={`px-4 py-2 rounded-xl flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer border-2 transform hover:scale-[1.02] active:scale-[0.98]bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg"
               }`}
       >
         <XCircle className={`w-5 h-5 transition-colors duration-200 ${hasActiveFilters ? "group-hover:text-red-500" : ""}`} />
-            <span>Clear All</span>
+            <span>Reset</span>
       </button>
           </div>
 

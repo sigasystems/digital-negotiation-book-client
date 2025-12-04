@@ -8,6 +8,7 @@ import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { productService } from "@/modules/product/services";
 import { offerDraftService } from "@/modules/offerDraft/services";
 import { ACTION_ICONS } from "@/app/config/actionConfig";
+import toast from "react-hot-toast";
 import {
   getRecordDisplayName,
   resolveEntityRoute,

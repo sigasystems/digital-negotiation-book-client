@@ -171,7 +171,7 @@ export default function ResponsiveDashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className=" mx-auto px-4 sm:px-2 lg:px-8 py-8 space-y-6">
+      <div className=" mx-auto px-4 sm:px-2 lg:px-[23px] py-8 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat) => {
@@ -199,15 +199,15 @@ export default function ResponsiveDashboard() {
           })}
         </div>
 
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="px-6 py-2 flex items-center justify-between">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden p-4">
+          <div className="py-2 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
                 {userLabel}
               </h3>
             </div>
           </div>
-          <div className="px-6 pb-4">
+          <div className="pb-4">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />

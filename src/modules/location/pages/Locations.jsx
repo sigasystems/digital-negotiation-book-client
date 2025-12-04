@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 import { countryServices } from "@/modules/country/service";
 
@@ -10,6 +11,7 @@ const Locations = () => {
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
   const [filters, setFilters] = useState("");
+  const navigate = useNavigate()
 
   const fetchLocations = async () => {
     setLoading(true);
@@ -62,9 +64,14 @@ const Locations = () => {
 
   return (
     <div className="px-[24.5px]">
-      <div className="px-3 pb-6">
+      <div className="pb-3 flex">
       <h1 className="text-2xl font-bold text-gray-800">Locations
       </h1>
+      <div className="ml-auto">
+        <button className="button-styling" onClick={() => navigate("/add-location")}>
+          Add Location
+        </button>
+      </div>
     </div>
 
       <DashboardTable
