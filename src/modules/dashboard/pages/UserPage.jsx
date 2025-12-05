@@ -91,6 +91,7 @@ const UserPage = () => {
       setBuyer(data);
       setOriginalBuyer(data);
     } catch (err) {
+      console.error(err)
       toast.error("Failed to fetch buyer");
       navigate(-1);
     } finally {
