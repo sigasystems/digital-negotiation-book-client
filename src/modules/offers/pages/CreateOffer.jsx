@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, FilePlus2, Package, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Save, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -230,23 +230,17 @@ const CreateOffer = () => {
   if (loading){ return (<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
-          <p className="text-slate-600 font-medium">Loading offer details...</p>
+          <p className="text-slate-600 font-medium text-base sm:text-lg">Loading draft details...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8">
+    <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px]">
 
-      <header className="max-w-sm rounded-lg text-l mb-3 text-red-700 font-bold">
-
-      <p>
-
-        Remaining Credits For Create Offer : {remainingOffers}
-
-      </p>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <Button 
@@ -257,11 +251,8 @@ const CreateOffer = () => {
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
-              
+              <div className="h-8 w-px bg-slate-300 hidden sm:block" />
               <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
-                <FilePlus2 className="text-white w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
               <div>
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Create & Send Offer</h1>
                 <p className="text-xs sm:text-sm text-slate-500">From Draft #{formData.draftNo}</p>
@@ -269,42 +260,39 @@ const CreateOffer = () => {
               </div>
             </div>
 
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1.5 text-xs sm:text-sm font-medium w-fit">
+            <div className="flex items-center gap-3">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1.5 text-xs sm:text-sm font-medium">
               Draft Loaded
             </Badge>
+            </div>
           </div>
 
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <main className="mx-auto py-4">
         <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <Package className="w-5 h-5 text-blue-600" />
+          <div className="rounded-lg text-l pb-4 text-red-700 font-bold">
+           Remaining Credits : {remainingOffers}
             </div>
-            <div className="flex-1">
-              <label className="text-sm sm:text-base font-semibold text-slate-900 block">
-            Offer Name <span className="text-red-500">*</span>
-          </label>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Enter a unique identifier for this offer</p>
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Offer Name</h2>
             </div>
-          </div>
+          
           <Input
             placeholder="e.g., Offer-2024-001"
             value={offerName}
             onChange={(e) => setOfferName(e.target.value)}
-            className="mt-3 bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all text-sm sm:text-base h-11 sm:h-12"
+            className="bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all text-sm sm:text-base h-11 sm:h-12"
           />
+            <p className="text-xs sm:text-sm text-slate-500 mt-2">Enter a unique identifier for this offer</p>
         </div>
 
-        {/* Party & Destination Card */}
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
-          <h2 className="font-semibold text-base sm:text-lg text-slate-900 mb-5 sm:mb-6 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-blue-600" />
-            Party & Destination Details
-          </h2>
-          
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+          <h2 className="font-semibold text-base sm:text-lg text-slate-900">Party & Destination Details</h2>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
             {/* To Party */}
         <div className="space-y-2">
@@ -385,11 +373,10 @@ const CreateOffer = () => {
         </div>
       </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
-          <h2 className="font-semibold text-base sm:text-lg text-slate-900 mb-5 sm:mb-6 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
-            Draft Information
-          </h2>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+          <h2 className="font-semibold text-base sm:text-lg text-slate-900">Draft Information</h2>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
@@ -435,6 +422,11 @@ const CreateOffer = () => {
               </div>
             ))}
           </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Product Details</h2>
         </div>
 
        <ProductSection
@@ -447,38 +439,49 @@ const CreateOffer = () => {
           addProduct={addProduct}
           removeProduct={removeProduct}
       />
+          </div>
+        </div>
       </main>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-2xl z-30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-end gap-3">
+        <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-sm z-20 mt-10 rounded-lg">
+          <div className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <div className="flex items-center gap-2 text-[#16a34a]">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="font-medium">Ready to create offer</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
             <Button 
               variant="outline" 
               onClick={() => navigate(-1)} 
-              disabled={creating} 
-              className="w-full sm:w-auto cursor-pointer hover:bg-slate-100 border-slate-300 transition-colors h-11 sm:h-12 text-sm sm:text-base font-medium"
+              disabled={creating}
+              className="cursor-pointer hover:bg-slate-100 transition-colors"
             >
+                <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
 
             <Button
               onClick={handleCreateOffer}
               disabled={creating}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white cursor-pointer shadow-lg hover:shadow-xl transition-all h-11 sm:h-12 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="button-styling"
             >
               {creating ? (
                 <>
-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2" />Sending Offer...
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating...
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />Create & Send Offer
+                  <Save className="w-4 h-4 mr-2" />Create & Send Offer
                 </>
               )}
             </Button>
           </div>
         </div>
-
+        </div>
       </div>
 
       <ConfirmationModal
@@ -489,7 +492,7 @@ const CreateOffer = () => {
         description="Are you sure you want to create this offer? This action will generate a new offer based on the draft details."
         confirmText="Create Offer"
         cancelText="Cancel"
-        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

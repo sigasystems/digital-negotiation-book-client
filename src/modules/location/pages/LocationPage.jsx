@@ -183,17 +183,17 @@ const LocationPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-        <div className="bg-white rounded-2xl shadow-xl p-8 flex items-center space-x-3">
-          <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-lg text-slate-600">Loading...</span>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
+          <p className="text-slate-600 font-medium text-base sm:text-lg">Loading location details...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-50 px-[24.5px]">
+    <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px] bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       {saving && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
           <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
@@ -201,40 +201,40 @@ const LocationPage = () => {
         </div>
       )}
 
-      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
-        <div className="px-6 py-4">
+      <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="cursor-pointer hover:bg-slate-100 transition-colors">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
-
-            <div className="flex items-center gap-3 ml-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
+            <div className="h-8 w-px bg-slate-300 hidden sm:block" />
+              <div className="flex items-center gap-3">
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">
                   Edit Location
                 </h1>
               </div>
             </div>
           </div>
 
+            <div className="flex items-center gap-3">
           {hasChanges && (
-            <Badge
-              variant="outline"
-              className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-2 cursor-pointer"
-            >
+            <Badge className="bg-amber-50 text-amber-700 border-amber-300 px-3 py-1.5 text-xs sm:text-sm font-medium animate-pulse">
+                  <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               Unsaved Changes
+                  </div>
             </Badge>
           )}
+            </div>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto py-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div className="px-6 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto py-4">
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+          
             {error && (
               <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4">
                   <p className="text-red-700 text-sm font-medium">{error}</p>
@@ -242,6 +242,7 @@ const LocationPage = () => {
             )}
 
             <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <InputField
                 label="City"
                 required
@@ -249,6 +250,7 @@ const LocationPage = () => {
                 value={form.city}
                 onChange={handleChange}
                 placeholder="Enter city"
+                className="cursor-pointer"
               />
 
               <InputField
@@ -258,6 +260,7 @@ const LocationPage = () => {
                 value={form.state}
                 onChange={handleChange}
                 placeholder="Enter state"
+                className="cursor-pointer"
               />
 
               <InputField
@@ -267,8 +270,11 @@ const LocationPage = () => {
                 value={form.code}
                 onChange={handleChange}
                 placeholder="Enter code"
+                className="cursor-pointer"
               />
+            </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div className="flex flex-col">
                 {!showCountryDropdown ? (
                     <>
@@ -277,6 +283,7 @@ const LocationPage = () => {
                             name="countryName"
                             value={form.countryName}
                             readOnly
+                          className="cursor-pointer"
                         />
                         <button
                             type="button"
@@ -309,20 +316,37 @@ const LocationPage = () => {
             </div>
           </div>
         </div>
+      </main>
 
-        <div className="flex justify-end gap-3 mt-4">
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-sm z-20 mt-10 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              {hasChanges ? (
+                <div className="flex items-center gap-2 text-amber-600">
+                  <div className="w-2 h-2 bg-amber-600 rounded-full animate-pulse"></div>
+                  <span className="font-medium">You have unsaved changes</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-green-600">
+                  <span className="font-medium">All changes saved</span>
+                </div>
+              )}
+        </div>
+
+        <div className="flex items-center gap-3">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
             disabled={saving}
-            className="cursor-pointer"
+            className="cursor-pointer hover:bg-slate-100 transition-colors"
           >
             <X className="w-4 h-4 mr-2" /> Cancel
           </Button>
-          <Button
+          <button
             onClick={() => setIsConfirmOpen(true)}
             disabled={saving || !hasChanges}
-            className="cursor-pointer"
+            className="cursor-pointer text-white shadow-md hover:shadow-lg bg-[#16a34a] flex justify-center items-center px-4 py-2 rounded-lg"
           >
             {saving ? (
               <>
@@ -330,12 +354,14 @@ const LocationPage = () => {
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" /> Update Location
+                <Save className="w-4 h-4 mr-2" /> Save Changes
               </>
             )}
-          </Button>
+          </button>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
 
       <ConfirmationModal
         isOpen={isConfirmOpen}

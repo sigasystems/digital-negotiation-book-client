@@ -21,7 +21,7 @@ export const VersionNavigation = ({ negotiations, activeVersion, onVersionChange
                 variant={activeVersion === index ? "default" : "outline"}
                 size="sm"
                 onClick={() => onVersionChange(index)}
-                className={activeVersion === index ? "bg-blue-600 hover:bg-blue-700" : ""}
+                className={activeVersion === index ? "bg-[#16a34a] hover:bg-green-700" : ""}
               >
                 V{index + 1}
               </Button>

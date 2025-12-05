@@ -116,7 +116,7 @@ const UserPage = () => {
       }, {});
 
       await roleBasedDataService.update(userRole, { id, ownerId: buyer.ownerId }, changedData);
-      toast.success("Buyer updated successfully");
+      toast.success("Buyer Updated Successfully!");
       setHasChanges(false);
       setOriginalBuyer(buyer);
       setTimeout(() => navigate(-1), 1000);

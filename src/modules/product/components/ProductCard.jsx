@@ -8,9 +8,6 @@ const ProductCard = memo(({ index, product, onChange, onRemove, onSpeciesChange,
     <div className="border-b border-gray-200 last:border-b-0">
       <div className="flex items-center justify-between px-9 py-4">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="p-2 sm:p-3 bg-indigo-50 rounded-lg text-indigo-600">
-            <Package size={18} className="sm:w-[22px] sm:h-[22px]" />
-          </div>
           <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
             Product {index + 1}
           </h2>

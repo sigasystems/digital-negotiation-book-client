@@ -6,13 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Save, X } from "lucide-react";
 import { FIELD_LABELS, ROLE_CONFIG, HIDDEN_FIELDS } from "@/app/config/roleConfig";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import ConfirmationModal from "@/components/common/ConfirmationModal"; // ✅ Import modal
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 const BuyerPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Use correct mapping between buyer <-> business_owner
   const {
     data,
     loading,
@@ -22,10 +21,23 @@ const BuyerPage = () => {
     handleSubmit,
   } = useUserProfile(id, "business_owner", "super_admin", ROLE_CONFIG, HIDDEN_FIELDS);
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // ✅ Modal state
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const config = ROLE_CONFIG.super_admin;
 
   const READ_ONLY_FIELDS = ["status", "isVerified", "isDeleted", "isApproved"];
+
+  const allFields = React.useMemo(() => {
+    if (!config?.sections) return [];
+    
+    const fields = [];
+    Object.values(config.sections).forEach(section => {
+      if (Array.isArray(section.fields)) {
+        fields.push(...section.fields);
+      }
+    });
+    
+    return [...new Set(fields)];
+  }, [config]);
 
   if (loading) {
     return (
@@ -100,25 +112,20 @@ const BuyerPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="mx-auto py-4">
         <div className="space-y-8">
-          {Object.entries(config.sections).map(([sectionKey, section]) => (
-            <div
-              key={sectionKey}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
-            >
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
               {/* Section Header */}
               <div className="bg-gradient-to-r from-slate-50 to-blue-50 px-5 py-4 border-b border-slate-200">
                 <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                  {section.title}
+                Buyer Information
                 </h2>
               </div>
 
-              {/* Fields */}
+              {/* Fields - ALL in one grid */}
               <div className="p-5 sm:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                  {section.fields.map(
+                  {allFields.map(
                     (key) =>
                       data?.[key] !== undefined && (
                         <div key={key} className="space-y-2">
@@ -145,11 +152,10 @@ const BuyerPage = () => {
                 </div>
               </div>
             </div>
-          ))}
         </div>
 
         {/* Actions */}
-        <div className="sticky bottom-0 sm:static bg-white border-t border-slate-200 mt-10 py-4 px-4 sm:px-0 shadow-lg sm:shadow-none z-30">
+        <div className="sticky bottom-0 bg-white border-t border-slate-200 mt-10 py-4 px-4 shadow-lg z-30 rounded-lg">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-end gap-3">
             <Button
               variant="outline"
@@ -163,7 +169,7 @@ const BuyerPage = () => {
             <Button
               onClick={handleSaveClick}
               disabled={saving || !hasChanges}
-              className=" button-styling"
+              className="button-styling"
             >
               {saving ? (
                 <>
@@ -186,7 +192,7 @@ const BuyerPage = () => {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={confirmSave}
         title="Confirm Save"
-        description="Are you sure you want to save these changes? This will update the buyer’s profile information."
+        description="Are you sure you want to save these changes? This will update the buyer's profile information."
         confirmText="Save Changes"
         cancelText="Cancel"
         confirmButtonColor="bg-[#16a34a] hover:bg-green-700"

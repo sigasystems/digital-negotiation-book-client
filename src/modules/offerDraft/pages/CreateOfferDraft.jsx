@@ -2,11 +2,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { format, isBefore, startOfDay, parseISO } from "date-fns";
-import { FileText, Sparkles } from "lucide-react";
 import { offerDraftService } from "../services";
 import { productService } from "@/modules/product/services";
 import { useToast } from "@/app/hooks/useToast";
-import Header from "../components/Header";
 import Section from "../components/Section";
 import ReadOnlyField from "../components/ReadOnlyField";
 import { InputField } from "@/components/common/InputField";
@@ -16,6 +14,8 @@ import Footer from "../components/Footer";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
 import planUsageService from "@/services/planUsageService";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const EMPTY_PRODUCT = {
   productId: "",
@@ -246,17 +246,19 @@ const CreateOfferDraft = () => {
 
         <div className="flex items-center gap-5">
 
-          <Header onBack={() => (window.location.href = "/dashboard")} />
-
-            <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg">
-              <FileText size={32} className="text-white" />
-            </div>
+         <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(-1)} 
+              className="hover:bg-slate-100 rounded-lg transition-all duration-200 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold text-gray-900">
                   Create Offer Draft
                 </h1>
-                <Sparkles size={20} className="text-yellow-500" />
             </div>
             <p className="text-sm text-gray-600 mt-0.5">
               Generate professional offer drafts for your clients
@@ -410,7 +412,7 @@ const CreateOfferDraft = () => {
         description="Are you sure you want to create this offer draft? This will save the draft with the details you’ve entered."
         confirmText="Create Draft"
         cancelText="Cancel"
-        confirmButtonColor="bg-blue-600 hover:bg-blue-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-blue-700"
       />
     </div>
   );

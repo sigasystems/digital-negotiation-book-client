@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Save, Package, X } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import ProductCard from "../components/ProductCard";
 import { productService } from "../services";
@@ -70,7 +69,7 @@ const ViewProduct = () => {
       };
 
       await productService.updateProduct(id, payload);
-      toast.success("Product updated successfully ✅");
+      toast.success("Product Updated Successfully!");
       setHasChanges(false);
     } catch (err) {
       console.error("Update failed:", err);
@@ -83,42 +82,58 @@ const ViewProduct = () => {
     if (loading)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-          <Spinner className="w-10 h-10 text-indigo-600 mb-3" />
-          <p className="text-slate-600 font-medium">Loading product details...</p>
+        <div className="relative">
+          <div className="w-10 h-10 border-2 border-slate-200 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
+        </div>
+        <p className="text-slate-600 font-medium mt-3">Loading product details...</p>
       </div>
     );
 
   if (!data)
     return (
-      <div className="text-center text-gray-500 mt-20">
-        No product data found.
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">No Product Data</h3>
+          <p className="text-slate-600 mb-4">The product you're looking for doesn't exist.</p>
+          <Button onClick={() => navigate(-1)} variant="outline" size="sm">
+            Go Back
+          </Button>
+        </div>
       </div>
     );
 
   return (
-    <div className="relative min-h-screen px-[24.5px]">
+    <div className="relative min-h-screen px-[24.5px] bg-slate-50">
       {/* Saving Overlay */}
       {saving && (
-        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-          <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
-          <p className="text-slate-700 font-medium">Saving changes...</p>
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 transition-all duration-300">
+          <div className="relative">
+            <div className="w-8 h-8 border-2 border-blue-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
+          </div>
+          <p className="text-slate-700 font-medium mt-2 animate-pulse duration-1000">Saving changes...</p>
+          <p className="text-sm text-slate-500">Please don't close the window</p>
         </div>
       )}
 
       {/* Header */}
-      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg">
+      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg mb-6 transition-all duration-200">
         <div className="px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className={`cursor-pointer`}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="hover:bg-slate-100 rounded-lg transition-all duration-200">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
 
             <div className="flex items-center gap-3 ml-3">
-              <div className="h-8 w-px bg-slate-300 hidden sm:block" />
+              <div className="h-8 w-px bg-slate-200 hidden sm:block transition-all duration-300" />
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                <h1 className="text-lg sm:text-xl font-semibold text-slate-900 transition-all duration-200">
                   Product Details
                 </h1>
+                <p className="text-sm text-slate-500 hidden sm:block mt-0.5 transition-all duration-200">
+                  {data?.productName || "Product Information"}
+                </p>
               </div>
             </div>
           </div>
@@ -126,9 +141,9 @@ const ViewProduct = () => {
           {hasChanges && (
             <Badge
               variant="outline"
-              className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-2"
+              className="bg-amber-50 text-amber-700 border-amber-200 text-sm font-normal transition-all duration-300"
             >
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 animate-pulse duration-1000"></span>
               Unsaved Changes
             </Badge>
           )}
@@ -136,8 +151,27 @@ const ViewProduct = () => {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto py-4">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+      <main className="mx-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-6 transition-all duration-200 hover:shadow-md">
+          <div className="border-b border-slate-100 px-6 py-4 transition-all duration-200">
+            <div className="flex items-center gap-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900 transition-all duration-200">
+                  Product Information
+                </h2>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="[&_input]:h-9 [&_input]:py-2 [&_input]:text-sm [&_input]:transition-all [&_input]:duration-200 
+                          [&_.input]:h-9 [&_.input]:py-2 [&_.input]:text-sm 
+                          [&_button]:transition-all [&_button]:duration-200
+                          [&_.h-10]:h-9 [&_.h-12]:h-10
+                          [&_.py-2]:py-1.5 [&_.py-3]:py-2
+                          [&_.text-base]:text-sm [&_.text-lg]:text-base
+                          [&_.space-y-2]:gap-3 [&_.space-y-4]:gap-4
+                          [&_.gap-4]:gap-3 [&_.gap-6]:gap-4">
           <ProductCard
             index={0}
             product={data}
@@ -156,15 +190,36 @@ const ViewProduct = () => {
             onRemoveSize={(i, si) => handleArrayUpdate("size", "remove", si)}
           />
         </div>
+          </div>
+        </div>
+        
+        {hasChanges && !saving && (
+          <div className="mb-6 transition-all duration-300">
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 transition-all duration-200">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse duration-1000"></div>
+                <div className="transition-all duration-200">
+                  <p className="text-sm font-medium text-blue-800">
+                    You have unsaved changes
+                  </p>
+                  <p className="text-xs text-blue-600">
+                    Review your changes before saving
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="sticky bottom-0 bg-white border-t border-slate-200 mt-10 py-4 px-4 shadow-lg z-30 rounded-lg">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-end gap-3">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
             disabled={saving}
-            className={`cursor-pointer`}
+            className="border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
           >
-            <X className="w-4 h-4 mr-2" /> Cancel
+            <X className="w-4 h-4 mr-2 transition-all duration-200" /> Cancel
           </Button>
           <Button
             onClick={() => setIsConfirmOpen(true)}
@@ -173,14 +228,15 @@ const ViewProduct = () => {
           >
             {saving ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin duration-700" /> Saving...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" /> Save Changes
+                <Save className="w-4 h-4 mr-2 transition-all duration-200" /> Save Changes
               </>
             )}
           </Button>
+          </div>
         </div>
       </main>
 
@@ -188,10 +244,10 @@ const ViewProduct = () => {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={confirmSave}
-        title="Confirm Save"
-        description="Are you sure you want to save these product changes?"
+        title="Save Product Changes"
+        description="Are you sure you want to save these changes to the product?"
         confirmText="Save Changes"
-        cancelText="Cancel"
+        cancelText="Review Changes"
         confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>

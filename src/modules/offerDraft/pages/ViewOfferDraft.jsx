@@ -10,18 +10,17 @@ import {
   Package, 
   Loader2,
   FilePlus2,
-  CheckCircle2
+  CheckCircle2,
+  X
 } from "lucide-react";
 import { offerDraftService } from "../services";
 import { productService } from "@/modules/product/services";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
 import { validateOfferDates } from "@/utils/formateDate";
 import { InputField } from "@/components/common/InputField";
-import Section from "../components/Section";
 import ReadOnlyField from "../components/ReadOnlyField";
 import ProductSection from "../components/ProductSection";
 import DatePicker from "../components/DatePicker";
-import FormActions from "../components/FormActions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -181,7 +180,7 @@ const ViewOfferDraft = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24 lg:pb-8 px-[24.5px]">
+    <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px]">
 
   <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
     <div className="px-4 sm:px-6 lg:px-8 py-4">
@@ -217,7 +216,6 @@ const ViewOfferDraft = () => {
             }
             className="button-styling"
           >
-            <FilePlus2 className="w-4 h-4 mr-2" />
             Create Offer
           </Button>
         </div>
@@ -225,13 +223,10 @@ const ViewOfferDraft = () => {
     </div>
   </header>
 
-  <main className="mx-auto py-4 space-y-6 sm:space-y-8">
-    {/* Business Information */}
-    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+  <main className="mx-auto py-4">
+    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">      
+          <div className="mb-8">
       <div className="flex items-center gap-3 mb-5 sm:mb-6">
-        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-          <Building2 className="w-5 h-5 text-blue-600" />
-        </div>
         <h2 className="font-semibold text-base sm:text-lg text-slate-900">Business Information</h2>
         </div>
       
@@ -275,11 +270,9 @@ const ViewOfferDraft = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+          {/* Draft Details Section */}
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-              <FileText className="w-5 h-5 text-green-600" />
-            </div>
             <h2 className="font-semibold text-base sm:text-lg text-slate-900">Draft Details</h2>
           </div>
 
@@ -329,11 +322,8 @@ const ViewOfferDraft = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-              <Calendar className="w-5 h-5 text-purple-600" />
-            </div>
             <h2 className="font-semibold text-base sm:text-lg text-slate-900">Important Dates</h2>
           </div>
 
@@ -362,11 +352,8 @@ const ViewOfferDraft = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
+        <div>
           <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <Package className="w-5 h-5 text-orange-600" />
-            </div>
             <h2 className="font-semibold text-base sm:text-lg text-slate-900">Product & Size Details</h2>
           </div>
 
@@ -377,13 +364,13 @@ const ViewOfferDraft = () => {
               speciesMap={speciesMap}
               onProductSelect={handleProductSelect}
             />
+          </div>
         </div>
       </main>
 
-      {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-2xl z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-sm z-20 mt-10 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2 text-sm text-slate-600">
               {isChanged ? (
                 <div className="flex items-center gap-2 text-amber-600">
@@ -398,14 +385,14 @@ const ViewOfferDraft = () => {
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
                 onClick={() => navigate(-1)} 
                 disabled={saving}
-                className="w-full sm:w-auto cursor-pointer hover:bg-slate-100 border-slate-300 transition-colors h-8 sm:h-9 text-sm sm:text-base font-medium"
+                className="cursor-pointer hover:bg-slate-100 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
 
@@ -416,12 +403,12 @@ const ViewOfferDraft = () => {
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2" />
-                    Saving Changes...
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    <Save className="w-4 h-4 mr-2" />
                     Save Changes
                   </>
                 )}

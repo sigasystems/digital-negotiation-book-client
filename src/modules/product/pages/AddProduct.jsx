@@ -157,9 +157,6 @@ const AddProduct = () => {
           </button>
         
           <div className="flex items-center gap-3 ml-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md">
-              <Package className="w-5 h-5 text-black" />
-            </div>
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Add Products

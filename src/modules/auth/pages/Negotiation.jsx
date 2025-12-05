@@ -86,7 +86,7 @@ const Negotiation = () => {
           title: "Confirm Action",
           description: "Are you sure you want to proceed?",
           confirmText: "Confirm",
-          confirmButtonColor: "bg-blue-600 hover:bg-blue-700"
+          confirmButtonColor: "bg-[#16a34a] hover:bg-green-700"
         };
     }
   };
@@ -186,7 +186,7 @@ const Negotiation = () => {
               </svg>
             </button>
             
-            <div className="px-4 py-1.5 bg-blue-600 rounded-md shadow-sm">
+            <div className="button-styling cursor-none">
               <span className="text-sm font-semibold text-white">
                 Version {version.versionNo} of {history.length}
               </span>
@@ -208,8 +208,8 @@ const Negotiation = () => {
               disabled={!isOfferEditable}
               className={`px-5 py-2 text-white text-sm font-medium rounded-md shadow-sm transition-colors ${
                 isOfferEditable 
-                  ? "bg-emerald-600 hover:bg-emerald-700 cursor-pointer" 
-                  : "bg-emerald-400 cursor-not-allowed"
+                  ? "bg-[#0ea5e9] hover:bg-[#0b84ba] cursor-pointer" 
+                  : "bg-[#3ec6ff] cursor-not-allowed"
               }`}
             >
               <span className="flex items-center gap-2">
@@ -314,7 +314,7 @@ const Negotiation = () => {
               const isLastColumn = idx === history.length - 1;
               
               let columnHeader = neg.fromParty || "Offer";
-              let headerBgColor = selected ? "bg-blue-600" : "bg-gray-700";
+              let headerBgColor = selected ? "bg-[#16a34a]" : "bg-gray-700";
               
               if (isLastColumn && !isOfferEditable && offer?.status) {
                 columnHeader = offer.status.toUpperCase();
@@ -326,7 +326,7 @@ const Negotiation = () => {
                 key={idx}
                 className={`rounded-lg overflow-hidden transition-all duration-200 flex flex-col shadow-sm ${
                     selected
-                        ? "bg-white border-2 border-blue-500 shadow-lg"
+                        ? "bg-white border-2 border-[#16a34a] shadow-lg"
                       : "bg-white border border-gray-200"}`}>                
                       <div className={`px-4 py-2.5 text-center text-white font-semibold text-xs shrink-0 ${headerBgColor}`}>
                       <div className="flex items-center justify-center gap-2">

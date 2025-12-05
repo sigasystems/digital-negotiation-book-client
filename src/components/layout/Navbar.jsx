@@ -225,7 +225,7 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
           ) : (
             <button
               onClick={handleDashboardCTA}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+              className="w-full px-4 py-2 bg-[#16a34a] text-white rounded-lg font-medium hover:bg-green-700"
             >
               Login
             </button>

@@ -189,7 +189,7 @@ export default function UpgradePlanPage() {
                 )
               }
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                billingCycle === "yearly" ? "bg-blue-600" : "bg-gray-300"
+                billingCycle === "yearly" ? "bg-[#16a34a]" : "bg-gray-300"
               }`}
             >
               <span
@@ -305,7 +305,7 @@ export default function UpgradePlanPage() {
               >
                 {isPopular && !isActive && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    <span className="bg-[#16a34a] text-white text-xs px-3 py-1 rounded-full font-medium">
                       Most Popular
                     </span>
                   </div>
@@ -377,7 +377,7 @@ export default function UpgradePlanPage() {
                         : !canUpgrade
                         ? "bg-gray-100 text-gray-500 cursor-not-allowed"
                         : isPopular
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        ? "bg-[#16a34a] hover:bg-green-700 text-white"
                         : "bg-gray-900 hover:bg-gray-800 text-white"
                     }`}
                   >

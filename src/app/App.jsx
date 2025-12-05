@@ -284,7 +284,9 @@ export default function App() {
       <Router>
         <AppContent />
       </Router>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} toastOptions={{
+          style: { marginTop: "60px" },
+        }}/>
     </>
   );
 }

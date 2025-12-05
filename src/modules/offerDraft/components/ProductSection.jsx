@@ -157,7 +157,7 @@ const ProductSection = ({
                   <button
                     type="button"
                     onClick={() => addBreakupRow(pIndex)}
-                    className="px-3 py-1 bg-indigo-600 text-white rounded-lg"
+                    className="button-styling"
                   >
                     + Add Row
                   </button>

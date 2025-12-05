@@ -42,7 +42,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
           onClick={() => onPageChange(num)}
           className={`cursor-pointer px-3 py-2 rounded-lg transition ${
             currentPage === num
-              ? "bg-blue-600 text-white"
+              ? "bg-[#16a34a] text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >

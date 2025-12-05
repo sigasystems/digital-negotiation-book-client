@@ -12,7 +12,7 @@ export const ErrorState = ({ error, onBack }) => (
       <p className="text-slate-600 mb-6">{error}</p>
       <Button
         onClick={onBack}
-        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+        className="flex items-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Previous
       </Button>
