@@ -287,7 +287,7 @@ const LocationPage = () => {
                         />
                         <button
                             type="button"
-                            className="text-sm text-indigo-600 hover:text-indigo-700 underline mt-1.5 self-start transition-colors"
+                            className="text-sm text-indigo-600 hover:text-indigo-700 underline mt-1.5 self-start transition-colors cursor-pointer"
                             onClick={() => setShowCountryDropdown(true)}
                         >
                             Change country
