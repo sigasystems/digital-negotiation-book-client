@@ -43,7 +43,6 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
     }
   }, [handleSearchSubmit]);
 
-  const hasActiveFilters = Object.values(filters).some(val => val !== "" && val !== undefined);
 
   return (
     <div className="w-full">
@@ -136,15 +135,6 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
             <span>Reset</span>
       </button>
           </div>
-
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2 text-xs text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="font-semibold">
-                {Object.values(filters).filter(v => v !== "" && v !== undefined).length} filter(s) active
-              </span>
-            </div>
-          )}
     </div>
   </div>
 
