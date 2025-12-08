@@ -141,8 +141,15 @@ const Negotiation = () => {
 
   const isOfferEditable = offer?.status?.toLowerCase() === "open" || offer?.status?.toLowerCase() === "close";
   
-  const formatDate = (date) =>
-    date ? new Date(date).toISOString().split("T")[0] : "-";
+  const formatDate = (date) =>{
+    if (!date) return "-";
+    try {
+      return new Date(date).toISOString().split("T")[0];
+    } catch (error) {
+      console.error("Error formatting date:", date, error);
+      return "-";
+    }
+  };
 
   const handlePrev = () =>
     setCurrentPage((p) => (p > 0 ? p - 1 : history.length - 1));
@@ -156,19 +163,21 @@ const Negotiation = () => {
   };
 
   const leftFields = [
-    { label: "Offer Name", key: "offerName", source: "offer" },
-    { label: "Offer Date", key: "createdAt", source: "offer" },
-    { label: "From Name", key: "fromParty", source: "offer" },
-    { label: "To Party", key: "toParty", source: "offer" },
-    { label: "Offer Validity", key: "offerValidityDate", source: "offer" },
-    { label: "Shipment Date", key: "shipmentDate", source: "offer" },
-    { label: "Processor", key: "processor", source: "offer" },
-    { label: "Plant Approval", key: "plantApprovalNumber", source: "offer" },
-    { label: "Brand", key: "brand", source: "offer" },
-    { label: "Origin", key: "origin", source: "offer" },
-    { label: "Destination", key: "destination", source: "offer" },
-    { label: "Product", key: "productName", source: "version" },
-    { label: "Species", key: "speciesName", source: "version" },
+    { label: "Offer Name", key: "offerName" },
+    { label: "Offer Date", key: "createdAt" },
+    { label: "From Name", key: "fromParty" },
+    { label: "To Party", key: "toParty" },
+    { label: "Offer Validity", key: "offerValidityDate" },
+    { label: "Shipment Date", key: "shipmentDate" },
+    { label: "Processor", key: "processor" },
+    { label: "Plant Approval", key: "plantApprovalNumber" },
+    { label: "Brand", key: "brand" },
+    { label: "Origin", key: "origin" },
+    { label: "Destination", key: "destination" },
+    { label: "Product", key: "productName" },
+    { label: "Species", key: "speciesName" },
+    { label: "Quantity", key: "quantity" },
+    { label: "Packing", key: "packing" },
   ];
 
   return (
@@ -302,7 +311,7 @@ const Negotiation = () => {
                     i % 2 === 0 ? 'bg-gray-50' : 'bg-white'
                   }`}
                 >
-                {row.size}
+                {row.size || "-"}
             </div>
           ))}
               </div>
@@ -339,10 +348,20 @@ const Negotiation = () => {
 
                   <div className="flex-1 overflow-y-auto">
                   {leftFields.map((field, fieldIdx) => {
-                        const source = field.source === "offer" ? offer : neg;
-                  const val = field.key.toLowerCase().includes("date")
-                    ? formatDate(source[field.key])
-                    : source[field.key] || "-";
+                    let val;
+                    
+                    if (field.key === "processor" || field.key === "origin" || field.key === "destination" || field.key === "offerValidityDate") {
+                      const rawValue = offer[field.key];
+                      val = field.key.toLowerCase().includes("date") ? formatDate(rawValue) : rawValue || "-";
+                    } else if (field.key === "createdAt") {
+                      val = formatDate(neg[field.key]);
+                    } else if (field.key.toLowerCase().includes("date")) {
+                      val = formatDate(neg[field.key]);
+                    } else if (field.key === "packing") {
+                      val = productMeta.packing || "-";
+                    } else {
+                      val = neg[field.key] || "-";
+                    }
 
                   return (
                     <div
@@ -357,67 +376,46 @@ const Negotiation = () => {
                   );
                 })}
 
-                <div className="px-4 py-2 text-[11px] text-gray-400 border-b border-gray-200 bg-gray-50">
-                  -
+                <div className="grid grid-cols-3 bg-gray-50 text-[10px] font-semibold border-b border-gray-200 text-gray-700">
+                  <div className="px-4 py-2 text-center border-r border-gray-200">
+                    Breakup
+                  </div>
+                  <div className="px-4 py-2 text-center border-r border-gray-200">
+                    Condition
+                  </div>
+                  <div className="px-4 py-2 text-center">
+                    Price
+                  </div>
                 </div>
 
-                <div className="px-4 py-2 text-[11px] font-semibold text-gray-800 border-b border-gray-200 bg-white">
-                  {neg.quantity || "-"}
-                </div>
 
-
-                <div className="border-t-2 border-gray-300">
-                                  
-                          <div className="grid grid-cols-4 bg-gray-100 text-[10px] font-semibold border-b border-gray-300 text-gray-700">
-                      <div className="py-2 px-2 text-center border-r border-gray-300">
-                              <div className="mb-0.5 uppercase">Breakup</div>
-                              {productMeta.breakupDetails && (
-                        <div className="text-[8px] text-gray-600 font-normal truncate">
-                          {productMeta.breakupDetails}
+                    <div className="grid grid-cols-3 bg-white text-[10px] font-semibold border-b border-gray-200 text-gray-700">
+                      <div className="px-4 py-4 text-center border-r border-gray-200">
                         </div>
-                              )}
-                      </div>
-
-                      <div className="py-2 px-2 text-center border-r border-gray-300 uppercase">
-                        Condition
-                      </div>
-
-                      <div className="py-2 px-2 text-center border-r border-gray-300">
-                              <div className="mb-0.5 uppercase">Price</div>
-                              {productMeta.priceDetails && (
-                        <div className="text-[8px] text-gray-600 font-normal truncate">
-                          {productMeta.priceDetails}
-                        </div>
-                              )}
-                      </div>
-
-                      <div className="py-2 px-2 text-center uppercase">
-                        Packing
+                      <div className="px-4 py-4 text-center border-r border-gray-200">
+                    </div>
+                  <div className="px-4 py-2 text-center">
                       </div>
                     </div>
 
                     {neg.sizeBreakups?.map((row, i) => (
                       <div
                         key={i}
-                        className={`grid grid-cols-4 text-[11px] border-b border-gray-200 ${
+                        className={`grid grid-cols-3 text-[11px] border-b border-gray-200 ${
                                 i % 2 === 0 ? "bg-gray-50" : "bg-white"
                               }`}
                       >
-                        <div className="py-2 px-2 text-center border-r border-gray-200 font-medium text-gray-800 truncate">
-                          {row.breakup}
+                        <div className="px-4 py-2 text-center border-r border-gray-200 text-gray-700 truncate">
+                          {row.breakup || "-"}
                         </div>
-                        <div className="py-2 px-2 text-center border-r border-gray-200 text-gray-700 truncate">
-                          {row.condition}
+                        <div className="px-4 py-2 text-center border-r border-gray-200 text-gray-700 truncate">
+                          {row.condition || "-"}
                         </div>
-                        <div className="py-2 px-2 text-center border-r border-gray-200 font-semibold text-emerald-600 truncate">
-                          {row.price}
-                        </div>
-                        <div className="py-2 px-2 text-center text-gray-700 truncate">
-                          {productMeta.packing || "-"}
+                        <div className="px-4 py-2 text-center font-semibold text-emerald-600 truncate">
+                          {row.price || "-"}
                         </div>
                       </div>
                     ))}
-                    </div>
                 </div>
               </div>
             );
