@@ -1,5 +1,4 @@
 import { toast } from "react-hot-toast";
-import { ACTION_LOADING_MESSAGES } from "@/app/config/actionConfig";
 
 export const runAction = async ({
   key,
@@ -7,21 +6,30 @@ export const runAction = async ({
   setLoading,
   refresh,
   getErrorMessage,
+  onSuccess,
+  onError,
 }) => {
-  setLoading(key);
-  const toastId = toast.loading(ACTION_LOADING_MESSAGES[key] || "Processing...");
-
   try {
-    await new Promise((r) => setTimeout(r, 2000));
-    await fn();
-
-    toast.success("Action completed", { id: toastId });
+    setLoading?.(key);
+    const result = await fn();
+    
+    if (onSuccess) {
+      onSuccess(result);
+    } else {
+      toast.success("Operation completed successfully");
+    }
+    
     refresh?.();
-  } catch (err) {
-    const msg = getErrorMessage(err, "Action failed");
-    toast.error(msg, { id: toastId });
+    return result;
+  } catch (error) {
+    if (onError) {
+      onError(error);
+    } else {
+      toast.error(getErrorMessage?.(error) || "Operation failed");
+    }
+    throw error;
   } finally {
-    setLoading(null);
+    setLoading?.(null);
   }
 };
 

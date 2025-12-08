@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { productService } from "@/modules/product/services";
 import { offerDraftService } from "@/modules/offerDraft/services";
+import { offerService } from "@/modules/offers/services";
 import { ACTION_ICONS } from "@/app/config/actionConfig";
 import toast from "react-hot-toast";
 import {
@@ -94,25 +95,44 @@ export const ActionsCell = ({ row, refreshData, userActions = [] }) => {
         key: "delete",
         title: "Delete Record",
         description: `Delete ${name}? This cannot be undone.`,
-        fn: () =>
-          runAction({
-            key: "delete",
             fn: async () => {
+            try {
+              setLoadingAction("delete");
+              
+              let result;
               if (type === "offer_draft") {
-                return offerDraftService.deleteDraft(record.draftNo || record.id);
-              }
-              if (type === "product") {
-                return productService.deleteProduct(record.id);
-              }
-              if (type === "country") {
-                return countryServices.remove(record.id);
-              }
-              return roleBasedDataService.softDelete(role, record.id);
-            },
-            setLoading: setLoadingAction,
-            refresh: refreshData,
-            getErrorMessage,
-          }),
+                result = await offerDraftService.deleteDraft(record.draftNo || record.id);
+              } else if (type === "product") {
+                result = await productService.deleteProduct(record.id);
+              } else if (type === "country") {
+                result = await countryServices.remove(record.id);
+          } else if (type === "offer") {
+            result = await offerService.deleteOffer(record.id);
+          } else {
+            result = await roleBasedDataService.softDelete(role, record.id);
+          }
+          
+          if (result?.data?.message) {
+            toast.success(result.data.message);
+          } else if (result?.message) {
+            toast.success(result.message);
+          } else {
+            toast.success(`${name} deleted successfully`);
+          }
+          
+          if (refreshData) {
+            refreshData();
+          }
+          
+          return result;
+        } catch (error) {
+          const errorMessage = getErrorMessage?.(error) || error?.response?.data?.message || error?.message || "Failed to delete record";
+          toast.error(errorMessage);
+          throw error;
+        } finally {
+          setLoadingAction(null);
+        }
+      },
       });
     },
   };
