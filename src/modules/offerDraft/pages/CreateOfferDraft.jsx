@@ -21,9 +21,9 @@ const EMPTY_PRODUCT = {
   productId: "",
   species: "",
   sizeBreakups: [{ size: "", breakup: "", price: "", condition: "" }],
-  sizeDetails: "",
-  breakupDetails: "",
-  priceDetails: "",
+  sizeDetails: "Units / Remarks",
+  breakupDetails: "Breakup Details",
+  priceDetails: "$",
   packing: "",
 };
 
@@ -46,7 +46,7 @@ const CreateOfferDraft = () => {
           }
         };
         fetchPlanUsage();
-      }, [user.id]);
+      }, [user.id, showToast]);
     
 
   const initialForm = useMemo(
@@ -161,9 +161,9 @@ const CreateOfferDraft = () => {
     productId: p.productId,
     productName: productInfo?.productName || "",
     species: p.species,
-    sizeDetails: p.sizeDetails || "",
-    breakupDetails: p.breakupDetails || "",
-    priceDetails: p.priceDetails || "",
+    sizeDetails: p.sizeDetails || "Units / Remarks",
+    breakupDetails: p.breakupDetails || "Breakup Details",
+    priceDetails: p.priceDetails || "$",
     packing: p.packing || "",
     sizeBreakups: p.sizeBreakups.map((s) => ({
       size: s.size,
@@ -409,7 +409,7 @@ const CreateOfferDraft = () => {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={confirmCreate}
         title="Confirm Offer Draft Creation"
-        description="Are you sure you want to create this offer draft? This will save the draft with the details you’ve entered."
+        description="Are you sure you want to create this offer draft? This will save the draft with the details you've entered."
         confirmText="Create Draft"
         cancelText="Cancel"
         confirmButtonColor="bg-[#16a34a] hover:bg-blue-700"

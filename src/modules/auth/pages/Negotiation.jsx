@@ -181,7 +181,7 @@ const Negotiation = () => {
   ];
 
   return (
-    <div>
+    <>
 
       <div className="px-8 py-3">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-4">
@@ -376,7 +376,7 @@ const Negotiation = () => {
                   );
                 })}
 
-                <div className="grid grid-cols-3 bg-gray-50 text-[10px] font-semibold border-b border-gray-200 text-gray-700">
+                <div className="grid grid-cols-3 bg-gray-50 text-[10px] font-bold border-b border-gray-200 text-gray-700">
                   <div className="px-4 py-2 text-center border-r border-gray-200">
                     Breakup
                   </div>
@@ -390,11 +390,13 @@ const Negotiation = () => {
 
 
                     <div className="grid grid-cols-3 bg-white text-[10px] font-semibold border-b border-gray-200 text-gray-700">
-                      <div className="px-4 py-4 text-center border-r border-gray-200">
+                      <div className="px-4 py-2 text-center border-r border-gray-200">
+                        {productMeta.breakupDetails || ""}
                         </div>
-                      <div className="px-4 py-4 text-center border-r border-gray-200">
+                      <div className="px-4 py-2 text-center border-r border-gray-200">
                     </div>
                   <div className="px-4 py-2 text-center">
+                        {productMeta.priceDetails || ""}
                       </div>
                     </div>
 
@@ -438,7 +440,7 @@ const Negotiation = () => {
         cancelText="Cancel"
         confirmButtonColor={modalContent.confirmButtonColor}
       />
-    </div>
+    </>
   );
 };
 

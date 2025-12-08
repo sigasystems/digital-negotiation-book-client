@@ -42,6 +42,19 @@ const ProductSection = ({
     });
   };
 
+  const handleNumberInput = (pIndex, rIndex, field, value) => {
+    const sanitizedValue = value.replace(/[^0-9.]/g, "");
+    
+    if (sanitizedValue.startsWith('-')) {
+      return;
+    }
+    const parts = sanitizedValue.split('.');
+    if (parts.length > 2) {
+      return;
+    }
+    updateBreakup(pIndex, rIndex, field, sanitizedValue);
+  };
+
   const addBreakupRow = (pIndex) => {
     setFormData(prev => {
       const products = prev.products.map((p, i) =>
@@ -177,7 +190,7 @@ const ProductSection = ({
                 <td className="px-3 py-2">
                   <input
                     type="text"
-                    value={product.sizeDetails || ""}
+                    value={product.sizeDetails || "Units / Remarks"}
                     onChange={(e) => updateProductField(pIndex, "sizeDetails", e.target.value)}
                     placeholder="Units / Remarks"
                     className="border rounded px-2 py-1 w-full font-semibold text-sm"
@@ -187,7 +200,7 @@ const ProductSection = ({
                 <td className="px-3 py-2">
                   <input
                     type="text"
-                    value={product.breakupDetails || ""}
+                    value={product.breakupDetails || "Breakup Details"}
                     onChange={(e) => updateProductField(pIndex, "breakupDetails", e.target.value)}
                     placeholder="Breakup Details"
                     className="border rounded px-2 py-1 w-full font-semibold text-sm"
@@ -196,7 +209,7 @@ const ProductSection = ({
                 <td className="px-3 py-2">
                   <input
                     type="text"
-                    value={product.priceDetails || ""}
+                    value={product.priceDetails || "$"}
                     onChange={(e) => updateProductField(pIndex, "priceDetails", e.target.value)}
                     placeholder="₹, $, £"
                     className="border rounded px-2 py-1 w-full font-semibold text-sm"
@@ -228,16 +241,36 @@ const ProductSection = ({
                   <td className="px-3 py-2">
                     <input
                       type="number"
+                          min="0"
+                          step="0.01"
                       value={row.breakup}
-              onChange={(e) => updateBreakup(pIndex, rIndex, "breakup", e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            handleNumberInput(pIndex, rIndex, "breakup", value);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === '-') {
+                              e.preventDefault();
+                            }
+                          }}
               className="border rounded px-2 py-1 w-full"
                     />
                   </td>
                   <td className="px-3 py-2">
                     <input
                       type="number"
+                          min="0"
+                          step="0.01"
                       value={row.price}
-              onChange={(e) => updateBreakup(pIndex, rIndex, "price", e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            handleNumberInput(pIndex, rIndex, "price", value);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === '-') {
+                              e.preventDefault();
+                            }
+                          }}
               className="border rounded px-2 py-1 w-full"
                     />
                   </td>
