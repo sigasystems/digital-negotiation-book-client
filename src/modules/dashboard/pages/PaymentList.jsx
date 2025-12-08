@@ -89,7 +89,7 @@ const PaymentList = () => {
                 placeholder={field.placeholder}
                 value={filters[field.key]}
                 onChange={(e) => handleInputChange(field.key, e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16a34a]"
               />
             </div>
           ))}
@@ -97,7 +97,7 @@ const PaymentList = () => {
         <div className="flex justify-end mt-4">
           <button
             onClick={handleSearch}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            className="button-styling"
           >
             Search
           </button>

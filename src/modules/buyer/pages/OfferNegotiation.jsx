@@ -313,14 +313,13 @@ const OfferNegotiation = () => {
   return (
     <div className="relative min-h-screen bg-slate-50">
       {state.saving && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 transition-all duration-300">
-          <div className="relative">
-            <div className="w-8 h-8 border-2 border-blue-100 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
-          </div>
-          <p className="text-slate-700 font-medium mt-2 animate-pulse duration-1000">Sending offer...</p>
-          <p className="text-sm text-slate-500">Please don't close the window</p>
-        </div>
+         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="relative">
+        <div className="w-10 h-10 border-2 border-slate-200 rounded-full"></div>
+        <div className="absolute top-0 left-0 w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
+      </div>
+      <p className="text-slate-600 font-medium mt-3">Sending Offer...</p>
+    </div>
       )}
 
       <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg mb-6 transition-all duration-200 mx-6">
