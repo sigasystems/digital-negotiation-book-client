@@ -34,7 +34,7 @@ export const NegotiationVersion = ({
         ? "border-blue-500 ring-2 ring-blue-100" 
         : "border-slate-200 hover:border-slate-300"
     }`}>
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">

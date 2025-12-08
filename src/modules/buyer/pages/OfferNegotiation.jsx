@@ -323,7 +323,7 @@ const OfferNegotiation = () => {
         </div>
       )}
 
-      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg mb-6 transition-all duration-200">
+      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg mb-6 transition-all duration-200 mx-6">
         <div className="px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="hover:bg-slate-100 rounded-lg transition-all duration-200 cursor-pointer">
@@ -381,7 +381,7 @@ const OfferNegotiation = () => {
         </div>
 
       <div className="sticky bottom-0 bg-white border-t border-slate-200 mt-10 py-4 px-4 shadow-lg z-30 rounded-lg">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
