@@ -7,8 +7,8 @@ export const OfferSummary = ({ offer }) => {
   if (!offer) return null;
 
   return (
-    <Card className="shadow-lg border-slate-200 hover:shadow-xl transition-shadow">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
+    <Card className="shadow-lg border-slate-200 hover:shadow-xl transition-shadow pt-4">
+      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b p-4">
         <CardTitle className="flex items-center gap-2 text-slate-800">
           <Building className="w-5 h-5 text-blue-600" />
           Offer Summary

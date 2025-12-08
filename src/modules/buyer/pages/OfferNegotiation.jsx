@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { buyerService } from "@/modules/buyer/service";
 import { productService } from "@/modules/product/services";
 import { offerService } from "@/modules/offers/services";
-import { ArrowLeft, FileText, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 // Import reusable components
 import { LoadingState } from "./components/LoadingState";
@@ -31,6 +32,7 @@ const OfferNegotiation = () => {
 
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -230,9 +232,18 @@ const OfferNegotiation = () => {
     [productsList, speciesMap, fetchProductDetails]
   );
 
-  const handleSave = useCallback(async () => {
+  const handleSaveClick = () => {
+    if (!state.negotiations.length) {
+      toast.error("No negotiation data to send.");
+      return;
+    }
+    setIsConfirmOpen(true);
+  };
+
+  const confirmSave = useCallback(async () => {
+    setIsConfirmOpen(false);
+    
     if (state.saving || !state.negotiations.length) {
-      if (!state.negotiations.length) toast.error("No negotiation data to send.");
       return;
     }
 
@@ -286,46 +297,71 @@ const OfferNegotiation = () => {
     updateState({ activeVersion: index });
   }, [updateState]);
 
-  if (state.loading) return <LoadingState />;
+  if (state.loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="relative">
+        <div className="w-10 h-10 border-2 border-slate-200 rounded-full"></div>
+        <div className="absolute top-0 left-0 w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
+      </div>
+      <p className="text-slate-600 font-medium mt-3">Loading negotiation details...</p>
+    </div>
+  );
+  
   if (state.error) return <ErrorState error={state.error} onBack={() => navigate(-1)} />;
   if (!state.negotiations.length) return <EmptyState onBack={() => navigate(-1)} />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
-      <header className="sticky top-15 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-40 mb-15">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-slate-600 hover:text-slate-800 cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
+    <div className="relative min-h-screen bg-slate-50">
+      {state.saving && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 transition-all duration-300">
+          <div className="relative">
+            <div className="w-8 h-8 border-2 border-blue-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin duration-700"></div>
+          </div>
+          <p className="text-slate-700 font-medium mt-2 animate-pulse duration-1000">Sending offer...</p>
+          <p className="text-sm text-slate-500">Please don't close the window</p>
+        </div>
+      )}
+
+      <header className="sticky top-17 bg-white border-b border-slate-200 shadow-sm z-20 rounded-lg mb-6 transition-all duration-200">
+        <div className="px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="hover:bg-slate-100 rounded-lg transition-all duration-200 cursor-pointer">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
+
+            <div className="flex items-center gap-3 ml-3">
+                <div className="h-8 w-px bg-slate-200 hidden sm:block transition-all duration-300" />
               <div>
-                <h1 className="text-xl font-bold text-slate-900">Offer Negotiation</h1>
-                <p className="text-sm text-slate-500">Manage and review negotiation versions</p>
+                <h1 className="text-lg sm:text-xl font-semibold text-slate-900 transition-all duration-200">
+                  Offer Negotiation
+                </h1>
+                <p className="text-sm text-slate-500 hidden sm:block mt-0.5 transition-all duration-200">
+                  Manage and review negotiation versions
+                </p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-              {state.negotiations.length} Version{state.negotiations.length > 1 ? 's' : ''}
-            </Badge>
           </div>
+
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200 text-sm font-normal transition-all duration-300"
+          >
+            {state.negotiations.length} Version{state.negotiations.length > 1 ? 's' : ''}
+          </Badge>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className="px-[24.5px]">
         <OfferSummary offer={state.rawOffer} />
         
+        <div className="mb-6">
         <VersionNavigation
           negotiations={state.negotiations}
           activeVersion={state.activeVersion}
           onVersionChange={handleVersionChange}
         />
+        </div>
 
         <div className="space-y-6">
           {state.negotiations.map((item, negIndex) => (
@@ -342,40 +378,47 @@ const OfferNegotiation = () => {
                 speciesMap={speciesMap}
               />
           ))}
-          </div>
         </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-2xl z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-end gap-3">
+      <div className="sticky bottom-0 bg-white border-t border-slate-200 mt-10 py-4 px-4 shadow-lg z-30 rounded-lg">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-end gap-3">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
             disabled={state.saving}
-              className="w-full sm:w-auto cursor-pointer border-slate-300 hover:bg-slate-50 transition-colors"
+              className="border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 cursor-pointer"
           >
-            Cancel
+              <X className="w-4 h-4 mr-2 transition-all duration-200" /> Cancel
           </Button>
           <Button
-            onClick={handleSave}
-            disabled={state.saving}
-              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer"
+            onClick={handleSaveClick}
+            disabled={state.saving || !state.negotiations.length}
+              className="button-styling"
           >
             {state.saving ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending Offer...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin duration-700" /> Sending Offer...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
-                Save & Send Offer
+                <Save className="w-4 h-4 mr-2 transition-all duration-200" /> Save & Send Offer
               </>
             )}
           </Button>
           </div>
         </div>
-      </footer>
+      </main>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmSave}
+        title="Send Offer"
+        description="Are you sure you want to save and send this offer? This will create a new offer version."
+        confirmText="Send Offer"
+        cancelText="Cancel"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
+      />
     </div>
   );
 };
