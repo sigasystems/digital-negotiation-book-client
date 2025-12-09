@@ -105,7 +105,7 @@ const Locations = () => {
         <div>
       <h1 className="text-2xl font-bold text-gray-800">Locations</h1>
       </div>
-        <button className="button-styling mt-[24px]" onClick={() => navigate("/create-offer-draft")}>
+        <button className="button-styling mt-[24px]" onClick={() => navigate("/add-location")}>
           Add Locations
         </button>
     </div>
