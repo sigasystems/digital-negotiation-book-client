@@ -70,12 +70,9 @@ export default function AddBuyerForm() {
 
   const error = validateBuyer(formData);
   if (error) return showToast(error, "error");
-
-    setLoading(true);
-
+  setLoading(true);
   try {
     const res = await businessOwnerService.addBuyer(formData);
-
     if (res?.status === 201) {
       toast.success("Buyer added successfully!");
       setFormData(initialData);
@@ -127,7 +124,7 @@ export default function AddBuyerForm() {
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
-              
+
               <div className="flex items-center gap-3">
                 {/* <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg">
                   <UserPlus className="text-white w-5 h-5 sm:w-6 sm:h-6" />
@@ -138,23 +135,23 @@ export default function AddBuyerForm() {
                 </div>
               </div>
             </div>
-
-      
           </div>
         </div>
       </header>
 
       <main className="mx-auto pt-4">
-       
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-          
           {/* Company Information */}
           <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-6">
             <div className="max-w-sm rounded-lg text-l mb-3 text-red-700 font-bold">
-                    Remaining Credits : {remainingBuyers}
+              Remaining Credits :{" "}
+              {remainingBuyers > 0 ? (
+                <span className="text-[#16a34a]">{remainingBuyers}</span>
+              ) : (
+                "Limit Reach For Buyers..."
+              )}
             </div>
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              
               <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
                 <Building2 className="w-5 h-5 text-indigo-600" />
               </div>
@@ -245,12 +242,8 @@ export default function AddBuyerForm() {
                 />
               </div>
             </div>
-            
           </div>
-
-          
         </form>
-        
 
           <div className="flex flex-col sm:flex-row justify-start gap-3 m-3">
             <Button 
@@ -282,10 +275,7 @@ export default function AddBuyerForm() {
               )}
             </Button>
           </div>
-  
       </main>
-
-     
     </div>
   );
 }

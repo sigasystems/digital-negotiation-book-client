@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 // 🔹 Core layout and route protection
 import Layout from "@/components/layout/Layout";
@@ -284,10 +290,13 @@ export default function App() {
       <Router>
         <AppContent />
       </Router>
-      <Toaster position="top-center" reverseOrder={false} toastOptions={{
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
           style: { marginTop: "60px" },
-        }}/>
+        }}
+      />
     </>
   );
 }
-

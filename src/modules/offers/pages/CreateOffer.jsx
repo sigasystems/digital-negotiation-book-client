@@ -12,7 +12,13 @@ import { productService } from "@/modules/product/services";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
 import { businessOwnerService } from "@/modules/businessOwner/services/businessOwner";
-import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 import { offerService } from "../services";
 import { locationServices } from "@/modules/location/service";
 import planUsageService from "@/services/planUsageService";
@@ -32,47 +38,56 @@ const CreateOffer = () => {
 
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
-  const initialForm = useMemo(() => ({
-    businessOwnerId: user?.businessOwnerId || "",
-    fromParty: user?.businessName || "",
-    buyerId: "",
-    toParty: "",
-    origin: "",
-    processor: "",
-    plantApprovalNumber: "",
-    brand: "",
-    offerValidityDate: "",
-    shipmentDate: "",
-    packing: "",
-    draftName: "",
-    quantity: "",
-    tolerance: "",
-    paymentTerms: "",
-    remark: "",
-    grandTotal: "",
-    destination: "",
-    products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
-  }), [user]); 
+  const initialForm = useMemo(
+    () => ({
+      businessOwnerId: user?.businessOwnerId || "",
+      fromParty: user?.businessName || "",
+      buyerId: "",
+      toParty: "",
+      origin: "",
+      processor: "",
+      plantApprovalNumber: "",
+      brand: "",
+      offerValidityDate: "",
+      shipmentDate: "",
+      packing: "",
+      draftName: "",
+      quantity: "",
+      tolerance: "",
+      paymentTerms: "",
+      remark: "",
+      grandTotal: "",
+      destination: "",
+      products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
+    }),
+    [user],
+  );
 
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [openPicker, setOpenPicker] = useState({ validity: false, shipment: false });
+  const [openPicker, setOpenPicker] = useState({
+    validity: false,
+    shipment: false,
+  });
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
   const [offerName, setOfferName] = useState("");
   const [buyers, setBuyers] = useState([]);
   const [locations, setLocations] = useState([]);
- const [remainingOffers, setRemainingOffers] = useState(0);
- const {showToast} = useToast();
+  const [remainingOffers, setRemainingOffers] = useState(0);
+  const { showToast } = useToast();
 
   const fetchProductDetails = async (productId) => {
     try {
       const res = await productService.searchProducts({ productId }, 0, 50);
       const product = res.data?.data?.products?.[0];
       if (product) {
-        setSpeciesMap((prev) => ({ ...prev, [productId]: product.species || [] }));
+        setSpeciesMap((prev) => ({
+          ...prev,
+          [productId]: product.species || [],
+        }));
       }
     } catch {
       toast.error("Unable to load product details");
@@ -82,7 +97,10 @@ const CreateOffer = () => {
   const handleChange = (key, value) =>
     setFormData((prev) => ({ ...prev, [key]: value }));
 
-  const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
+  const handleProductSelect = createHandleProductSelect(
+    setFormData,
+    fetchProductDetails,
+  );
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
@@ -108,15 +126,14 @@ const CreateOffer = () => {
   };
 
   const loadNextOfferName = async () => {
-  try {
-    const res = await offerService.getOfferName();
-    const name = res?.data?.data?.offerName;
-    if (name) setOfferName(name);
-  } catch {
-    toast.error("Unable to load next offer name");
-  }
-};
-
+    try {
+      const res = await offerService.getOfferName();
+      const name = res?.data?.data?.offerName;
+      if (name) setOfferName(name);
+    } catch {
+      toast.error("Unable to load next offer name");
+    }
+  };
 
   useEffect(() => {
     const loadDraft = async () => {
@@ -143,10 +160,12 @@ const CreateOffer = () => {
           }));
 
           setFormData((prev) => ({
-          ...prev,
-          ...data,
-            products: mappedProducts.length ? mappedProducts : [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
-        }));
+            ...prev,
+            ...data,
+            products: mappedProducts.length
+              ? mappedProducts
+              : [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
+          }));
           setOfferName(`Offer ${data.draftNo}`);
         }
       } catch {
@@ -196,20 +215,20 @@ const CreateOffer = () => {
     setConfirmOpen(true);
   };
 
-      // Fetch plan usage on mount
-      useEffect(() => {
-        const fetchPlanUsage = async () => {
-          try {
-            await planUsageService.fetchUsage(user.id);
-            const remaining = planUsageService.getRemainingCredits("offers");
-            setRemainingOffers(remaining);
-          } catch (err) {
-            console.error("Failed to fetch plan usage:", err);
-            showToast("error", "Failed to load plan info.");
-          }
-        };
-        fetchPlanUsage();
-      }, [user.id]);
+  // Fetch plan usage on mount
+  useEffect(() => {
+    const fetchPlanUsage = async () => {
+      try {
+        await planUsageService.fetchUsage(user.id);
+        const remaining = planUsageService.getRemainingCredits("offers");
+        setRemainingOffers(remaining);
+      } catch (err) {
+        console.error("Failed to fetch plan usage:", err);
+        showToast("error", "Failed to load plan info.");
+      }
+    };
+    fetchPlanUsage();
+  }, [user.id]);
   const confirmCreate = async () => {
     setConfirmOpen(false);
     setCreating(true);
@@ -219,7 +238,6 @@ const CreateOffer = () => {
       const msg = res?.data?.message || "Offer created successfully";
       toast.success(msg);
       setTimeout(() => navigate("/offers"), 800);
-
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to create offer");
     } finally {
@@ -227,10 +245,14 @@ const CreateOffer = () => {
     }
   };
 
-  if (loading){ return (<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
-          <p className="text-slate-600 font-medium text-base sm:text-lg">Loading draft details...</p>
+          <p className="text-slate-600 font-medium text-base sm:text-lg">
+            Loading draft details...
+          </p>
         </div>
       </div>
     );
@@ -238,213 +260,250 @@ const CreateOffer = () => {
 
   return (
     <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px]">
-
       <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate(-1)} 
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(-1)}
                 className="cursor-pointer hover:bg-slate-100 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
               <div className="h-8 w-px bg-slate-300 hidden sm:block" />
               <div className="flex items-center gap-3">
-              <div>
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Create & Send Offer</h1>
-                <p className="text-xs sm:text-sm text-slate-500">From Draft #{formData.draftNo}</p>
+                <div>
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">
+                    Create & Send Offer
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-500">
+                    From Draft #{formData.draftNo}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1.5 text-xs sm:text-sm font-medium">
-              Draft Loaded
-            </Badge>
+              <Badge
+                variant="outline"
+                className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1.5 text-xs sm:text-sm font-medium"
+              >
+                Draft Loaded
+              </Badge>
             </div>
           </div>
-
         </div>
       </header>
 
       <main className="mx-auto py-4">
         <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">
           <div className="rounded-lg text-l pb-4 text-red-700 font-bold">
-           Remaining Credits : {remainingOffers}
-            </div>
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Offer Name</h2>
-            </div>
-          
-          <Input
-            placeholder="e.g., Offer-2024-001"
-            value={offerName}
-            onChange={(e) => setOfferName(e.target.value)}
-            className="bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all text-sm sm:text-base h-11 sm:h-12"
-          />
-            <p className="text-xs sm:text-sm text-slate-500 mt-2">Enter a unique identifier for this offer</p>
-        </div>
-
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-          <h2 className="font-semibold text-base sm:text-lg text-slate-900">Party & Destination Details</h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
-            {/* To Party */}
-        <div className="space-y-2">
-          <label className="text-sm sm:text-base font-medium text-slate-700 block">
-            To Party <span className="text-red-500">*</span>
-          </label>
-          <Select
-            onValueChange={(val) => {
-              const buyer = buyers.find((b) => b.id === val);
-              setFormData((prev) => ({
-                ...prev,
-                buyerId: val,
-                toParty: buyer?.buyersCompanyName || "",
-              }));
-            }}
-            value={formData.buyerId || ""}
-          >
-            <SelectTrigger className="cursor-pointer bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all h-11 sm:h-12 text-sm sm:text-base">
-              <SelectValue placeholder="Select buyer company" />
-            </SelectTrigger>
-            <SelectContent>
-              {buyers.length > 0 ? (
-                buyers.map((buyer) => (
-                  <SelectItem key={buyer.id} value={buyer.id} className="cursor-pointer">
-                    {buyer.buyersCompanyName}
-                  </SelectItem>
-                ))
-              ) : (
-                <div className="px-3 py-2 text-slate-500 text-sm">
-                  No buyers found
-                </div>
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-
-
-      <div className="space-y-2">
-        <label className="text-sm sm:text-base font-medium text-slate-700 block">
-          Destination <span className="text-red-500">*</span>
-        </label>
-
-        <Select
-          onValueChange={(val) => {
-            const loc = locations.find((l) => l.id === val);
-            setFormData((prev) => ({
-              ...prev,
-              destination: `${loc.city}, ${loc.state}, ${loc.country?.name}`,
-            }));
-          }}
-                value={formData.destination ? locations.find(l => formData.destination.includes(l.city))?.id : ""}
-        >
-          <SelectTrigger className="cursor-pointer bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all h-11 sm:h-12 text-sm sm:text-base">
-            <SelectValue placeholder="Select destination location" />
-          </SelectTrigger>
-
-          <SelectContent>
-            {locations.length > 0 ? (
-              locations.map((loc) => (
-                <SelectItem
-                  key={loc.id}
-                  value={loc.id}
-                  className="cursor-pointer"
-                >
-                  {`${loc.city}, ${loc.state}, ${loc.country?.name}`}
-                </SelectItem>
-              ))
+            Remaining Credits : :{" "}
+            {removeProduct > 0 ? (
+              <span className="text-[#16a34a]">{remainingOffers}</span>
             ) : (
-              <div className="px-3 py-2 text-slate-500 text-sm">
-                No locations found
-              </div>
+              "Limit Reach For Offers..."
             )}
-          </SelectContent>
-        </Select>
-      </div>
+          </div>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">
+                Offer Name
+              </h2>
+            </div>
 
-
-        </div>
-      </div>
+            <Input
+              placeholder="e.g., Offer-2024-001"
+              value={offerName}
+              onChange={(e) => setOfferName(e.target.value)}
+              className="bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all text-sm sm:text-base h-11 sm:h-12"
+            />
+            <p className="text-xs sm:text-sm text-slate-500 mt-2">
+              Enter a unique identifier for this offer
+            </p>
+          </div>
 
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
-          <h2 className="font-semibold text-base sm:text-lg text-slate-900">Draft Information</h2>
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">
+                Party & Destination Details
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+              {/* To Party */}
+              <div className="space-y-2">
+                <label className="text-sm sm:text-base font-medium text-slate-700 block">
+                  To Party <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  onValueChange={(val) => {
+                    const buyer = buyers.find((b) => b.id === val);
+                    setFormData((prev) => ({
+                      ...prev,
+                      buyerId: val,
+                      toParty: buyer?.buyersCompanyName || "",
+                    }));
+                  }}
+                  value={formData.buyerId || ""}
+                >
+                  <SelectTrigger className="cursor-pointer bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all h-11 sm:h-12 text-sm sm:text-base">
+                    <SelectValue placeholder="Select buyer company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {buyers.length > 0 ? (
+                      buyers.map((buyer) => (
+                        <SelectItem
+                          key={buyer.id}
+                          value={buyer.id}
+                          className="cursor-pointer"
+                        >
+                          {buyer.buyersCompanyName}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-slate-500 text-sm">
+                        No buyers found
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm sm:text-base font-medium text-slate-700 block">
+                  Destination <span className="text-red-500">*</span>
+                </label>
+
+                <Select
+                  onValueChange={(val) => {
+                    const loc = locations.find((l) => l.id === val);
+                    setFormData((prev) => ({
+                      ...prev,
+                      destination: `${loc.city}, ${loc.state}, ${loc.country?.name}`,
+                    }));
+                  }}
+                  value={
+                    formData.destination
+                      ? locations.find((l) =>
+                          formData.destination.includes(l.city),
+                        )?.id
+                      : ""
+                  }
+                >
+                  <SelectTrigger className="cursor-pointer bg-slate-50 hover:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 transition-all h-11 sm:h-12 text-sm sm:text-base">
+                    <SelectValue placeholder="Select destination location" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {locations.length > 0 ? (
+                      locations.map((loc) => (
+                        <SelectItem
+                          key={loc.id}
+                          value={loc.id}
+                          className="cursor-pointer"
+                        >
+                          {`${loc.city}, ${loc.state}, ${loc.country?.name}`}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-slate-500 text-sm">
+                        No locations found
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {[
-              ["draftNo", "Draft Number", true],
-              ["fromParty", "From Party", true],
-              ["origin", "Origin", false],
-              ["processor", "Processor", true],
-              ["plantApprovalNumber", "Plant Approval No", false],
-              ["brand", "Brand", true],
-              ["draftName", "Draft Name", true],
-              ["offerValidityDate", "Offer Validity", false],
-              ["shipmentDate", "Shipment Date", false],
-              ["grandTotal", "Grand Total", false],
-              ["quantity", "Quantity", false],
-              ["tolerance", "Tolerance", false],
-              ["paymentTerms", "Payment Terms", false],
-              ["remark", "Remark", false],
-            ].map(([key, label, isDisabled]) => (
-              <div key={key} className="space-y-2">
-                <label className="text-xs sm:text-sm font-medium text-slate-700 block">{label}</label>
-                {key === "offerValidityDate" || key === "shipmentDate" ? (
-                  <DatePicker
-                    value={formData[key]}
-                    onSelect={(d) => handleDateSelect(key, d)}
-                    open={openPicker[key === "offerValidityDate" ? "validity" : "shipment"]}
-                    setOpen={(v) => setOpenPicker((prev) => ({ 
-                       ...prev, 
-                      [key === "offerValidityDate" ? "validity" : "shipment"]: v 
-                    }))}
-                  />
-                ) : (
-                <Input
-                  value={formData[key] || ""}
-                  disabled={isDisabled}
-                  onChange={(e) => handleChange(key, e.target.value)}
-                  className={`text-sm sm:text-base h-10 sm:h-11 transition-all ${
-                    isDisabled
-                      ? "bg-slate-100 cursor-not-allowed text-slate-600 border-slate-200"
-                      : "bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 cursor-text"
-                  }`}
-                />
-                )}
-              </div>
-            ))}
-          </div>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">
+                Draft Information
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {[
+                ["draftNo", "Draft Number", true],
+                ["fromParty", "From Party", true],
+                ["origin", "Origin", false],
+                ["processor", "Processor", true],
+                ["plantApprovalNumber", "Plant Approval No", false],
+                ["brand", "Brand", true],
+                ["draftName", "Draft Name", true],
+                ["offerValidityDate", "Offer Validity", false],
+                ["shipmentDate", "Shipment Date", false],
+                ["grandTotal", "Grand Total", false],
+                ["quantity", "Quantity", false],
+                ["tolerance", "Tolerance", false],
+                ["paymentTerms", "Payment Terms", false],
+                ["remark", "Remark", false],
+              ].map(([key, label, isDisabled]) => (
+                <div key={key} className="space-y-2">
+                  <label className="text-xs sm:text-sm font-medium text-slate-700 block">
+                    {label}
+                  </label>
+                  {key === "offerValidityDate" || key === "shipmentDate" ? (
+                    <DatePicker
+                      value={formData[key]}
+                      onSelect={(d) => handleDateSelect(key, d)}
+                      open={
+                        openPicker[
+                          key === "offerValidityDate" ? "validity" : "shipment"
+                        ]
+                      }
+                      setOpen={(v) =>
+                        setOpenPicker((prev) => ({
+                          ...prev,
+                          [key === "offerValidityDate"
+                            ? "validity"
+                            : "shipment"]: v,
+                        }))
+                      }
+                    />
+                  ) : (
+                    <Input
+                      value={formData[key] || ""}
+                      disabled={isDisabled}
+                      onChange={(e) => handleChange(key, e.target.value)}
+                      className={`text-sm sm:text-base h-10 sm:h-11 transition-all ${
+                        isDisabled
+                          ? "bg-slate-100 cursor-not-allowed text-slate-600 border-slate-200"
+                          : "bg-slate-50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500 border-slate-300 cursor-text"
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div>
             <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Product Details</h2>
-        </div>
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">
+                Product Details
+              </h2>
+            </div>
 
-       <ProductSection
-          productsData={formData.products}
-          setFormData={setFormData}
-          productsList={productsList}
-          speciesMap={speciesMap}
-          onProductSelect={handleProductSelect}
-          readOnly={false}
-          addProduct={addProduct}
-          removeProduct={removeProduct}
-      />
+            <ProductSection
+              productsData={formData.products}
+              setFormData={setFormData}
+              productsList={productsList}
+              speciesMap={speciesMap}
+              onProductSelect={handleProductSelect}
+              readOnly={false}
+              addProduct={addProduct}
+              removeProduct={removeProduct}
+            />
           </div>
         </div>
       </main>
 
-        <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-sm z-20 mt-10 rounded-lg">
-          <div className="px-4 sm:px-6 lg:px-8 py-4">
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-sm z-20 mt-10 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2 text-sm text-slate-600">
               <div className="flex items-center gap-2 text-[#16a34a]">
@@ -454,33 +513,35 @@ const CreateOffer = () => {
             </div>
 
             <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(-1)} 
-              disabled={creating}
-              className="cursor-pointer hover:bg-slate-100 transition-colors"
-            >
+              <Button
+                variant="outline"
+                onClick={() => navigate(-1)}
+                disabled={creating}
+                className="cursor-pointer hover:bg-slate-100 transition-colors"
+              >
                 <X className="w-4 h-4 mr-2" />
-              Cancel
-            </Button>
+                Cancel
+              </Button>
 
-            <Button
-              onClick={handleCreateOffer}
-              disabled={creating}
-              className="button-styling"
-            >
-              {creating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />Create & Send Offer
-                </>
-              )}
-            </Button>
+              <Button
+                onClick={handleCreateOffer}
+                disabled={creating}
+                className="button-styling"
+              >
+                {creating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Create & Send Offer
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
         </div>
       </div>
 

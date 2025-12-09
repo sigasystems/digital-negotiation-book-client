@@ -31,23 +31,22 @@ const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const { showToast } = useToast();
 
-    const [ remainingOffers, setRemainingOffers] = useState(0);
-      const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-      const navigate = useNavigate();
-      useEffect(() => {
-        const fetchPlanUsage = async () => {
-          try {
-            await planUsageService.fetchUsage(user.id);
-            const remaining = planUsageService.getRemainingCredits("offers");
-            setRemainingOffers(remaining);
-          } catch (err) {
-            console.error("Failed to fetch plan usage:", err);
-            showToast("error", "Failed to load plan info.");
-          }
-        };
-        fetchPlanUsage();
-      }, [user.id, showToast]);
-    
+  const [remainingOffers, setRemainingOffers] = useState(0);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchPlanUsage = async () => {
+      try {
+        await planUsageService.fetchUsage(user.id);
+        const remaining = planUsageService.getRemainingCredits("offers");
+        setRemainingOffers(remaining);
+      } catch (err) {
+        console.error("Failed to fetch plan usage:", err);
+        showToast("error", "Failed to load plan info.");
+      }
+    };
+    fetchPlanUsage();
+  }, [user.id, showToast]);
 
   const initialForm = useMemo(
     () => ({
@@ -67,12 +66,15 @@ const CreateOfferDraft = () => {
       grandTotal: "",
       products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
     }),
-    [user]
+    [user],
   );
 
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [openPicker, setOpenPicker] = useState({ validity: false, shipment: false });
+  const [openPicker, setOpenPicker] = useState({
+    validity: false,
+    shipment: false,
+  });
 
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
@@ -84,7 +86,7 @@ const CreateOfferDraft = () => {
 
       if (product) {
         setSpeciesMap((prev) => ({
-      ...prev,
+          ...prev,
           [productId]: product.species || [],
         }));
       }
@@ -98,7 +100,10 @@ const CreateOfferDraft = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
+  const handleProductSelect = createHandleProductSelect(
+    setFormData,
+    fetchProductDetails,
+  );
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
@@ -110,74 +115,76 @@ const CreateOfferDraft = () => {
     }));
   };
 
- const validateForm = () => {
-  const required = [
-    "quantity",
-    "tolerance",
-    "paymentTerms",
-    "remark",
-    "grandTotal",
-    "origin",
-    "processor",
-    "plantApprovalNumber",
-    "brand",
-  ];
+  const validateForm = () => {
+    const required = [
+      "quantity",
+      "tolerance",
+      "paymentTerms",
+      "remark",
+      "grandTotal",
+      "origin",
+      "processor",
+      "plantApprovalNumber",
+      "brand",
+    ];
 
-  for (const f of required) {
-    if (!formData[f]?.trim()) return `Please fill in all mandatory fields!`;
-  }
-
-  for (const [i, p] of formData.products.entries()) {
-    if (!p.productId) return `Product #${i + 1}: Product is required`;
-    if (!p.species) return `Product #${i + 1}: Species is required`;
-
-    for (const [r, s] of p.sizeBreakups.entries()) {
-      if (!s.size || !s.breakup || !s.price)
-        return `Product #${i + 1}: Row ${r + 1} incomplete`;
+    for (const f of required) {
+      if (!formData[f]?.trim()) return `Please fill in all mandatory fields!`;
     }
-  }
 
-  const today = startOfDay(new Date());
-  const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
-  const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
+    for (const [i, p] of formData.products.entries()) {
+      if (!p.productId) return `Product #${i + 1}: Product is required`;
+      if (!p.species) return `Product #${i + 1}: Species is required`;
 
-  if (validityDate && isBefore(validityDate, today)) {
-    return "Offer Validity Date cannot be earlier than today";
-  }
+      for (const [r, s] of p.sizeBreakups.entries()) {
+        if (!s.size || !s.breakup || !s.price)
+          return `Product #${i + 1}: Row ${r + 1} incomplete`;
+      }
+    }
 
-  if (shipmentDate && validityDate && isBefore(shipmentDate, validityDate)) {
-    return "Shipment Date cannot be earlier than Offer Validity Date";
-  }
+    const today = startOfDay(new Date());
+    const validityDate = formData.offerValidityDate
+      ? parseISO(formData.offerValidityDate)
+      : null;
+    const shipmentDate = formData.shipmentDate
+      ? parseISO(formData.shipmentDate)
+      : null;
 
-  return null;
-};
+    if (validityDate && isBefore(validityDate, today)) {
+      return "Offer Validity Date cannot be earlier than today";
+    }
+
+    if (shipmentDate && validityDate && isBefore(shipmentDate, validityDate)) {
+      return "Shipment Date cannot be earlier than Offer Validity Date";
+    }
+
+    return null;
+  };
   const formatPayload = () => ({
     ...formData,
     grandTotal: +formData.grandTotal,
-   products: formData.products.map((p) => {
-  const productInfo = productsList.find((x) => x.id === p.productId);
+    products: formData.products.map((p) => {
+      const productInfo = productsList.find((x) => x.id === p.productId);
 
-  return {
-    productId: p.productId,
-    productName: productInfo?.productName || "",
-    species: p.species,
-    sizeDetails: p.sizeDetails || "Units / Remarks",
-    breakupDetails: p.breakupDetails || "Breakup Details",
-    priceDetails: p.priceDetails || "$",
-    packing: p.packing || "",
-    sizeBreakups: p.sizeBreakups.map((s) => ({
-      size: s.size,
-      breakup: +s.breakup,
-      condition: s.condition || "",
-      price: +s.price,
-    })),
-  };
-}),
-
+      return {
+        productId: p.productId,
+        productName: productInfo?.productName || "",
+        species: p.species,
+        sizeDetails: p.sizeDetails || "Units / Remarks",
+        breakupDetails: p.breakupDetails || "Breakup Details",
+        priceDetails: p.priceDetails || "$",
+        packing: p.packing || "",
+        sizeBreakups: p.sizeBreakups.map((s) => ({
+          size: s.size,
+          breakup: +s.breakup,
+          condition: s.condition || "",
+          price: +s.price,
+        })),
+      };
+    }),
   });
 
   const submitDraft = async () => {
-
     setLoading(true);
     try {
       const payload = formatPayload();
@@ -186,7 +193,7 @@ const CreateOfferDraft = () => {
       if (res?.status === 201 || res?.data?.success) {
         toast.success("Draft created successfully");
         setFormData(initialForm);
-        navigate("/offer-draft")
+        navigate("/offer-draft");
       } else {
         toast.error("Failed to create draft");
       }
@@ -210,46 +217,44 @@ const CreateOfferDraft = () => {
   };
 
   useEffect(() => {
-  const loadAllProducts = async () => {
-    try {
-      const res = await productService.getAllProducts(0, 500);
-      setProductsList(res.data?.data?.products || []);
-    } catch (err) {
+    const loadAllProducts = async () => {
+      try {
+        const res = await productService.getAllProducts(0, 500);
+        setProductsList(res.data?.data?.products || []);
+      } catch (err) {
         console.error(err);
-      toast.error("Unable to load products");
-    }
-  };
+        toast.error("Unable to load products");
+      }
+    };
 
-  loadAllProducts();
+    loadAllProducts();
 
-  const loadLatestDraftNo = async () => {
-    try {
-      const res = await offerDraftService.getLatestDraftNo();
-      const lastDraftNo = res.data?.lastDraftNo || 0;
-      setFormData((prev) => ({
-        ...prev,
-        draftName: `Offer Draft ${lastDraftNo + 1}`,
-      }));
-    } catch (err) {
-      console.error(err);
-      toast.error("Unable to fetch latest draft number");
-    }
-  };
+    const loadLatestDraftNo = async () => {
+      try {
+        const res = await offerDraftService.getLatestDraftNo();
+        const lastDraftNo = res.data?.lastDraftNo || 0;
+        setFormData((prev) => ({
+          ...prev,
+          draftName: `Offer Draft ${lastDraftNo + 1}`,
+        }));
+      } catch (err) {
+        console.error(err);
+        toast.error("Unable to fetch latest draft number");
+      }
+    };
 
-  loadLatestDraftNo();
-}, []);
+    loadLatestDraftNo();
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-[24.5px]">
-   <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
-      <div className=" mx-auto px-6 py-4">
-
-        <div className="flex items-center gap-5">
-
-         <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)} 
+      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
+        <div className=" mx-auto px-6 py-4">
+          <div className="flex items-center gap-5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
               className="hover:bg-slate-100 rounded-lg transition-all duration-200 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
@@ -259,147 +264,154 @@ const CreateOfferDraft = () => {
                 <h1 className="text-xl font-bold text-gray-900">
                   Create Offer Draft
                 </h1>
+              </div>
+              <p className="text-sm text-gray-600 mt-0.5">
+                Generate professional offer drafts for your clients
+              </p>
             </div>
-            <p className="text-sm text-gray-600 mt-0.5">
-              Generate professional offer drafts for your clients
-            </p>
           </div>
         </div>
-
-      </div>
-    </header>
-    <main className="mx-auto py-6">
-
-      <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-
-<div className="rounded-lg text-l pt-3 px-6 text-red-700 font-bold">
-           Remaining Credits : {remainingOffers}
-        </div>
+      </header>
+      <main className="mx-auto py-6">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="rounded-lg text-l pt-3 px-6 text-red-700 font-bold">
+            Remaining Credits :{" "}
+            {remainingOffers > 0 ? (
+              <span className="text-[#16a34a]">{remainingOffers}</span>
+            ) : (
+              "Limit Reach For Offers..."
+            )}
+          </div>
 
           <form onSubmit={handleCreateClick}>
-             <Section title="Draft Details">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <ReadOnlyField label="Draft Name" value={formData.draftName} />
-              <InputField 
-                required={true} 
-                label="Quantity (MT)" 
-                name="quantity" 
-                value={formData.quantity} 
+            <Section title="Draft Details">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <ReadOnlyField label="Draft Name" value={formData.draftName} />
+                <InputField
+                  required={true}
+                  label="Quantity (MT)"
+                  name="quantity"
+                  value={formData.quantity}
                   placeholder="25"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Tolerance (%)" 
-                name="tolerance" 
-                value={formData.tolerance} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Tolerance (%)"
+                  name="tolerance"
+                  value={formData.tolerance}
                   placeholder="+/- 10"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Payment Terms" 
-                name="paymentTerms" 
-                value={formData.paymentTerms} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Payment Terms"
+                  name="paymentTerms"
+                  value={formData.paymentTerms}
                   placeholder="LC at sight, 30% advance"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Remarks" 
-                name="remark" 
-                value={formData.remark} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Remarks"
+                  name="remark"
+                  value={formData.remark}
                   placeholder="Optional notes or conditions"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Grand Total (USD)" 
-                name="grandTotal" 
-                value={formData.grandTotal} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Grand Total (USD)"
+                  name="grandTotal"
+                  value={formData.grandTotal}
                   placeholder="12500"
-                onChange={handleChange} 
-              />
-            </div>
-          </Section>
+                  onChange={handleChange}
+                />
+              </div>
+            </Section>
 
-          <Section title="Dates">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker
-                label="Offer Validity Date"
-                value={formData.offerValidityDate}
+            <Section title="Dates">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <DatePicker
+                  label="Offer Validity Date"
+                  value={formData.offerValidityDate}
                   placeholder="Select validity date"
-                onSelect={(d) => handleDateSelect("offerValidityDate", d)}
-                open={openPicker.validity}
-                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, validity: v }))}
-              />
+                  onSelect={(d) => handleDateSelect("offerValidityDate", d)}
+                  open={openPicker.validity}
+                  setOpen={(v) =>
+                    setOpenPicker((prev) => ({ ...prev, validity: v }))
+                  }
+                />
 
-              <DatePicker
-                label="Shipment Date"
-                value={formData.shipmentDate}
-                placeholder="Select shipment date"
-                onSelect={(d) => handleDateSelect("shipmentDate", d)}
-                open={openPicker.shipment}
-                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, shipment: v }))}
-              />
-            </div>
-          </Section>
+                <DatePicker
+                  label="Shipment Date"
+                  value={formData.shipmentDate}
+                  placeholder="Select shipment date"
+                  onSelect={(d) => handleDateSelect("shipmentDate", d)}
+                  open={openPicker.shipment}
+                  setOpen={(v) =>
+                    setOpenPicker((prev) => ({ ...prev, shipment: v }))
+                  }
+                />
+              </div>
+            </Section>
 
-          <Section title="Business Information">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <ReadOnlyField label="From Party" value={formData.fromParty} />
-              <InputField 
-                required={true} 
-                label="Origin" 
-                name="origin" 
-                value={formData.origin} 
+            <Section title="Business Information">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <ReadOnlyField label="From Party" value={formData.fromParty} />
+                <InputField
+                  required={true}
+                  label="Origin"
+                  name="origin"
+                  value={formData.origin}
                   placeholder="Brazil"
-                onChange={handleChange}
-              />
-              <InputField 
-                required={true} 
-                label="Processor" 
-                name="processor" 
-                value={formData.processor} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Processor"
+                  name="processor"
+                  value={formData.processor}
                   placeholder="Company or facility name"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Plant Approval Number" 
-                name="plantApprovalNumber" 
-                value={formData.plantApprovalNumber} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Plant Approval Number"
+                  name="plantApprovalNumber"
+                  value={formData.plantApprovalNumber}
                   placeholder="ABC-12345"
-                onChange={handleChange}
-              />
-              <InputField 
-                required={true} 
-                label="Brand" 
-                name="brand" 
-                value={formData.brand} 
+                  onChange={handleChange}
+                />
+                <InputField
+                  required={true}
+                  label="Brand"
+                  name="brand"
+                  value={formData.brand}
                   placeholder="Product brand name"
-                onChange={handleChange} 
+                  onChange={handleChange}
+                />
+              </div>
+            </Section>
+
+            <Section title="Products & Size Details">
+              <ProductSection
+                productsData={formData.products || []}
+                setFormData={setFormData}
+                productsList={productsList}
+                speciesMap={speciesMap}
+                onProductSelect={handleProductSelect}
               />
-            </div>
-          </Section>
+            </Section>
 
-          <Section title="Products & Size Details">
-            <ProductSection
-              productsData={formData.products || []}
-              setFormData={setFormData}
-              productsList={productsList}
-              speciesMap={speciesMap}
-              onProductSelect={handleProductSelect}
-            />
-          </Section>
-
-          <Footer loading={loading} />
-        </form>
-      </div>
+            <Footer loading={loading} />
+          </form>
+        </div>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            All fields marked with an asterisk (*) are required. Please ensure all information is accurate before submitting.
+            All fields marked with an asterisk (*) are required. Please ensure
+            all information is accurate before submitting.
           </p>
         </div>
       </main>

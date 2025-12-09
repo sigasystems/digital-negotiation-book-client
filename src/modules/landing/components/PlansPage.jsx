@@ -3,11 +3,22 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getAllPlans, upgradePlan } from "../services/planService";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 
-const safeJSONParse = (value) => {try { return JSON.parse(value || "{}");} catch { return {}; }};
+const safeJSONParse = (value) => {
+  try {
+    return JSON.parse(value || "{}");
+  } catch {
+    return {};
+  }
+};
 
 export default function Plans() {
   const [billingCycle, setBillingCycle] = useState("monthly");
@@ -48,11 +59,9 @@ export default function Plans() {
       minimumFractionDigits: 0,
     }).format(amount || 0);
 
-  const handlePlanSelect = async (plan) => {
-    const billingCycle = "monthly";
-
+  const handlePlanSelect = async (plan = {}, navigate, billingCycle) => {
     if (!userId) {
-      navigate("/checkout", { state: { selectedPlan: plan } });
+      navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
       return;
     }
 
@@ -65,7 +74,7 @@ export default function Plans() {
             planId: plan.id,
             billingCycle,
             isUpgrade: true,
-          })
+          }),
         );
 
         const res = await upgradePlan({ userId, planId: plan.id });
@@ -92,12 +101,11 @@ export default function Plans() {
         planName: plan.name,
         billingCycle,
         isUpgrade: false,
-      })
+      }),
     );
 
     navigate("/register");
   };
-
 
   const isActivePlan = (planId) => planId === currentPlanId;
 
@@ -177,7 +185,9 @@ export default function Plans() {
                     )}
 
                     <CardHeader className="text-center pb-4">
-                      <h2 className="text-xl font-semibold mb-1">{plan.name}</h2>
+                      <h2 className="text-xl font-semibold mb-1">
+                        {plan.name}
+                      </h2>
                       <p className="text-sm text-gray-700">
                         {plan.description || "Ideal for scaling your business."}
                       </p>
@@ -197,7 +207,10 @@ export default function Plans() {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div>
                             <span className="text-gray-700">Locations: </span>
-                            <span className="font-medium"> {plan.maxLocations} </span>
+                            <span className="font-medium">
+                              {" "}
+                              {plan.maxLocations}{" "}
+                            </span>
                           </div>
                           <div>
                             <span className="text-gray-700">Products: </span>
@@ -207,11 +220,15 @@ export default function Plans() {
                           </div>
                           <div>
                             <span className="text-gray-700">Offers: </span>
-                            <span className="font-medium">{plan.maxOffers}</span>
+                            <span className="font-medium">
+                              {plan.maxOffers}
+                            </span>
                           </div>
                           <div>
                             <span className="text-gray-700">Buyers: </span>
-                            <span className="font-medium">{plan.maxBuyers}</span>
+                            <span className="font-medium">
+                              {plan.maxBuyers}
+                            </span>
                           </div>
                         </div>
 
@@ -224,7 +241,10 @@ export default function Plans() {
                                   className="flex items-start gap-2 text-sm"
                                 >
                                   <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5" />
-                                  <span className="text-gray-700"> {feature} </span>
+                                  <span className="text-gray-700">
+                                    {" "}
+                                    {feature}{" "}
+                                  </span>
                                 </li>
                               ))
                             ) : (
@@ -239,7 +259,9 @@ export default function Plans() {
 
                     <CardFooter className="pt-0">
                       <Button
-                        onClick={() => handlePlanSelect(plan)}
+                        onClick={() =>
+                          handlePlanSelect(plan || {}, navigate, billingCycle)
+                        }
                         disabled={isActive}
                         className={`w-full ${
                           isActive
@@ -252,7 +274,11 @@ export default function Plans() {
                     </CardFooter>
                   </Card>
                 );
-              }) ) : ( <p>No plans found.</p>)}</div>
+              })
+            ) : (
+              <p>No plans found.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

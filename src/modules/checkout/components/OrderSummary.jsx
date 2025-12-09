@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {  createPayment } from "../services/paymentService";
-import {login} from "../../auth/authServices"
+import {login} from "../../auth/authServices";
 import { showError, showSuccess } from "@/utils/toastService";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -55,8 +55,8 @@ export default function OrderSummary({
 
     try {
       // 1️⃣: we only register here user automatically
-      const loginResponse = await login({      
-         first_name: formData.first_name,
+      const loginResponse = await login({
+        first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
@@ -67,14 +67,14 @@ export default function OrderSummary({
       const accessToken = authData?.accessToken;
       const refreshToken = authData?.refreshToken ?? null;
 
-      if (loginResponse?.statusCode === 200 && loginResponse?.success === true && accessToken && tokenPayload) {
+      if (loginResponse?.statusCode === 200 && loginResponse?.success === true && accessToken && tokenPayload) {     
         setSession(
           {
             accessToken,
             refreshToken,
             user: tokenPayload,
           },
-          { remember: true }
+          { remember: true },
         );
       } else {
         const message =
@@ -92,7 +92,7 @@ export default function OrderSummary({
         billingCycle,
       };
       const paymentRes = await createPayment(paymentPayload);
-  console.log('paymentres....',paymentRes)
+      console.log("paymentres....", paymentRes);
       if (paymentRes) {
         showSuccess("Redirecting to Stripe checkout...");
 
@@ -103,17 +103,17 @@ export default function OrderSummary({
             billingCycle,
             userId: user.id,
             ...formData,
-          })
+          }),
         );
 
         window.location.href = paymentRes;
-      const ownerPayload = {
-        planId: selectedPlan.id,
-        billingCycle,
-        userId: user.id,
-        ...formData,
-      };
-      console.log('ownerpayload...', ownerPayload)
+        const ownerPayload = {
+          planId: selectedPlan.id,
+          billingCycle,
+          userId: user.id,
+          ...formData,
+        };
+        console.log("ownerpayload...", ownerPayload);
       } else {
         showError("Checkout URL not received from server.");
       }
@@ -126,7 +126,7 @@ export default function OrderSummary({
   };
 
   const planFeatures = [
-    { label: "Users", value: selectedPlan.maxUsers },
+    { label: "Locations", value: selectedPlan.maxLocations },
     { label: "Products", value: selectedPlan.maxProducts },
     { label: "Offers", value: selectedPlan.maxOffers },
     { label: "Buyers", value: selectedPlan.maxBuyers },
@@ -143,8 +143,12 @@ export default function OrderSummary({
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <div>
-                <h3 className="font-semibold text-slate-900">{selectedPlan.name}</h3>
-                <p className="text- text-slate-600">{selectedPlan.description}</p>
+                <h3 className="font-semibold text-slate-900">
+                  {selectedPlan.name}
+                </h3>
+                <p className="text- text-slate-600">
+                  {selectedPlan.description}
+                </p>
               </div>
               <Badge variant="outline" className="capitalize  bg-amber-300">
                 {billingCycle} Billing
@@ -168,7 +172,7 @@ export default function OrderSummary({
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
                 <span>
-                  {calculateTotal()} {selectedPlan.currency}
+                  {calculateTotal()} {selectedPlan.currency || "INR"}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -180,14 +184,17 @@ export default function OrderSummary({
                 <span className="font-semibold text-slate-900">Total</span>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-slate-900">
-  {selectedPlan.price === 0 ? (
-    <>You’re starting your <span className="text-green-600">trial plan</span> 🎉</>
-  ) : (
-    <>
-      {calculateTotal()} {selectedPlan.currency}
-    </>
-  )}
-</p>
+                    {selectedPlan.price === 0 ? (
+                      <>
+                        You’re starting your{" "}
+                        <span className="text-green-600">trial plan</span> 🎉
+                      </>
+                    ) : (
+                      <>
+                        {calculateTotal()} {selectedPlan.currency}
+                      </>
+                    )}
+                  </p>
 
                   <p className="text-xs text-slate-500">
                     per {billingCycle === "monthly" ? "month" : "year"}
