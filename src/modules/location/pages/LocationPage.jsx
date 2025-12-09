@@ -45,12 +45,12 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, description, con
         <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
         <p className="text-sm text-slate-600 mb-6">{description}</p>
         <div className="flex gap-3 justify-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="cursor-pointer">
             {cancelText}
           </Button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-200 ${confirmButtonColor}`}
+            className={`px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-200 ${confirmButtonColor} cursor-pointer`}
           >
             {confirmText}
           </button>
@@ -371,7 +371,7 @@ const LocationPage = () => {
         description="Are you sure you want to save these location changes?"
         confirmText="Update Location"
         cancelText="Cancel"
-        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );
