@@ -2,12 +2,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useCallback, useEffect } from "react";
 import SelectedPlanCard from "../components/SelectedPlanCard";
 import OrderSummary from "../components/OrderSummary";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { User, Mail, Phone, Building2, MapPin, EyeOff, Eye } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  Building2,
+  MapPin,
+  EyeOff,
+  Eye,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import { validateCheckoutForm, validateSingleField } from "../utils/validateCheckoutForm";
+import {
+  validateCheckoutForm,
+  validateSingleField,
+} from "../utils/validateCheckoutForm";
 import { useCheckUniqueFieldQuery } from "../hooks/checkUniqueFiledQuery";
 
 export default function CheckoutPage() {
@@ -38,8 +55,14 @@ export default function CheckoutPage() {
 
   // React Query checks for unique fields
   const emailCheck = useCheckUniqueFieldQuery("email", formData.email);
-  const businessCheck = useCheckUniqueFieldQuery("businessName", formData.businessName);
-  const regCheck = useCheckUniqueFieldQuery("registrationNumber", formData.registrationNumber);
+  const businessCheck = useCheckUniqueFieldQuery(
+    "businessName",
+    formData.businessName,
+  );
+  const regCheck = useCheckUniqueFieldQuery(
+    "registrationNumber",
+    formData.registrationNumber,
+  );
 
   // map server error to field errors
   const uniqueErrors = {
@@ -95,10 +118,11 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
           <div className="lg:col-span-2 space-y-6">
-
-            <SelectedPlanCard selectedPlan={selectedPlan} billingCycle={billingCycle} />
+            <SelectedPlanCard
+              selectedPlan={selectedPlan}
+              billingCycle={billingCycle}
+            />
 
             <Card className="shadow-md border-slate-200">
               <CardHeader>
@@ -107,18 +131,23 @@ export default function CheckoutPage() {
                     <User className="w-4 h-4 text-indigo-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Personal Information</CardTitle>
-                    <CardDescription>Enter your personal details</CardDescription>
+                    <CardTitle className="text-lg">
+                      Personal Information
+                    </CardTitle>
+                    <CardDescription>
+                      Enter your personal details
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="space-y-4">
-                
                 {/* FIRST NAME / LAST NAME */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="m-1" htmlFor="first_name">First Name *</Label>
+                    <Label className="m-1" htmlFor="first_name">
+                      First Name *
+                    </Label>
                     <Input
                       id="first_name"
                       name="first_name"
@@ -127,10 +156,16 @@ export default function CheckoutPage() {
                       placeholder="John"
                       className={errors.first_name ? "border-red-500" : ""}
                     />
-                    {errors.first_name && <p className="text-xs text-red-500">{errors.first_name}</p>}
+                    {errors.first_name && (
+                      <p className="text-xs text-red-500">
+                        {errors.first_name}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <Label className="m-1" htmlFor="last_name">Last Name *</Label>
+                    <Label className="m-1" htmlFor="last_name">
+                      Last Name *
+                    </Label>
                     <Input
                       id="last_name"
                       name="last_name"
@@ -139,14 +174,18 @@ export default function CheckoutPage() {
                       placeholder="Doe"
                       className={errors.last_name ? "border-red-500" : ""}
                     />
-                    {errors.last_name && <p className="text-xs text-red-500">{errors.last_name}</p>}
+                    {errors.last_name && (
+                      <p className="text-xs text-red-500">{errors.last_name}</p>
+                    )}
                   </div>
                 </div>
 
                 {/* EMAIL / PHONE */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="m-1" htmlFor="email">Email *</Label>
+                    <Label className="m-1" htmlFor="email">
+                      Email *
+                    </Label>
                     <Input
                       id="email"
                       name="email"
@@ -154,7 +193,11 @@ export default function CheckoutPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@company.com"
-                      className={(errors.email || uniqueErrors.email) ? "border-red-500" : ""}
+                      className={
+                        errors.email || uniqueErrors.email
+                          ? "border-red-500"
+                          : ""
+                      }
                     />
                     {(errors.email || uniqueErrors.email) && (
                       <p className="text-xs text-red-500">
@@ -164,7 +207,9 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <Label className="m-1" htmlFor="phoneNumber">Phone Number *</Label>
+                    <Label className="m-1" htmlFor="phoneNumber">
+                      Phone Number *
+                    </Label>
                     <Input
                       id="phoneNumber"
                       name="phoneNumber"
@@ -174,14 +219,18 @@ export default function CheckoutPage() {
                       className={errors.phoneNumber ? "border-red-500" : ""}
                     />
                     {errors.phoneNumber && (
-                      <p className="text-xs text-red-500">{errors.phoneNumber}</p>
+                      <p className="text-xs text-red-500">
+                        {errors.phoneNumber}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 {/* PASSWORD */}
                 <div>
-                  <Label className="m-1" htmlFor="password">Password *</Label>
+                  <Label className="m-1" htmlFor="password">
+                    Password *
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -197,41 +246,56 @@ export default function CheckoutPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
-                  {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
+                  {errors.password && (
+                    <p className="text-xs text-red-500">{errors.password}</p>
+                  )}
                 </div>
-
               </CardContent>
             </Card>
 
             {/* BUSINESS CARD AND ADDRESS CARDS CONTINUE... (unchanged) */}
 
-{/* Business Information */}
-             <Card className="shadow-md border-slate-200">
-               <CardHeader>
-                 <div className="flex items-center gap-2">
-                   <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                     <Building2 className="w-4 h-4 text-indigo-600" />
-                   </div>
-                   <div>
-                     <CardTitle className="text-lg">Business Information</CardTitle>
-                     <CardDescription>Provide your business details</CardDescription>
-                   </div>
-                 </div>
-               </CardHeader>
-               <CardContent className="space-y-4">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-                   <div>
-                     <Label className="m-1" htmlFor="businessName"  >Business Name *</Label>
-                     <Input
+            {/* Business Information */}
+            <Card className="shadow-md border-slate-200">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">
+                      Business Information
+                    </CardTitle>
+                    <CardDescription>
+                      Provide your business details
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+                  <div>
+                    <Label className="m-1" htmlFor="businessName">
+                      Business Name *
+                    </Label>
+                    <Input
                       id="businessName"
                       name="businessName"
                       value={formData.businessName}
                       onChange={handleChange}
                       placeholder="Your Business Name"
-                      className={(errors.businessName || uniqueErrors.businessName) ? "border-red-500" : ""}
+                      className={
+                        errors.businessName || uniqueErrors.businessName
+                          ? "border-red-500"
+                          : ""
+                      }
                     />
                     {(errors.businessName || uniqueErrors.businessName) && (
                       <p className="text-xs text-red-500">
@@ -240,18 +304,27 @@ export default function CheckoutPage() {
                     )}
                   </div>
                   <div>
-                    <Label htmlFor="registrationNumber" className="m-1">Registration Number *</Label>
+                    <Label htmlFor="registrationNumber" className="m-1">
+                      Registration Number *
+                    </Label>
                     <Input
                       id="registrationNumber"
                       name="registrationNumber"
                       value={formData.registrationNumber}
                       onChange={handleChange}
                       placeholder="REG12345"
-                      className={(errors.registrationNumber || uniqueErrors.registrationNumber) ? "border-red-500" : ""}
+                      className={
+                        errors.registrationNumber ||
+                        uniqueErrors.registrationNumber
+                          ? "border-red-500"
+                          : ""
+                      }
                     />
-                    {(errors.registrationNumber || uniqueErrors.registrationNumber) && (
+                    {(errors.registrationNumber ||
+                      uniqueErrors.registrationNumber) && (
                       <p className="text-xs text-red-500">
-                        {errors.registrationNumber || uniqueErrors.registrationNumber}
+                        {errors.registrationNumber ||
+                          uniqueErrors.registrationNumber}
                       </p>
                     )}
                   </div>
@@ -259,7 +332,9 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="m-1" htmlFor="taxId">Tax ID</Label>
+                    <Label className="m-1" htmlFor="taxId">
+                      Tax ID
+                    </Label>
                     <Input
                       id="taxId"
                       name="taxId"
@@ -269,7 +344,9 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <Label className="m-1" htmlFor="website">Website</Label>
+                    <Label className="m-1" htmlFor="website">
+                      Website
+                    </Label>
                     <Input
                       id="website"
                       name="website"
@@ -291,14 +368,18 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <CardTitle className="text-lg">Billing Address</CardTitle>
-                    <CardDescription>Provide your billing details</CardDescription>
+                    <CardDescription>
+                      Provide your billing details
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="address" className="m-1">Address *</Label>
+                  <Label htmlFor="address" className="m-1">
+                    Address *
+                  </Label>
                   <Input
                     id="address"
                     name="address"
@@ -314,7 +395,9 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="m-1" htmlFor="city">City *</Label>
+                    <Label className="m-1" htmlFor="city">
+                      City *
+                    </Label>
                     <Input
                       id="city"
                       name="city"
@@ -328,7 +411,9 @@ export default function CheckoutPage() {
                     )}
                   </div>
                   <div>
-                    <Label className="m-1" htmlFor="state">State *</Label>
+                    <Label className="m-1" htmlFor="state">
+                      State *
+                    </Label>
                     <Input
                       id="state"
                       name="state"
@@ -345,7 +430,9 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="m-1" htmlFor="country">Country *</Label>
+                    <Label className="m-1" htmlFor="country">
+                      Country *
+                    </Label>
                     <Input
                       id="country"
                       name="country"
@@ -359,7 +446,9 @@ export default function CheckoutPage() {
                     )}
                   </div>
                   <div>
-                    <Label className="m-1" htmlFor="postalCode">Postal Code *</Label>
+                    <Label className="m-1" htmlFor="postalCode">
+                      Postal Code *
+                    </Label>
                     <Input
                       id="postalCode"
                       name="postalCode"
@@ -369,14 +458,15 @@ export default function CheckoutPage() {
                       className={errors.postalCode ? "border-red-500" : ""}
                     />
                     {errors.postalCode && (
-                      <p className="text-xs text-red-500">{errors.postalCode}</p>
+                      <p className="text-xs text-red-500">
+                        {errors.postalCode}
+                      </p>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-
 
           <OrderSummary
             selectedPlan={selectedPlan}
