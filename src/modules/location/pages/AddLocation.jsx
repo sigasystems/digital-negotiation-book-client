@@ -12,7 +12,7 @@ const AddLocation = () => {
   const navigate = useNavigate();
   const { toasts, showToast } = useToast();
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  
+
   const [form, setForm] = useState([
     {
       city: "",
@@ -61,28 +61,35 @@ const AddLocation = () => {
   }, []);
 
   const handleChange = useCallback((i, field, value) => {
-    setForm(prev => prev.map((loc, idx) => 
-      idx === i ? { ...loc, [field]: value } : loc
-    ));
+    setForm((prev) =>
+      prev.map((loc, idx) => (idx === i ? { ...loc, [field]: value } : loc)),
+    );
   }, []);
 
   const toggleManualCountry = useCallback((i) => {
-    setForm(prev => prev.map((loc, idx) => 
-      idx === i ? {
-        ...loc,
-        manualCountry: !loc.manualCountry,
-        countryId: "",
-        countryName: "",
-        countryCode: ""
-      } : loc
-    ));
+    setForm((prev) =>
+      prev.map((loc, idx) =>
+        idx === i
+          ? {
+              ...loc,
+              manualCountry: !loc.manualCountry,
+              countryId: "",
+              countryName: "",
+              countryCode: "",
+            }
+          : loc,
+      ),
+    );
   }, []);
 
   const addLocation = useCallback(() => {
     if (form.length >= MAX_LOCATIONS) {
-      return showToast("error", `You can only add up to ${MAX_LOCATIONS} locations at once.`);
+      return showToast(
+        "error",
+        `You can only add up to ${MAX_LOCATIONS} locations at once.`,
+      );
     }
-    setForm(prev => [
+    setForm((prev) => [
       ...prev,
       {
         city: "",
@@ -97,7 +104,7 @@ const AddLocation = () => {
   }, [form.length]);
 
   const removeLocation = useCallback((i) => {
-    setForm(prev => prev.filter((_, idx) => idx !== i));
+    setForm((prev) => prev.filter((_, idx) => idx !== i));
   }, []);
 
   const validate = useCallback(() => {
@@ -108,8 +115,10 @@ const AddLocation = () => {
       if (!loc.code.trim()) errors[`code-${i}`] = "Code is required";
 
       if (loc.manualCountry) {
-        if (!loc.countryName.trim()) errors[`countryName-${i}`] = "Country name required";
-        if (!loc.countryCode.trim()) errors[`countryCode-${i}`] = "Country code required";
+        if (!loc.countryName.trim())
+          errors[`countryName-${i}`] = "Country name required";
+        if (!loc.countryCode.trim())
+          errors[`countryCode-${i}`] = "Country code required";
       } else {
         if (!loc.countryId) errors[`countryId-${i}`] = "Select a country";
       }
@@ -120,14 +129,14 @@ const AddLocation = () => {
   const handleSubmit = (e) => {
     e?.preventDefault();
     const errors = validate();
-    
+
     if (Object.keys(errors).length > 0) {
       // Show first error
       const firstError = Object.values(errors)[0];
       showToast("error", firstError);
       return;
     }
-    
+
     setIsConfirmOpen(true);
   };
 
@@ -177,10 +186,9 @@ const AddLocation = () => {
       loadCountries();
     } catch (err) {
       const backend = err?.response?.data;
-      const msg =
-        backend?.error?.length
-          ? backend.error.join(", ")
-          : backend?.message || "Failed to add locations";
+      const msg = backend?.error?.length
+        ? backend.error.join(", ")
+        : backend?.message || "Failed to add locations";
       showToast("error", msg);
     } finally {
       setLoading(false);
@@ -229,12 +237,31 @@ const AddLocation = () => {
       <main className="mx-auto py-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div>
-            <div className="text-l text-red-700 px-9 pt-4 font-bold">
-              Remaining Credits : {remainingLocations}
+            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+              {remainingLocations > 0 ? (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+
+                  <span className="text-[#16a34a] text-lg">
+                    {remainingLocations}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+                  <span className="text-red-700 text-lg">
+                    Plan limit for adding location is exceeded...
+                  </span>
+                </>
+              )}
             </div>
-            
+
             {form.map((loc, i) => (
-              <div 
+              <div
                 key={i}
                 className="border-b border-slate-100 last:border-b-0"
               >
@@ -274,7 +301,9 @@ const AddLocation = () => {
                       <input
                         type="text"
                         value={loc.city}
-                        onChange={(e) => handleChange(i, "city", e.target.value)}
+                        onChange={(e) =>
+                          handleChange(i, "city", e.target.value)
+                        }
                         placeholder="Enter city"
                         className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition"
                       />
@@ -288,7 +317,9 @@ const AddLocation = () => {
                       <input
                         type="text"
                         value={loc.state}
-                        onChange={(e) => handleChange(i, "state", e.target.value)}
+                        onChange={(e) =>
+                          handleChange(i, "state", e.target.value)
+                        }
                         placeholder="Enter state"
                         className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition"
                       />
@@ -304,7 +335,9 @@ const AddLocation = () => {
                         <>
                           <select
                             value={loc.countryId}
-                            onChange={(e) => handleChange(i, "countryId", e.target.value)}
+                            onChange={(e) =>
+                              handleChange(i, "countryId", e.target.value)
+                            }
                             className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition cursor-pointer"
                           >
                             <option value="">Select country</option>
@@ -328,7 +361,9 @@ const AddLocation = () => {
                           <input
                             type="text"
                             value={loc.countryName}
-                            onChange={(e) => handleChange(i, "countryName", e.target.value)}
+                            onChange={(e) =>
+                              handleChange(i, "countryName", e.target.value)
+                            }
                             placeholder="Country name"
                             className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition mb-2"
                           />
@@ -336,7 +371,13 @@ const AddLocation = () => {
                           <input
                             type="text"
                             value={loc.countryCode}
-                            onChange={(e) => handleChange(i, "countryCode", e.target.value.toUpperCase())}
+                            onChange={(e) =>
+                              handleChange(
+                                i,
+                                "countryCode",
+                                e.target.value.toUpperCase(),
+                              )
+                            }
                             placeholder="Code (US)"
                             maxLength={3}
                             className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition font-medium text-center"
@@ -362,7 +403,9 @@ const AddLocation = () => {
                         type="text"
                         value={loc.code}
                         maxLength={4}
-                        onChange={(e) => handleChange(i, "code", e.target.value.toUpperCase())}
+                        onChange={(e) =>
+                          handleChange(i, "code", e.target.value.toUpperCase())
+                        }
                         placeholder="ABC1"
                         className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#16a34a] focus:border-[#16a34a] outline-none transition font-medium text-center"
                       />

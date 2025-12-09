@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Check, ArrowLeft, Package } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
-import { Toast } from "@/components/common/Toast";
+
 import { useToast } from "@/app/hooks/useToast";
-import ConfirmationModal from "@/components/common/ConfirmationModal";
-import ProductCard from "../components/ProductCard";
+
 import { productService } from "../services";
 import planUsageService from "@/services/planUsageService";
+import { Toast } from "@/components/common/Toast";
+import { ArrowLeft, Check, Plus } from "lucide-react";
+import ProductCard from "../components/ProductCard";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { Spinner } from "@/components/ui/spinner";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ const AddProduct = () => {
   ]);
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [remainingProducts , setRemainingProducts] = useState(0);
+  const [remainingProducts, setRemainingProducts] = useState(0);
   const MAX_PRODUCTS = 5;
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const AddProduct = () => {
   const handleChange = useCallback((index, e) => {
     const { name, value } = e.target;
     setProducts((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, [name]: value } : p))
+      prev.map((p, i) => (i === index ? { ...p, [name]: value } : p)),
     );
   }, []);
 
@@ -47,16 +49,16 @@ const AddProduct = () => {
       prev.map((p, i) =>
         i === productIndex
           ? { ...p, [field]: p[field].map((v, j) => (j === index ? value : v)) }
-          : p
-      )
+          : p,
+      ),
     );
   }, []);
 
   const addFieldArray = useCallback((productIndex, field) => {
     setProducts((prev) =>
       prev.map((p, i) =>
-        i === productIndex ? { ...p, [field]: [...p[field], ""] } : p
-      )
+        i === productIndex ? { ...p, [field]: [...p[field], ""] } : p,
+      ),
     );
   }, []);
 
@@ -65,8 +67,8 @@ const AddProduct = () => {
       prev.map((p, i) =>
         i === productIndex
           ? { ...p, [field]: p[field].filter((_, j) => j !== index) }
-          : p
-      )
+          : p,
+      ),
     );
   }, []);
 
@@ -74,7 +76,7 @@ const AddProduct = () => {
     if (products.length >= MAX_PRODUCTS) {
       return showToast(
         "error",
-        `You can only add up to ${MAX_PRODUCTS} products at once.`
+        `You can only add up to ${MAX_PRODUCTS} products at once.`,
       );
     }
 
@@ -95,10 +97,13 @@ const AddProduct = () => {
       if (!p.species[0]?.trim())
         return showToast(
           "error",
-          `Product ${i + 1}: At least one species required.`
+          `Product ${i + 1}: At least one species required.`,
         );
       if (!p.size[0]?.trim())
-        return showToast("error", `Product ${i + 1}: At least one size required.`);
+        return showToast(
+          "error",
+          `Product ${i + 1}: At least one size required.`,
+        );
     }
     setIsConfirmOpen(true);
   };
@@ -122,10 +127,13 @@ const AddProduct = () => {
         const { type, used, max } = err.response.data;
         return showToast(
           "error",
-          `You have reached your ${type} limit: ${used}/${max}. Please upgrade your plan.`
+          `You have reached your ${type} limit: ${used}/${max}. Please upgrade your plan.`,
         );
       }
-      showToast("error", err?.response?.data?.message || "Failed to add products.");
+      showToast(
+        "error",
+        err?.response?.data?.message || "Failed to add products.",
+      );
     } finally {
       setLoading(false);
     }
@@ -154,14 +162,14 @@ const AddProduct = () => {
               className="cursor-pointer inline-flex items-center text-slate-700 hover:text-slate-900"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </button>
-          <div className="h-8 w-px bg-slate-300 hidden sm:block" />
-          <div className="flex items-center gap-3 ml-3">
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+            </button>
+            <div className="h-8 w-px bg-slate-300 hidden sm:block" />
+            <div className="flex items-center gap-3 ml-3">
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Add Products
                 </h1>
-              <p className="text-xs sm:text-sm text-slate-500">
+                <p className="text-xs sm:text-sm text-slate-500">
                   Create new product entries
                 </p>
               </div>
@@ -173,9 +181,29 @@ const AddProduct = () => {
       <main className="mx-auto py-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div>
-            <div className="text-l text-red-700 px-9 pt-4 font-bold font-bold ">
-           Remaining Credits : {remainingProducts}
-        </div>
+            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+              {remainingProducts > 0 ? (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+
+                  <span className="text-[#16a34a] text-lg">
+                    {remainingProducts}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+                  <span className="text-red-700 text-lg">
+                    Plan limit for adding products is exceeded...
+                  </span>
+                </>
+              )}
+            </div>
+
             {products.map((p, i) => (
               <ProductCard
                 key={i}
@@ -194,43 +222,41 @@ const AddProduct = () => {
                   updateFieldArray(pi, "size", si, val)
                 }
                 onAddSize={(pi) => addFieldArray(pi, "size")}
-                onRemoveSize={(pi, si) =>
-                  removeFieldArray(pi, "size", si)
-                }
+                onRemoveSize={(pi, si) => removeFieldArray(pi, "size", si)}
               />
             ))}
           </div>
 
-            <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
-              <button
-                onClick={addProduct}
-                disabled={products.length >= MAX_PRODUCTS}
-                className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${
-                  products.length >= MAX_PRODUCTS
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-white hover:text-black"
-                }`}
-              >
-                <Plus className="w-4 h-4" />
-                Add Another Product ({products.length}/{MAX_PRODUCTS})
-              </button>
+          <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
+            <button
+              onClick={addProduct}
+              disabled={products.length >= MAX_PRODUCTS}
+              className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${
+                products.length >= MAX_PRODUCTS
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:text-black"
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              Add Another Product ({products.length}/{MAX_PRODUCTS})
+            </button>
 
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="inline-flex items-center gap-2 button-styling"
-              >
-                {loading ? (
-                  <>
-                    <Spinner className="w-4 h-4" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" /> Add Products
-                  </>
-                )}
-              </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="inline-flex items-center gap-2 button-styling"
+            >
+              {loading ? (
+                <>
+                  <Spinner className="w-4 h-4" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" /> Add Products
+                </>
+              )}
+            </button>
           </div>
         </div>
       </main>

@@ -68,11 +68,14 @@ const CreateOfferDraft = () => {
       grandTotal: "",
       products: [JSON.parse(JSON.stringify(EMPTY_PRODUCT))],
     }),
-    [user]
+    [user][user],
   );
 
   const [formData, setFormData] = useState(initialForm);
-  const [openPicker, setOpenPicker] = useState({ validity: false, shipment: false });
+  const [openPicker, setOpenPicker] = useState({
+    validity: false,
+    shipment: false,
+  });
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
 
@@ -97,7 +100,10 @@ const CreateOfferDraft = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProductSelect = createHandleProductSelect(setFormData, fetchProductDetails);
+  const handleProductSelect = createHandleProductSelect(
+    setFormData,
+    fetchProductDetails,
+  );
 
   const handleDateSelect = (key, date) => {
     if (!date) return;
@@ -137,8 +143,12 @@ const CreateOfferDraft = () => {
     }
 
     const today = startOfDay(new Date());
-    const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
-    const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
+    const validityDate = formData.offerValidityDate
+      ? parseISO(formData.offerValidityDate)
+      : null;
+    const shipmentDate = formData.shipmentDate
+      ? parseISO(formData.shipmentDate)
+      : null;
 
     if (validityDate && isBefore(validityDate, today)) {
       return "Offer Validity Date cannot be earlier than today";
@@ -189,7 +199,10 @@ const CreateOfferDraft = () => {
         showToast("error", "Failed to create draft");
       }
     } catch (err) {
-      showToast("error", err?.response?.data?.message || "Error creating draft");
+      showToast(
+        "error",
+        err?.response?.data?.message || "Error creating draft",
+      );
     } finally {
       setLoading(false);
     }
@@ -280,8 +293,27 @@ const CreateOfferDraft = () => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="p-6 space-y-6">
             {/* Remaining Credits */}
-            <div className="text-l text-red-700 font-bold">
-              Remaining Credits : {remainingOffers}
+            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+              {remainingOffers > 0 ? (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+
+                  <span className="text-[#16a34a] text-lg">
+                    {remainingOffers}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+                  <span className="text-red-700 text-lg">
+                    Plan limit for adding offers is exceeded...
+                  </span>
+                </>
+              )}
             </div>
 
             <form onSubmit={handleCreateClick}>
@@ -372,9 +404,7 @@ const CreateOfferDraft = () => {
 
               {/* Dates Section */}
               <div className="border border-slate-200 rounded-lg p-6 mb-6">
-                <h2 className="font-semibold text-slate-900 mb-6">
-                  Dates
-                </h2>
+                <h2 className="font-semibold text-slate-900 mb-6">Dates</h2>
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <DatePicker
@@ -383,7 +413,9 @@ const CreateOfferDraft = () => {
                       placeholder="Select validity date"
                       onSelect={(d) => handleDateSelect("offerValidityDate", d)}
                       open={openPicker.validity}
-                      setOpen={(v) => setOpenPicker((prev) => ({ ...prev, validity: v }))}
+                      setOpen={(v) =>
+                        setOpenPicker((prev) => ({ ...prev, validity: v }))
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -393,7 +425,9 @@ const CreateOfferDraft = () => {
                       placeholder="Select shipment date"
                       onSelect={(d) => handleDateSelect("shipmentDate", d)}
                       open={openPicker.shipment}
-                      setOpen={(v) => setOpenPicker((prev) => ({ ...prev, shipment: v }))}
+                      setOpen={(v) =>
+                        setOpenPicker((prev) => ({ ...prev, shipment: v }))
+                      }
                     />
                   </div>
                 </div>
@@ -444,7 +478,8 @@ const CreateOfferDraft = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      Plant Approval Number <span className="text-rose-500">*</span>
+                      Plant Approval Number{" "}
+                      <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
