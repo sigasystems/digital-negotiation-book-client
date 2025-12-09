@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useCallback  } from "react";
+import React, { useMemo, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import {
   useReactTable,
   getCoreRowModel,
@@ -51,6 +52,9 @@ export default function DashboardTable({
   isLoading = false,
   isSearching = false
 }) {
+  const location = useLocation();
+  const isDashboardPage = location.pathname === "/dashboard";
+  
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
@@ -299,70 +303,73 @@ export default function DashboardTable({
         <SearchFilters fields={searchFields} onSearch={handleSearch} />
       )}
 
-          <div>
-      <Table containerClassName="rounded-[5px]">
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow
-              key={headerGroup.id}
-              className="bg-indigo-50 hover:bg-indigo-50"
-            >
-              {headerGroup.headers.slice(1).map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="border border-gray-300 px-4 py-2 text-left select-none font-semibold text-gray-700 hover:bg-inherit"
-                >
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
+      <div>
+        <Table containerClassName="rounded-[5px]">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow
+                key={headerGroup.id}
+                className="bg-indigo-50 hover:bg-indigo-50"
+              >
+                {headerGroup.headers.slice(1).map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="border border-gray-300 px-4 py-2 text-left select-none font-semibold text-gray-700 hover:bg-inherit"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
 
-        <TableBody>
+          <TableBody>
             {isLoading || isSearching ? (
               Array.from({ length: pageSize }).map((_, index) => (
                 <TableRowSkeleton key={index} columnsCount={columnCount} />
               ))
             ) : table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className="even:bg-gray-50 hover:bg-indigo-50 transition-colors cursor-default"
-              >
-                {row.getAllCells().slice(1).map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className="border border-gray-300 px-4 py-2 select-text"
-                    style={{ userSelect: "text" }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="even:bg-gray-50 hover:bg-indigo-50 transition-colors cursor-default"
+                >
+                  {row.getAllCells().slice(1).map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="border border-gray-300 px-4 py-2 select-text"
+                      style={{ userSelect: "text" }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columnCount}>
+                  No results found
+                </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columnCount}>
-                No results found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-          </div>
-
-      <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <Pagination
-          pageIndex={pageIndex}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          onPageChange={setPageIndex}
-          onPageSizeChange={setPageSize}
-          className="cursor-pointer"
-          isLoading={isLoading || isSearching}
-        />
+            )}
+          </TableBody>
+        </Table>
       </div>
+
+      {/* Conditionally render pagination based on route */}
+      {!isDashboardPage && (
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <Pagination
+            pageIndex={pageIndex}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+            className="cursor-pointer"
+            isLoading={isLoading || isSearching}
+          />
+        </div>
+      )}
     </div>
   );
 }
