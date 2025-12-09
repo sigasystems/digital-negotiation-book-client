@@ -50,16 +50,6 @@ const DatePicker = ({ label, value, onSelect, open, setOpen, editable = true }) 
         )}
 
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              type="button"
-              className="flex items-center justify-center cursor-pointer"
-              disabled={!editable}
-            >
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"

@@ -45,7 +45,7 @@ const DynamicInputList = memo(({ label, items, onChange, onAdd, onRemove, requir
       <button
         type="button"
         onClick={onAdd}
-        className="w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-all font-medium flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-indigo-50 text-black rounded-lg hover:bg-indigo-100 transition-all font-medium flex items-center justify-center gap-2 cursor-pointer"
       >
         <Plus size={14} className="sm:w-4 sm:h-4" />
         Add Another {label}

@@ -14,7 +14,8 @@ import Footer from "../components/Footer";
 import { createHandleProductSelect } from "@/utils/getAllProducts";
 import planUsageService from "@/services/planUsageService";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
-import { Button } from "@/components/ui/button";
+import { Toast } from "@/components/common/Toast";
+import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft } from "lucide-react";
 
 const EMPTY_PRODUCT = {
@@ -29,25 +30,25 @@ const EMPTY_PRODUCT = {
 
 const CreateOfferDraft = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const { showToast } = useToast();
+  const { toasts, showToast } = useToast();
+  const [remainingOffers, setRemainingOffers] = useState(0);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const [ remainingOffers, setRemainingOffers] = useState(0);
-      const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-      const navigate = useNavigate();
-      useEffect(() => {
-        const fetchPlanUsage = async () => {
-          try {
-            await planUsageService.fetchUsage(user.id);
-            const remaining = planUsageService.getRemainingCredits("offers");
-            setRemainingOffers(remaining);
-          } catch (err) {
-            console.error("Failed to fetch plan usage:", err);
-            showToast("error", "Failed to load plan info.");
-          }
-        };
-        fetchPlanUsage();
-      }, [user.id, showToast]);
-    
+  useEffect(() => {
+    const fetchPlanUsage = async () => {
+      try {
+        await planUsageService.fetchUsage(user.id);
+        const remaining = planUsageService.getRemainingCredits("offers");
+        setRemainingOffers(remaining);
+      } catch (err) {
+        console.error("Failed to fetch plan usage:", err);
+        showToast("error", "Failed to load plan info.");
+      }
+    };
+    fetchPlanUsage();
+  }, [user.id, showToast]);
 
   const initialForm = useMemo(
     () => ({
@@ -71,9 +72,7 @@ const CreateOfferDraft = () => {
   );
 
   const [formData, setFormData] = useState(initialForm);
-  const [loading, setLoading] = useState(false);
   const [openPicker, setOpenPicker] = useState({ validity: false, shipment: false });
-
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
 
@@ -84,7 +83,7 @@ const CreateOfferDraft = () => {
 
       if (product) {
         setSpeciesMap((prev) => ({
-      ...prev,
+          ...prev,
           [productId]: product.species || [],
         }));
       }
@@ -110,88 +109,87 @@ const CreateOfferDraft = () => {
     }));
   };
 
- const validateForm = () => {
-  const required = [
-    "quantity",
-    "tolerance",
-    "paymentTerms",
-    "remark",
-    "grandTotal",
-    "origin",
-    "processor",
-    "plantApprovalNumber",
-    "brand",
-  ];
+  const validateForm = () => {
+    const required = [
+      "quantity",
+      "tolerance",
+      "paymentTerms",
+      "remark",
+      "grandTotal",
+      "origin",
+      "processor",
+      "plantApprovalNumber",
+      "brand",
+    ];
 
-  for (const f of required) {
-    if (!formData[f]?.trim()) return `Please fill in all mandatory fields!`;
-  }
-
-  for (const [i, p] of formData.products.entries()) {
-    if (!p.productId) return `Product #${i + 1}: Product is required`;
-    if (!p.species) return `Product #${i + 1}: Species is required`;
-
-    for (const [r, s] of p.sizeBreakups.entries()) {
-      if (!s.size || !s.breakup || !s.price)
-        return `Product #${i + 1}: Row ${r + 1} incomplete`;
+    for (const f of required) {
+      if (!formData[f]?.trim()) return `Please fill in all mandatory fields!`;
     }
-  }
 
-  const today = startOfDay(new Date());
-  const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
-  const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
+    for (const [i, p] of formData.products.entries()) {
+      if (!p.productId) return `Product #${i + 1}: Product is required`;
+      if (!p.species) return `Product #${i + 1}: Species is required`;
 
-  if (validityDate && isBefore(validityDate, today)) {
-    return "Offer Validity Date cannot be earlier than today";
-  }
+      for (const [r, s] of p.sizeBreakups.entries()) {
+        if (!s.size || !s.breakup || !s.price)
+          return `Product #${i + 1}: Row ${r + 1} incomplete`;
+      }
+    }
 
-  if (shipmentDate && validityDate && isBefore(shipmentDate, validityDate)) {
-    return "Shipment Date cannot be earlier than Offer Validity Date";
-  }
+    const today = startOfDay(new Date());
+    const validityDate = formData.offerValidityDate ? parseISO(formData.offerValidityDate) : null;
+    const shipmentDate = formData.shipmentDate ? parseISO(formData.shipmentDate) : null;
 
-  return null;
-};
+    if (validityDate && isBefore(validityDate, today)) {
+      return "Offer Validity Date cannot be earlier than today";
+    }
+
+    if (shipmentDate && validityDate && isBefore(shipmentDate, validityDate)) {
+      return "Shipment Date cannot be earlier than Offer Validity Date";
+    }
+
+    return null;
+  };
+
   const formatPayload = () => ({
     ...formData,
     grandTotal: +formData.grandTotal,
-   products: formData.products.map((p) => {
-  const productInfo = productsList.find((x) => x.id === p.productId);
+    products: formData.products.map((p) => {
+      const productInfo = productsList.find((x) => x.id === p.productId);
 
-  return {
-    productId: p.productId,
-    productName: productInfo?.productName || "",
-    species: p.species,
-    sizeDetails: p.sizeDetails || "Units / Remarks",
-    breakupDetails: p.breakupDetails || "Breakup Details",
-    priceDetails: p.priceDetails || "$",
-    packing: p.packing || "",
-    sizeBreakups: p.sizeBreakups.map((s) => ({
-      size: s.size,
-      breakup: +s.breakup,
-      condition: s.condition || "",
-      price: +s.price,
-    })),
-  };
-}),
-
+      return {
+        productId: p.productId,
+        productName: productInfo?.productName || "",
+        species: p.species,
+        sizeDetails: p.sizeDetails || "Units / Remarks",
+        breakupDetails: p.breakupDetails || "Breakup Details",
+        priceDetails: p.priceDetails || "$",
+        packing: p.packing || "",
+        sizeBreakups: p.sizeBreakups.map((s) => ({
+          size: s.size,
+          breakup: +s.breakup,
+          condition: s.condition || "",
+          price: +s.price,
+        })),
+      };
+    }),
   });
 
   const submitDraft = async () => {
-
     setLoading(true);
     try {
       const payload = formatPayload();
       const res = await offerDraftService.createDraft(payload);
 
       if (res?.status === 201 || res?.data?.success) {
-        toast.success("Draft created successfully");
+        showToast("success", "Draft created successfully");
         setFormData(initialForm);
-        navigate("/offer-draft")
+        navigate("/offer-draft");
       } else {
-        toast.error("Failed to create draft");
+        showToast("error", "Failed to create draft");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Error creating draft");
+      showToast("error", err?.response?.data?.message || "Error creating draft");
     } finally {
       setLoading(false);
     }
@@ -200,7 +198,7 @@ const CreateOfferDraft = () => {
   const handleCreateClick = (e) => {
     e.preventDefault();
     const error = validateForm();
-    if (error) return toast.error(error);
+    if (error) return showToast("error", error);
     setIsConfirmOpen(true);
   };
 
@@ -210,197 +208,309 @@ const CreateOfferDraft = () => {
   };
 
   useEffect(() => {
-  const loadAllProducts = async () => {
-    try {
-      const res = await productService.getAllProducts(0, 500);
-      setProductsList(res.data?.data?.products || []);
-    } catch (err) {
+    const loadAllProducts = async () => {
+      try {
+        const res = await productService.getAllProducts(0, 500);
+        setProductsList(res.data?.data?.products || []);
+      } catch (err) {
         console.error(err);
-      toast.error("Unable to load products");
-    }
-  };
+        showToast("error", "Unable to load products");
+      }
+    };
 
-  loadAllProducts();
+    loadAllProducts();
 
-  const loadLatestDraftNo = async () => {
-    try {
-      const res = await offerDraftService.getLatestDraftNo();
-      const lastDraftNo = res.data?.lastDraftNo || 0;
-      setFormData((prev) => ({
-        ...prev,
-        draftName: `Offer Draft ${lastDraftNo + 1}`,
-      }));
-    } catch (err) {
-      console.error(err);
-      toast.error("Unable to fetch latest draft number");
-    }
-  };
+    const loadLatestDraftNo = async () => {
+      try {
+        const res = await offerDraftService.getLatestDraftNo();
+        const lastDraftNo = res.data?.lastDraftNo || 0;
+        setFormData((prev) => ({
+          ...prev,
+          draftName: `Offer Draft ${lastDraftNo + 1}`,
+        }));
+      } catch (err) {
+        console.error(err);
+        showToast("error", "Unable to fetch latest draft number");
+      }
+    };
 
-  loadLatestDraftNo();
-}, []);
+    loadLatestDraftNo();
+  }, []);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 px-[24.5px]">
-   <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
-      <div className=" mx-auto px-6 py-4">
+    <div className="relative min-h-screen bg-slate-50 px-[24.5px]">
+      {loading && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
+          <p className="text-slate-700 font-medium">Creating draft...</p>
+        </div>
+      )}
 
-        <div className="flex items-center gap-5">
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map((t) => (
+          <Toast key={t.id} type={t.type} message={t.message} />
+        ))}
+      </div>
 
-         <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)} 
-              className="hover:bg-slate-100 rounded-lg transition-all duration-200 cursor-pointer"
+      <header className="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-20 rounded-xl">
+        <div className="mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="cursor-pointer inline-flex items-center text-slate-700 hover:text-slate-900"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
-            </Button>
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-gray-900">
+            </button>
+            <div className="h-8 w-px bg-slate-300 hidden sm:block" />
+            <div className="flex items-center gap-3 ml-3">
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   Create Offer Draft
                 </h1>
+                <p className="text-xs sm:text-sm text-slate-500">
+                  Generate professional offer drafts
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-gray-600 mt-0.5">
-              Generate professional offer drafts for your clients
-            </p>
           </div>
         </div>
+      </header>
 
-      </div>
-    </header>
-    <main className="mx-auto py-6">
-
-      <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-
-<div className="rounded-lg text-l pt-3 px-6 text-red-700 font-bold">
-           Remaining Credits : {remainingOffers}
-        </div>
-
-          <form onSubmit={handleCreateClick}>
-             <Section title="Draft Details">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <ReadOnlyField label="Draft Name" value={formData.draftName} />
-              <InputField 
-                required={true} 
-                label="Quantity (MT)" 
-                name="quantity" 
-                value={formData.quantity} 
-                  placeholder="25"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Tolerance (%)" 
-                name="tolerance" 
-                value={formData.tolerance} 
-                  placeholder="+/- 10"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Payment Terms" 
-                name="paymentTerms" 
-                value={formData.paymentTerms} 
-                  placeholder="LC at sight, 30% advance"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Remarks" 
-                name="remark" 
-                value={formData.remark} 
-                  placeholder="Optional notes or conditions"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Grand Total (USD)" 
-                name="grandTotal" 
-                value={formData.grandTotal} 
-                  placeholder="12500"
-                onChange={handleChange} 
-              />
+      <main className="mx-auto py-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="p-6 space-y-6">
+            {/* Remaining Credits */}
+            <div className="text-l text-red-700 font-bold">
+              Remaining Credits : {remainingOffers}
             </div>
-          </Section>
 
-          <Section title="Dates">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <DatePicker
-                label="Offer Validity Date"
-                value={formData.offerValidityDate}
-                  placeholder="Select validity date"
-                onSelect={(d) => handleDateSelect("offerValidityDate", d)}
-                open={openPicker.validity}
-                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, validity: v }))}
-              />
+            <form onSubmit={handleCreateClick}>
+              {/* Draft Details Section */}
+              <div className="border border-slate-200 rounded-lg p-6 mb-6">
+                <h2 className="font-semibold text-slate-900 mb-6">
+                  Draft Details
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Draft Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.draftName}
+                      readOnly
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Quantity (MT) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="quantity"
+                      value={formData.quantity}
+                      placeholder="25"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Tolerance (%) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="tolerance"
+                      value={formData.tolerance}
+                      placeholder="+/- 10"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Payment Terms <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="paymentTerms"
+                      value={formData.paymentTerms}
+                      placeholder="LC at sight, 30% advance"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Remarks <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="remark"
+                      value={formData.remark}
+                      placeholder="Optional notes or conditions"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Grand Total (USD) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="grandTotal"
+                      value={formData.grandTotal}
+                      placeholder="12500"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <DatePicker
-                label="Shipment Date"
-                value={formData.shipmentDate}
-                placeholder="Select shipment date"
-                onSelect={(d) => handleDateSelect("shipmentDate", d)}
-                open={openPicker.shipment}
-                setOpen={(v) => setOpenPicker((prev) => ({ ...prev, shipment: v }))}
-              />
-            </div>
-          </Section>
+              {/* Dates Section */}
+              <div className="border border-slate-200 rounded-lg p-6 mb-6">
+                <h2 className="font-semibold text-slate-900 mb-6">
+                  Dates
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <DatePicker
+                      label="Offer Validity Date"
+                      value={formData.offerValidityDate}
+                      placeholder="Select validity date"
+                      onSelect={(d) => handleDateSelect("offerValidityDate", d)}
+                      open={openPicker.validity}
+                      setOpen={(v) => setOpenPicker((prev) => ({ ...prev, validity: v }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <DatePicker
+                      label="Shipment Date"
+                      value={formData.shipmentDate}
+                      placeholder="Select shipment date"
+                      onSelect={(d) => handleDateSelect("shipmentDate", d)}
+                      open={openPicker.shipment}
+                      setOpen={(v) => setOpenPicker((prev) => ({ ...prev, shipment: v }))}
+                    />
+                  </div>
+                </div>
+              </div>
 
-          <Section title="Business Information">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <ReadOnlyField label="From Party" value={formData.fromParty} />
-              <InputField 
-                required={true} 
-                label="Origin" 
-                name="origin" 
-                value={formData.origin} 
-                  placeholder="Brazil"
-                onChange={handleChange}
-              />
-              <InputField 
-                required={true} 
-                label="Processor" 
-                name="processor" 
-                value={formData.processor} 
-                  placeholder="Company or facility name"
-                onChange={handleChange} 
-              />
-              <InputField 
-                required={true} 
-                label="Plant Approval Number" 
-                name="plantApprovalNumber" 
-                value={formData.plantApprovalNumber} 
-                  placeholder="ABC-12345"
-                onChange={handleChange}
-              />
-              <InputField 
-                required={true} 
-                label="Brand" 
-                name="brand" 
-                value={formData.brand} 
-                  placeholder="Product brand name"
-                onChange={handleChange} 
-              />
-            </div>
-          </Section>
+              {/* Business Information Section */}
+              <div className="border border-slate-200 rounded-lg p-6 mb-6">
+                <h2 className="font-semibold text-slate-900 mb-6">
+                  Business Information
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      From Party
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.fromParty}
+                      readOnly
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Origin <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="origin"
+                      value={formData.origin}
+                      placeholder="Brazil"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Processor <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="processor"
+                      value={formData.processor}
+                      placeholder="Company or facility name"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Plant Approval Number <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="plantApprovalNumber"
+                      value={formData.plantApprovalNumber}
+                      placeholder="ABC-12345"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Brand <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="brand"
+                      value={formData.brand}
+                      placeholder="Product brand name"
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+              </div>
 
-          <Section title="Products & Size Details">
-            <ProductSection
-              productsData={formData.products || []}
-              setFormData={setFormData}
-              productsList={productsList}
-              speciesMap={speciesMap}
-              onProductSelect={handleProductSelect}
-            />
-          </Section>
+              {/* Products & Size Details Section */}
+              <div className="border border-slate-200 rounded-lg p-6">
+                <h2 className="font-semibold text-slate-900 mb-6">
+                  Products & Size Details
+                </h2>
+                <ProductSection
+                  productsData={formData.products || []}
+                  setFormData={setFormData}
+                  productsList={productsList}
+                  speciesMap={speciesMap}
+                  onProductSelect={handleProductSelect}
+                />
+              </div>
+            </form>
+          </div>
 
-          <Footer loading={loading} />
-        </form>
-      </div>
+          <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
+            <button
+              onClick={() => navigate(-1)}
+              disabled={loading}
+              className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              Cancel
+            </button>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            All fields marked with an asterisk (*) are required. Please ensure all information is accurate before submitting.
-          </p>
+            <button
+              onClick={handleCreateClick}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-4 py-2 button-styling"
+            >
+              {loading ? (
+                <>
+                  <Spinner className="w-4 h-4" />
+                  Creating...
+                </>
+              ) : (
+                <>Create Draft</>
+              )}
+            </button>
+          </div>
         </div>
       </main>
 
@@ -412,7 +522,7 @@ const CreateOfferDraft = () => {
         description="Are you sure you want to create this offer draft? This will save the draft with the details you've entered."
         confirmText="Create Draft"
         cancelText="Cancel"
-        confirmButtonColor="bg-[#16a34a] hover:bg-blue-700"
+        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
       />
     </div>
   );

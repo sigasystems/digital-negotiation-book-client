@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { BarChart3, TrendingUp, Users, Activity, Search } from "lucide-react";
-import { useReloadOncePerSession } from "@/hooks/useReloadOncePerSession";
 import DashboardTable from "./DashboardTable";
 import { roleBasedDataService } from "@/services/roleBasedDataService";
 import { useQuery } from "@tanstack/react-query";
@@ -53,8 +52,6 @@ export default function ResponsiveDashboard() {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const userRole = user?.userRole || "guest";
   const userActions = [];
-
-  useReloadOncePerSession("landingPageReloaded");
 
   const { data: dashboardResponse, isLoading } = useQuery({
     queryKey: ["dashboardData", userRole, pageIndex, pageSize],
@@ -205,20 +202,6 @@ export default function ResponsiveDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">
                 {userLabel}
               </h3>
-            </div>
-          </div>
-          <div className="pb-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by email..."
-                  value={emailFilter}
-                  onChange={(e) => setEmailFilter(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm rounded-sm"
-                />
-              </div>
             </div>
           </div>
 

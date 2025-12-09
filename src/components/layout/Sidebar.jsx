@@ -105,7 +105,7 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               variant="ghost"
               size="icon"
               onClick={toggleCollapse}
-              className="hidden lg:flex cursor-pointer p-2 hover:bg-indigo-100 rounded focus-visible:ring focus-visible:ring-indigo-400"
+              className="hidden lg:flex cursor-pointer p-2 hover:bg-indigo-100 rounded focus-visible:ring focus-visible:ring-green-400"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               type="button"
             >
@@ -151,11 +151,10 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
                       "flex items-center rounded-md text-sm font-medium w-full transition-colors select-none cursor-pointer",
                       collapsed ? "justify-center p-2" : "gap-3 px-[11.5px] py-2",
                       isActive
-                        ? "bg-indigo-100 text-gray-700 font-semibold"
-                        : "text-gray-700 hover:text-indigo-700 hover:bg-indigo-50",
+                        ? "bg-green-100 text-[#16a34a] font-semibold"
+                        : "text-gray-700 hover:text-[#16a34a] hover:bg-green-50",
                     )
                   }
-                  title={collapsed ? name : undefined}
                 >
                   <Icon className="w-5 h-5 shrink-0 text-black-400" strokeWidth={2.2} />
                   {!collapsed && <span className="truncate">{name}</span>}
@@ -165,12 +164,12 @@ export default function Sidebar({ collapsed, setCollapsed, onClose }) {
               return collapsed ? (
                 <Tooltip key={name} delayDuration={150}>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  {/* <TooltipContent
+                  <TooltipContent
                     side="right"
-                    className="bg-indigo-900 text-white text-sm px-3 py-1 rounded-md shadow-lg select-none"
+                    className="bg-green-50 text-black text-sm px-3 py-1 rounded-md shadow-lg select-none"
                   >
                     {name}
-                  </TooltipContent> */}
+                  </TooltipContent>
                 </Tooltip>
               ) : (
                 link

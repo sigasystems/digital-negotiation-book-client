@@ -155,7 +155,7 @@ const AddProduct = () => {
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </button>
-        
+          <div className="h-8 w-px bg-slate-300 hidden sm:block" />
           <div className="flex items-center gap-3 ml-3">
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-slate-900">
@@ -208,7 +208,7 @@ const AddProduct = () => {
                 className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${
                   products.length >= MAX_PRODUCTS
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-white hover:text-indigo-700"
+                    : "bg-white hover:text-black"
                 }`}
               >
                 <Plus className="w-4 h-4" />
@@ -243,7 +243,7 @@ const AddProduct = () => {
         description="Are you sure you want to add these products?"
         confirmText="Yes, Add"
         cancelText="Cancel"
-        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

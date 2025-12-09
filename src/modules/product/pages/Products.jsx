@@ -141,7 +141,7 @@ export default function Products() {
         searchFields={[
           { name: "productName", label: "Product Name", type: "text" },
           // { name: "species", label: "Species", type: "text" },
-          { name: "size", label: "Size", type: "text", placeholder: "50kg" },
+          // { name: "size", label: "Size", type: "text", placeholder: "50kg" },
         ]}
         isLoading={isPaginationLoading || loading || isSearching}
         isSearching={isSearching}

@@ -163,7 +163,7 @@ const ViewProduct = () => {
             </div>
           </div>
           
-          <div className="p-6">
+          <div>
             <div className="[&_input]:h-9 [&_input]:py-2 [&_input]:text-sm [&_input]:transition-all [&_input]:duration-200 
                           [&_.input]:h-9 [&_.input]:py-2 [&_.input]:text-sm 
                           [&_button]:transition-all [&_button]:duration-200

@@ -343,7 +343,7 @@ export default function DashboardTable({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columnCount} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={columnCount}>
                 No results found
               </TableCell>
             </TableRow>

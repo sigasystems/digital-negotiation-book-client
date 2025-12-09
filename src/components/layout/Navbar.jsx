@@ -148,25 +148,23 @@ export default function Navbar({ onMenuClick, showSidebarButton = true, isNoSide
             {/* Dropdown */}
             {userDropdownOpen && (
               <div 
-                className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-60 py-3"
+                className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-60 py-2 min-w-[180px]"
                 style={{ width: dropdownWidth || "auto" }}
               >
-                <div className="flex flex-col items-center px-2">
+                <div className="flex flex-col">
                   <Link
                     to="/profile"
-                    className="w-full flex justify-center items-center gap-3 px-4 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150 cursor-pointer rounded-lg"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150 cursor-pointer rounded-lg text-left"
                   >
-                    <User className="w-4 h-4" />
+                    <User className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm font-medium">Profile</span>
                   </Link>
 
-                  <div className="w-11/12 border-t border-gray-100 my-1"></div>
-
                   <button
                     onClick={() => setLogoutOpen(true)}
-                    className="w-full flex justify-center items-center gap-3 px-4 text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer rounded-lg"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer rounded-lg text-left"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm font-medium">Logout</span>
                   </button>
                 </div>
