@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Building2, 
-  UserCircle2, 
-  MapPin, 
-  ArrowLeft, 
-  Save, 
+import {
+  Building2,
+  UserCircle2,
+  MapPin,
+  ArrowLeft,
+  Save,
   Loader2,
   UserPlus,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 import { businessOwnerService } from "../services/businessOwner";
 import { useToast } from "@/app/hooks/useToast";
@@ -27,7 +27,7 @@ export default function AddBuyerForm() {
   const [remainingBuyers, setRemainingBuyers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  
+
   const { toasts, showToast } = useToast();
   const navigate = useNavigate();
 
@@ -140,8 +140,27 @@ export default function AddBuyerForm() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="p-6 space-y-6">
             {/* Remaining Credits */}
-            <div className="text-l text-red-700 font-bold">
-              Remaining Credits : {remainingBuyers}
+            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+              {remainingBuyers > 0 ? (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+
+                  <span className="text-[#16a34a] text-lg">
+                    {remainingBuyers}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#16a34a] text-lg">
+                    Remaining Credits:
+                  </span>
+                  <span className="text-red-700 text-lg">
+                    Plan limit for adding buyer is exceeded...
+                  </span>
+                </>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -165,7 +184,10 @@ export default function AddBuyerForm() {
                   {BUYER_FORM_FIELDS.company.map((field) => (
                     <div key={field.name} className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        {field.label} {field.required && <span className="text-rose-500">*</span>}
+                        {field.label}{" "}
+                        {field.required && (
+                          <span className="text-rose-500">*</span>
+                        )}
                       </label>
                       <input
                         type={field.type || "text"}
@@ -200,7 +222,10 @@ export default function AddBuyerForm() {
                   {BUYER_FORM_FIELDS.contact.map((field) => (
                     <div key={field.name} className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        {field.label} {field.required && <span className="text-rose-500">*</span>}
+                        {field.label}{" "}
+                        {field.required && (
+                          <span className="text-rose-500">*</span>
+                        )}
                       </label>
                       <input
                         type={field.type || "text"}
@@ -236,7 +261,10 @@ export default function AddBuyerForm() {
                     {BUYER_FORM_FIELDS.address.map((field) => (
                       <div key={field.name} className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">
-                          {field.label} {field.required && <span className="text-rose-500">*</span>}
+                          {field.label}{" "}
+                          {field.required && (
+                            <span className="text-rose-500">*</span>
+                          )}
                         </label>
                         <input
                           type={field.type || "text"}
