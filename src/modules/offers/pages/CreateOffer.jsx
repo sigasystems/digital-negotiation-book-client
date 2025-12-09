@@ -261,7 +261,7 @@ const CreateOffer = () => {
             </div>
 
             <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1.5 text-xs sm:text-sm font-medium">
+            <Badge variant="outline" className="bg-blue-50 text-green-700 border-green-300 px-3 py-1.5 text-xs sm:text-sm font-medium">
               Draft Loaded
             </Badge>
             </div>

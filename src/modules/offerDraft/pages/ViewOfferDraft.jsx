@@ -23,6 +23,7 @@ import ProductSection from "../components/ProductSection";
 import DatePicker from "../components/DatePicker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 const ViewOfferDraft = () => {
   const { id } = useParams();
@@ -32,6 +33,7 @@ const ViewOfferDraft = () => {
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const [productsList, setProductsList] = useState([]);
   const [speciesMap, setSpeciesMap] = useState({});
@@ -166,6 +168,27 @@ const ViewOfferDraft = () => {
     }
   };
 
+  const handleSaveClick = () => {
+    if (!isChanged) return;
+    
+    const validation = validateOfferDates(
+      formData.offerValidityDate,
+      formData.shipmentDate
+    );
+
+    if (validation) {
+      toast.error(validation);
+      return;
+    }
+    
+    setIsConfirmOpen(true);
+  };
+
+  const confirmSave = async () => {
+    setIsConfirmOpen(false);
+    await handleSave();
+  };
+
   const isChanged = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   if (loading || !formData) {
@@ -181,181 +204,187 @@ const ViewOfferDraft = () => {
 
   return (
     <div className="min-h-screen pb-24 lg:pb-8 px-[24.5px]">
+      {saving && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
+          <p className="text-slate-700 font-medium">Saving changes...</p>
+        </div>
+      )}
 
-  <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
-    <div className="px-4 sm:px-6 lg:px-8 py-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate(-1)} 
-            className="cursor-pointer hover:bg-slate-100 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button>
-          <div className="h-8 w-px bg-slate-300 hidden sm:block" />
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">View Draft</h1>
+      <header className="sticky top-17 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm z-20 rounded-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate(-1)} 
+                className="cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" /> Back
+              </Button>
+              <div className="h-8 w-px bg-slate-300 hidden sm:block" />
+              <div className="flex items-center gap-3">
+                <div>
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">View Draft</h1>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {isChanged && (
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 px-3 py-1.5 text-xs sm:text-sm font-medium animate-pulse">
+                  Unsaved Changes
+                </Badge>
+              )}
+              <Button
+                onClick={() =>
+                  navigate(`/offer/${formData.draftNo}`, {
+                    state: { draftId: id },
+                  })
+                }
+                className="button-styling"
+              >
+                Create Offer
+              </Button>
             </div>
           </div>
         </div>
+      </header>
 
-        <div className="flex items-center gap-3">
-          {isChanged && (
-            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 px-3 py-1.5 text-xs sm:text-sm font-medium animate-pulse">
-              Unsaved Changes
-            </Badge>
-          )}
-          <Button
-            onClick={() =>
-              navigate(`/offer/${formData.draftNo}`, {
-                state: { draftId: id },
-              })
-            }
-            className="button-styling"
-          >
-            Create Offer
-          </Button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main className="mx-auto py-4">
-    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">      
+      <main className="mx-auto py-4">
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow p-5 sm:p-6 lg:p-8">      
           <div className="mb-8">
-      <div className="flex items-center gap-3 mb-5 sm:mb-6">
-        <h2 className="font-semibold text-base sm:text-lg text-slate-900">Business Information</h2>
-        </div>
-      
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Business Information</h2>
+            </div>
+          
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <ReadOnlyField label="Draft Number" value={formData.draftNo} />
-                  <InputField 
-              label="From Party" 
-              name="fromParty" 
-              value={formData.fromParty} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Origin" 
-              name="origin" 
-              value={formData.origin} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Processor" 
-              name="processor" 
-              value={formData.processor} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Plant Approval Number" 
-              name="plantApprovalNumber" 
-              value={formData.plantApprovalNumber} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Brand" 
-              name="brand" 
-              value={formData.brand} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
+              <InputField 
+                label="From Party" 
+                name="fromParty" 
+                value={formData.fromParty} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Origin" 
+                name="origin" 
+                value={formData.origin} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Processor" 
+                name="processor" 
+                value={formData.processor} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Plant Approval Number" 
+                name="plantApprovalNumber" 
+                value={formData.plantApprovalNumber} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Brand" 
+                name="brand" 
+                value={formData.brand} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+            </div>
           </div>
-        </div>
 
           {/* Draft Details Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <h2 className="font-semibold text-base sm:text-lg text-slate-900">Draft Details</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            <InputField 
-              label="Draft Name" 
-              name="draftName" 
-              value={formData.draftName} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Quantity" 
-              name="quantity" 
-              value={formData.quantity} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Tolerance" 
-              name="tolerance" 
-              value={formData.tolerance} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Payment Terms" 
-              name="paymentTerms" 
-              value={formData.paymentTerms} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Remark" 
-              name="remark" 
-              value={formData.remark} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-            <InputField 
-              label="Grand Total" 
-              name="grandTotal" 
-              value={formData.grandTotal} 
-              onChange={handleChange}
-              className="cursor-pointer"
-            />
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <h2 className="font-semibold text-base sm:text-lg text-slate-900">Important Dates</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-            <div className="space-y-2">
-              <DatePicker 
-                label="Offer Validity Date" 
-                value={formData.offerValidityDate} 
-                onSelect={(d) => handleDateSelect("offerValidityDate", d)} 
-                open={openPicker.validity} 
-                setOpen={(v) => setOpenPicker((p) => ({ ...p, validity: v }))}
-                className="cursor-pointer"
-              />
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Draft Details</h2>
             </div>
 
-            <div className="space-y-2">
-              <DatePicker 
-                label="Shipment Date" 
-                value={formData.shipmentDate} 
-                onSelect={(d) => handleDateSelect("shipmentDate", d)} 
-                open={openPicker.shipment} 
-                setOpen={(v) => setOpenPicker((p) => ({ ...p, shipment: v }))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              <InputField 
+                label="Draft Name" 
+                name="draftName" 
+                value={formData.draftName} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Quantity" 
+                name="quantity" 
+                value={formData.quantity} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Tolerance" 
+                name="tolerance" 
+                value={formData.tolerance} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Payment Terms" 
+                name="paymentTerms" 
+                value={formData.paymentTerms} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Remark" 
+                name="remark" 
+                value={formData.remark} 
+                onChange={handleChange}
+                className="cursor-pointer"
+              />
+              <InputField 
+                label="Grand Total" 
+                name="grandTotal" 
+                value={formData.grandTotal} 
+                onChange={handleChange}
                 className="cursor-pointer"
               />
             </div>
           </div>
-        </div>
 
-        <div>
-          <div className="flex items-center gap-3 mb-5 sm:mb-6">
-            <h2 className="font-semibold text-base sm:text-lg text-slate-900">Product & Size Details</h2>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Important Dates</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+              <div className="space-y-2">
+                <DatePicker 
+                  label="Offer Validity Date" 
+                  value={formData.offerValidityDate} 
+                  onSelect={(d) => handleDateSelect("offerValidityDate", d)} 
+                  open={openPicker.validity} 
+                  setOpen={(v) => setOpenPicker((p) => ({ ...p, validity: v }))}
+                  className="cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <DatePicker 
+                  label="Shipment Date" 
+                  value={formData.shipmentDate} 
+                  onSelect={(d) => handleDateSelect("shipmentDate", d)} 
+                  open={openPicker.shipment} 
+                  setOpen={(v) => setOpenPicker((p) => ({ ...p, shipment: v }))}
+                  className="cursor-pointer"
+                />
+              </div>
+            </div>
           </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <h2 className="font-semibold text-base sm:text-lg text-slate-900">Product & Size Details</h2>
+            </div>
 
             <ProductSection
               productsData={formData.products}
@@ -397,7 +426,7 @@ const ViewOfferDraft = () => {
               </Button>
 
               <Button
-                onClick={handleSave}
+                onClick={handleSaveClick}
                 disabled={saving || !isChanged}
                 className="button-styling"
               >
@@ -417,6 +446,17 @@ const ViewOfferDraft = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmSave}
+        title="Confirm Update"
+        description="Are you sure you want to save these changes? This will update the draft with the new information."
+        confirmText="Save Changes"
+        cancelText="Cancel"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
+      />
     </div>
   );
 };
