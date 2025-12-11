@@ -16,7 +16,7 @@ export const Toast = ({ type, message }) => {
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white ${colors[type] || colors.info}`}
+      className={`fixed top-20 left-1/2 transform -translate-x-1/2 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white z-50 ${colors[type] || colors.info}`}
     >
       <Icon size={18} />
       <span className="font-medium text-sm">{message}</span>
