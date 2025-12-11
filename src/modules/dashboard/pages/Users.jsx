@@ -132,6 +132,7 @@ export default function Users({ userRole }) {
         ],
       },
       { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product" },
+      { name: "locationName", label: "Location Name", type: "text", placeholder: "Enter location" },
     ];
   }
 
