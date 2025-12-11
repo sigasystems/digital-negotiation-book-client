@@ -131,6 +131,7 @@ export default function Users({ userRole }) {
           { value: "inactive", label: "Inactive" },
         ],
       },
+      { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product" },
     ];
   }
 

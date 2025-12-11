@@ -6,27 +6,34 @@ import {
   MapPin,
   ArrowLeft,
   Save,
-  Loader2,
-  UserPlus,
-  CheckCircle2,
+  Package,
+  ChevronDown,
 } from "lucide-react";
 import { businessOwnerService } from "../services/businessOwner";
 import { useToast } from "@/app/hooks/useToast";
 import { validateBuyer } from "@/app/config/buyerValidation";
 import { BUYER_FORM_FIELDS } from "@/app/config/buyerFormConfig";
-import { InputField } from "@/components/common/InputField";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import toast from "react-hot-toast";
 import planUsageService from "@/services/planUsageService";
 import { Toast } from "@/components/common/Toast";
 import { Spinner } from "@/components/ui/spinner";
+import { productService } from "@/modules/product/services";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function AddBuyerForm() {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const [remainingBuyers, setRemainingBuyers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { toasts, showToast } = useToast();
   const navigate = useNavigate();
@@ -45,33 +52,50 @@ export default function AddBuyerForm() {
     city: "",
     address: "",
     postalCode: "",
+    productName: "",
   };
 
   const [formData, setFormData] = useState(initialData);
 
-  // Fetch plan usage on mount
   useEffect(() => {
-    const fetchPlanUsage = async () => {
+    const fetchData = async () => {
       try {
+        setProductsLoading(true);
+        const productsResponse = await productService.getAllProducts(1, 100);
+        if (productsResponse?.data?.data?.products) {
+          setProducts(productsResponse.data.data.products);
+        }
+        setProductsLoading(false);
+
         await planUsageService.fetchUsage(user.id);
         const remaining = planUsageService.getRemainingCredits("buyers");
         setRemainingBuyers(remaining);
       } catch (err) {
-        console.error("Failed to fetch plan usage:", err);
-        showToast("error", "Failed to load plan info.");
+        console.error("Failed to fetch data:", err);
+        showToast("error", "Failed to load required data.");
+        setProductsLoading(false);
       }
     };
-    fetchPlanUsage();
+    fetchData();
   }, [user.id]);
 
   const updateField = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  const handleProductSelect = (product) => {
+    setSelectedProduct(product);
+    setFormData({ ...formData, productName: product.productName });
+  };
+
   const handleSubmit = (e) => {
-    e?.preventDefault();
+    e.preventDefault();
     
     const error = validateBuyer(formData);
     if (error) return showToast("error", error);
+    
+    if (!formData.productName) {
+      return showToast("error", "Please select a product");
+    }
     
     setIsConfirmOpen(true);
   };
@@ -86,6 +110,7 @@ export default function AddBuyerForm() {
       if (res?.status === 201) {
         showToast("success", "Buyer added successfully!");
         setFormData(initialData);
+        setSelectedProduct(null);
         setTimeout(() => navigate("/users"), 1000);
       } else {
         showToast("error", res?.message || "Failed to add buyer");
@@ -106,7 +131,53 @@ export default function AddBuyerForm() {
         </div>
       )}
 
-      <div className="fixed top-4 right-4 z-50 space-y-2">
+      {isConfirmOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-lg max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-indigo-50 rounded-lg">
+                <Package className="w-6 h-6 text-indigo-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Confirm Buyer Creation
+              </h3>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <p className="text-slate-600">
+                Are you sure you want to add this buyer?
+              </p>
+              {selectedProduct && (
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-sm font-medium text-slate-700 mb-1">
+                    Selected Product:
+                  </p>
+                  <p className="text-sm text-slate-900 font-semibold">
+                    {selectedProduct.productName}
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsConfirmOpen(false)}
+                className="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSubmit}
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm transition"
+              >
+                Confirm & Add Buyer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="fixed top-4 right-4 z-40 space-y-2">
         {toasts.map((t) => (
           <Toast key={t.id} type={t.type} message={t.message} />
         ))}
@@ -139,7 +210,6 @@ export default function AddBuyerForm() {
       <main className="mx-auto py-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="p-6 space-y-6">
-            {/* Remaining Credits */}
             <div className="flex items-center gap-2 px-9 pt-4 font-bold">
               {remainingBuyers > 0 ? (
                 <>
@@ -240,6 +310,77 @@ export default function AddBuyerForm() {
                 </div>
               </div>
 
+              <div className="border border-slate-200 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-green-50 rounded-lg">
+                    <Package className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-slate-900">
+                      Product Selection
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                      Select the product associated with this buyer
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Select Product <span className="text-rose-500">*</span>
+                  </label>
+                  
+                  {productsLoading ? (
+                    <div className="flex items-center justify-center p-4">
+                      <Spinner className="w-5 h-5 text-[#16a34a]" />
+                      <span className="ml-3 text-slate-600">Loading products...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className="w-full flex items-center justify-between px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white hover:bg-slate-50 text-left"
+                          >
+                            <span className={`${!selectedProduct ? 'text-slate-400' : 'text-slate-900'}`}>
+                              {selectedProduct ? selectedProduct.productName : "Select a product"}
+                            </span>
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-64 overflow-y-auto" align="start">
+                          <DropdownMenuLabel>Available Products</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          {products.length === 0 ? (
+                            <div className="px-2 py-4 text-center text-sm text-slate-500">
+                              No products found
+                            </div>
+                          ) : (
+                            products.map((product) => (
+                              <DropdownMenuItem
+                                key={product._id}
+                                onClick={() => handleProductSelect(product)}
+                                className="cursor-pointer"
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{product.productName}</span>
+                                  {product.sku && (
+                                    <span className="text-xs text-slate-500 mt-1">
+                                      SKU: {product.sku}
+                                    </span>
+                                  )}
+                                </div>
+                              </DropdownMenuItem>
+                            ))
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* Address Information */}
               <div className="border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -292,12 +433,11 @@ export default function AddBuyerForm() {
                     />
                   </div>
                 </div>
-              </div>
-            </form>
           </div>
 
-          <div className="flex justify-end gap-3 p-4 bg-slate-50 border-t border-slate-200">
+          <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
             <button
+              type="button"
               onClick={() => navigate(-1)}
               disabled={loading}
               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -306,9 +446,8 @@ export default function AddBuyerForm() {
             </button>
 
             <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="inline-flex items-center gap-2 px-4 py-2 button-styling"
+              type="submit"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg button-styling"
             >
               {loading ? (
                 <>
@@ -321,6 +460,8 @@ export default function AddBuyerForm() {
                 </>
               )}
             </button>
+          </div>
+        </form>
           </div>
         </div>
       </main>
