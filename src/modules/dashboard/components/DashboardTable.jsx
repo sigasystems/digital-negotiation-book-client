@@ -60,7 +60,6 @@ export default function DashboardTable({
 
   const HIDDEN_KEYS = [
     "id",
-    "code",
     "ownerId",
     "ownerid",
     "isDeleted",

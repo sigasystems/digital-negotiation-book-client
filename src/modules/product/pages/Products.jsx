@@ -140,6 +140,7 @@ export default function Products() {
         onSearch={handleSearch}
         searchFields={[
           { name: "productName", label: "Product Name", type: "text" },
+          { name: "code", label: "Product code", type: "text" },
           // { name: "species", label: "Species", type: "text" },
           // { name: "size", label: "Size", type: "text", placeholder: "50kg" },
         ]}
