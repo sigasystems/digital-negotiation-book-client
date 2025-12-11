@@ -17,10 +17,10 @@ export const getEntityType = (record) => {
   const {country, code} = record
   if(country && code) return "country"
   if (record.offerName) return "offer";
+  if (record.buyersCompanyName && record.productName) return "buyer";
   if (record.draftNo || record.type === "offer_draft") return "offer_draft";
   if (record.productName || record.type === "product") return "product";
   if (record.businessName) return "business_owner";
-  if (record.buyersCompanyName) return "buyer";
 
   return "unknown";
 };

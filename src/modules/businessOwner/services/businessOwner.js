@@ -38,6 +38,7 @@ export const businessOwnerService = {
     const query = {};
       if (filters.country) query.country = filters.country;
       if (filters.productName) query.productName = filters.productName;
+      if (filters.locationName) query.locationName = filters.locationName;
       if (filters.status) query.status = filters.status;
       if (filters.isVerified !== undefined) query.isVerified = filters.isVerified;
       if (filters.page !== undefined) query.page = filters.page;
