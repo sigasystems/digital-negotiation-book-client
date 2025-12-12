@@ -344,7 +344,7 @@ export default function AddBuyerForm() {
       <main className="mx-auto py-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="p-6 space-y-6">
-            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+            <div className="flex items-center gap-2 pt-4 font-bold">
               {remainingBuyers > 0 ? (
                 <>
                   <span className="text-[#16a34a] text-lg">

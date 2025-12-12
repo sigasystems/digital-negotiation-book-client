@@ -60,6 +60,7 @@ export default function DashboardTable({
 
   const HIDDEN_KEYS = [
     "id",
+    "country",
     "ownerId",
     "ownerid",
     "isDeleted",
@@ -98,11 +99,37 @@ export default function DashboardTable({
     "brand",
     "offerDraftId",
     "buyerId",
+    "displayProducts",
+    "productsCount",
   ];
 
   const handleSearch = useCallback((searchFilters) => {
     onSearch?.(searchFilters);
   }, [onSearch]);
+
+  const renderProductsCell = (products) => {
+    
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      return <span className="select-none">No products</span>;
+    }
+    
+    const productNames = products.map(p => p.productName || p.name || "Unnamed Product").filter(Boolean);
+    
+    if (productNames.length === 0) {
+      return <span className="select-none">{products.length} item(s)</span>;
+    }
+    
+    const displayText = productNames[0] + (productNames.length > 1 ? ` +${productNames.length - 1} more` : '');
+    
+    return (
+      <span 
+        className="select-none cursor-help" 
+        title={productNames.length > 1 ? productNames.join(', ') : productNames[0]}
+      >
+        {displayText}
+      </span>
+    );
+  };
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -136,9 +163,11 @@ export default function DashboardTable({
         id: col.key,
         accessorKey: col.key,
         header: col.label,
-        cell: ({ row }) => (
-          <span className="select-none">{String(row.getValue(col.key) ?? "")}</span>
-        ),
+        cell: col.cellRenderer 
+          ? ({ row }) => col.cellRenderer(row.original)
+          : ({ row }) => (
+              <span className="select-none">{String(row.getValue(col.key) ?? "")}</span>
+            ),
       }));
 
       const actionsColumn =
@@ -163,9 +192,17 @@ export default function DashboardTable({
       return actionsColumn ? [selectColumn, ...mapped, actionsColumn] : [selectColumn, ...mapped];
     }
 
-    const dynamicColumns = Object.keys(data[0])
-      .filter((key) => !HIDDEN_KEYS.includes(key))
-      .map((key) => {
+    const allKeys = data.reduce((keys, item) => {
+      Object.keys(item).forEach(key => {
+        const isHidden = key !== "draftProducts" && HIDDEN_KEYS.includes(key);
+        if (!keys.includes(key) && !isHidden) {
+          keys.push(key);
+        }
+      });
+      return keys;
+    }, []);
+
+    const dynamicColumns = allKeys.map((key) => {
         if (key === "status") {
           return {
             id: key,
@@ -243,16 +280,49 @@ export default function DashboardTable({
           };
         }
 
+        if (key === "draftProducts") {
+          return {
+            id: "draftProducts",
+            accessorKey: "draftProducts",
+            header: "Products",
+            cell: ({ row }) => {
+              const products = row.getValue("draftProducts");
+              return renderProductsCell(products);
+            },
+          };
+        }
+
+        if (key === "displayProducts") {
+          return {
+            id: "displayProducts",
+            accessorKey: "displayProducts",
+            header: "Products",
+            cell: ({ row }) => {
+              const products = row.getValue("displayProducts");
+              return renderProductsCell(products);
+            },
+          };
+        }
+
         return {
           id: key,
           accessorKey: key,
           header: formatHeader(key),
           cell: ({ row }) => {
             const value = row.getValue(key);
-            if (Array.isArray(value))
+            
+            if (key.toLowerCase().includes('product') && key !== 'draftProducts' && Array.isArray(value)) {
+              return renderProductsCell(value);
+            }
+            
+            if (Array.isArray(value)) {
               return <span className="select-none">{value.length} item(s)</span>;
-            if (typeof value === "object" && value !== null)
+            }
+            
+            if (typeof value === "object" && value !== null) {
               return <span className="select-none">{JSON.stringify(value)}</span>;
+            }
+            
             return <span className="select-none">{String(value ?? "")}</span>;
           },
         };
@@ -277,7 +347,9 @@ export default function DashboardTable({
           }
         : null;
 
-    return actionsColumn ? [selectColumn, ...dynamicColumns, actionsColumn] : [selectColumn, ...dynamicColumns];
+    const finalColumns = actionsColumn ? [selectColumn, ...dynamicColumns, actionsColumn] : [selectColumn, ...dynamicColumns];
+    
+    return finalColumns;
   }, [data, userActions, columnsOverride, fetchOwners]);
 
   const table = useReactTable({
@@ -328,12 +400,14 @@ export default function DashboardTable({
                 <TableRowSkeleton key={index} columnsCount={columnCount} />
               ))
             ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row) => {
+              return (
                 <TableRow
                   key={row.id}
                   className="even:bg-gray-50 hover:bg-indigo-50 transition-colors cursor-default"
                 >
-                  {row.getAllCells().slice(1).map((cell) => (
+                  {row.getAllCells().slice(1).map((cell) => {
+                      return (
                     <TableCell
                       key={cell.id}
                       className="border border-gray-300 px-4 py-2 select-text"
@@ -341,9 +415,11 @@ export default function DashboardTable({
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
-                  ))}
+                  );
+                    })}
                 </TableRow>
-              ))
+              );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={columnCount}>
@@ -355,7 +431,6 @@ export default function DashboardTable({
         </Table>
       </div>
 
-      {/* Conditionally render pagination based on route */}
       {!isDashboardPage && (
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Pagination

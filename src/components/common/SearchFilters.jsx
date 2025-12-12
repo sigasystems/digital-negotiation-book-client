@@ -101,7 +101,7 @@ export const SearchFilters = ({ fields = [], onSearch }) => {
                         className="w-full h-[44px] appearance-none bg-white border-2 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:border-[#16a34a] focus:outline-none focus:ring-[#16a34a] focus:ring-opacity-50 focus:border-[#16a34a] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
                       >
                         <option value="">
-                          {field.placeholder || `All ${field.label}`}
+                          {field.placeholder || `All ${field.label.charAt(0).toLowerCase() + field.label.slice(1)}`}
                         </option>
                         {field.options?.map((opt) => (
                           <option key={opt.value} value={opt.value}>

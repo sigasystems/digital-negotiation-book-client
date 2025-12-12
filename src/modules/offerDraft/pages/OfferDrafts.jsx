@@ -138,6 +138,7 @@ export default function OfferDrafts() {
         totalItems={totalItems}
         searchFields={[
           { name: "draftNo", label: "Draft No", type: "number", placeholder: "Enter draft number" },
+          { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product name" },
           { name: "draftName", label: "Draft Name", type: "text", placeholder: "Enter draft name" },
           {
             name: "status",

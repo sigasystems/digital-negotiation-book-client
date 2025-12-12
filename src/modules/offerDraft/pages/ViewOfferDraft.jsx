@@ -306,13 +306,7 @@ const ViewOfferDraft = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              <InputField 
-                label="Draft Name" 
-                name="draftName" 
-                value={formData.draftName} 
-                onChange={handleChange}
-                className="cursor-pointer"
-              />
+              <ReadOnlyField label="Draft name" value={formData.draftName} />
               <InputField 
                 label="Quantity" 
                 name="quantity" 

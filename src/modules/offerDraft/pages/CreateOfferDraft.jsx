@@ -237,9 +237,17 @@ const CreateOfferDraft = () => {
       try {
         const res = await offerDraftService.getLatestDraftNo();
         const lastDraftNo = res.data?.lastDraftNo || 0;
+        
+        const currentDate = new Date();
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const year = String(currentDate.getFullYear()).slice(-2);
+        
+        const formattedDate = `${day}-${month}-${year}`;
+        
         setFormData((prev) => ({
           ...prev,
-          draftName: `Offer Draft ${lastDraftNo + 1}`,
+          draftName: `${lastDraftNo + 1}/${formattedDate}`,
         }));
       } catch (err) {
         console.error(err);
@@ -254,7 +262,7 @@ const CreateOfferDraft = () => {
     <div className="relative min-h-screen bg-slate-50 px-[24.5px]">
       {loading && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-          <Spinner className="w-8 h-8 text-indigo-600 mb-3" />
+          <Spinner className="w-8 h-8 text-green-600 mb-3" />
           <p className="text-slate-700 font-medium">Creating draft...</p>
         </div>
       )}
@@ -293,7 +301,7 @@ const CreateOfferDraft = () => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="p-6 space-y-6">
             {/* Remaining Credits */}
-            <div className="flex items-center gap-2 px-9 pt-4 font-bold">
+            <div className="flex items-center gap-2 pt-4 font-bold">
               {remainingOffers > 0 ? (
                 <>
                   <span className="text-[#16a34a] text-lg">
@@ -331,7 +339,7 @@ const CreateOfferDraft = () => {
                       type="text"
                       value={formData.draftName}
                       readOnly
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 outline-none"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 outline-none font-medium"
                     />
                   </div>
                   <div className="space-y-2">
@@ -344,7 +352,7 @@ const CreateOfferDraft = () => {
                       value={formData.quantity}
                       placeholder="25"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -557,7 +565,7 @@ const CreateOfferDraft = () => {
         description="Are you sure you want to create this offer draft? This will save the draft with the details you've entered."
         confirmText="Create Draft"
         cancelText="Cancel"
-        confirmButtonColor="bg-indigo-600 hover:bg-indigo-700"
+        confirmButtonColor="bg-[#16a34a] hover:bg-green-700"
       />
     </div>
   );

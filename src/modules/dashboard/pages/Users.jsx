@@ -121,7 +121,8 @@ export default function Users({ userRole }) {
 
   if (userRole === "business_owner") {
     searchFields = [
-      { name: "country", label: "Country", type: "text", placeholder: "Enter country" },
+      { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product" },
+      { name: "locationName", label: "Location Name", type: "text", placeholder: "Enter location" },
       {
         name: "status",
         label: "Status",
@@ -131,8 +132,6 @@ export default function Users({ userRole }) {
           { value: "inactive", label: "Inactive" },
         ],
       },
-      { name: "productName", label: "Product Name", type: "text", placeholder: "Enter product" },
-      { name: "locationName", label: "Location Name", type: "text", placeholder: "Enter location" },
     ];
   }
 
