@@ -278,7 +278,7 @@ const CreateOfferDraft = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="cursor-pointer inline-flex items-center text-slate-700 hover:text-slate-900"
+              className="cursor-pointer inline-flex items-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-sm p-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </button>
@@ -352,7 +352,7 @@ const CreateOfferDraft = () => {
                       value={formData.quantity}
                       placeholder="25"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -365,7 +365,7 @@ const CreateOfferDraft = () => {
                       value={formData.tolerance}
                       placeholder="+/- 10"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -378,7 +378,7 @@ const CreateOfferDraft = () => {
                       value={formData.paymentTerms}
                       placeholder="LC at sight, 30% advance"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -391,7 +391,7 @@ const CreateOfferDraft = () => {
                       value={formData.remark}
                       placeholder="Optional notes or conditions"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -404,7 +404,7 @@ const CreateOfferDraft = () => {
                       value={formData.grandTotal}
                       placeholder="12500"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                 </div>
@@ -468,7 +468,7 @@ const CreateOfferDraft = () => {
                       value={formData.origin}
                       placeholder="Brazil"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -481,7 +481,7 @@ const CreateOfferDraft = () => {
                       value={formData.processor}
                       placeholder="Company or facility name"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -495,7 +495,7 @@ const CreateOfferDraft = () => {
                       value={formData.plantApprovalNumber}
                       placeholder="ABC-12345"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                   <div className="space-y-2">
@@ -508,7 +508,7 @@ const CreateOfferDraft = () => {
                       value={formData.brand}
                       placeholder="Product brand name"
                       onChange={handleChange}
-                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
                     />
                   </div>
                 </div>

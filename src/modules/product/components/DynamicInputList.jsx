@@ -23,10 +23,10 @@ const DynamicInputList = memo(({ label, items, onChange, onAdd, onRemove, requir
               onBlur={() => handleBlur(i)}
               placeholder={`${label} ${i + 1}`}
               required={requiredFirst && i === 0}
-              className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 outline-none bg-gray-50 hover:bg-white transition-all ${
+              className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base border rounded-lg outline-none bg-gray-50 hover:bg-white transition-all ${
                 showError
                   ? "border-red-500 focus:ring-red-400"
-                  : "border-gray-300 focus:ring-indigo-400"
+                  : "border-gray-300 focus:ring-green-400"
               }`}
             />
             {items.length > 1 && (
@@ -45,7 +45,7 @@ const DynamicInputList = memo(({ label, items, onChange, onAdd, onRemove, requir
       <button
         type="button"
         onClick={onAdd}
-        className="w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-indigo-50 text-black rounded-lg hover:bg-indigo-100 transition-all font-medium flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-green-50 text-black rounded-lg hover:bg-green-100 transition-all font-medium flex items-center justify-center gap-2 cursor-pointer"
       >
         <Plus size={14} className="sm:w-4 sm:h-4" />
         Add Another {label}

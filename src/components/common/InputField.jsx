@@ -22,8 +22,7 @@ export const InputField = ({
       {...mergedProps}
       type={type}
       placeholder={placeholder}
-      className="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                 focus:ring-2 focus:ring-indigo-400 outline-none hover:bg-white transition-all"
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg  focus:ring-green-300 focus:border-[#16a34a] outline-none hover:bg-white transition-all"
     />
 
     {error && <p className="text-red-600 text-sm mt-1">{error.message}</p>}
