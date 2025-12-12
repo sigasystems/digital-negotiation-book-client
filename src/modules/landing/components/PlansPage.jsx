@@ -21,8 +21,9 @@ const safeJSONParse = (value) => {
 };
 
 export default function Plans() {
-  const [billingCycle, setBillingCycle] = useState("monthly");
+  const [billingCycle, setBillingCycle] = useState("yearly");
   const navigate = useNavigate();
+  console.log("billing cycle is....", billingCycle);
 
   const storedUser = useMemo(() => {
     return safeJSONParse(sessionStorage.getItem("user"));
@@ -60,6 +61,7 @@ export default function Plans() {
     }).format(amount || 0);
 
   const handlePlanSelect = async (plan = {}, navigate, billingCycle) => {
+    console.log("selected billing cycle from planspage is...", billingCycle);
     if (!userId) {
       navigate("/checkout", { state: { selectedPlan: plan, billingCycle } });
       return;
