@@ -11,15 +11,15 @@ export default function LandingPage() {
   useReloadOncePerSession("landingPageReloaded");
 
   return (
-    <main className="flex flex-col min-h-screen w-full">
+    <main className="flex flex-col w-full">
       <LandingNavbar />
       <Hero />
       <div className="container mx-auto p-4">
-      <Features />
-      <PlansPage />
-      <Testimonials />
-      <CTA />
-      <Footer />
+        <Features />
+        <PlansPage />
+        <Testimonials />
+        <CTA />
+        <Footer />
       </div>
     </main>
   );

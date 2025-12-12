@@ -10,7 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Check, CreditCard, MoveLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly" }) {
+export default function SelectedPlanCard({
+  selectedPlan,
+  billingCycle = "monthly",
+}) {
   if (!selectedPlan) {
     return (
       <div className="border border-dashed border-slate-300 rounded-lg p-6 text-center text-slate-500">
@@ -37,7 +40,7 @@ export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly
     billingCycle === "yearly" ? priceYearly || 0 : priceMonthly || 0;
 
   return (
-    <Card className="shadow-md border-slate-200 mt-12">
+    <Card className="shadow-md border-slate-200 ">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -101,11 +104,12 @@ export default function SelectedPlanCard({ selectedPlan, billingCycle = "monthly
                 </div>
               ))
             ) : (
-              <p className="text-slate-500 italic text-sm">No features listed.</p>
+              <p className="text-slate-500 italic text-sm">
+                No features listed.
+              </p>
             )}
           </div>
         </div>
-
       </CardContent>
     </Card>
   );

@@ -25,7 +25,7 @@ export default function LandingNavbar({
       { label: "Onboard Process", path: "/onboard-process" },
       { label: "Contact", path: "/contact" },
     ],
-    []
+    [],
   );
 
   const handleLogin = () => navigate("/login");
@@ -33,17 +33,18 @@ export default function LandingNavbar({
   return (
     <header
       className={cn(
-        "w-full h-16 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50",
-        isNoSidebarRoute ? "px-4 sm:px-6 lg:px-78" : "px-4 sm:px-6 lg:px-13"
+        "w-full h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm sticky top-0 z-50",
       )}
     >
-      <div className="w-full h-full mx-auto flex items-center justify-between">
-        <div className="flex items-center">
+      {/* Wrapper Container */}
+      <div className="h-full mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 max-w-screen-xl">
+        {/* LEFT SECTION */}
+        <div className="flex items-center gap-2">
           {showSidebarButton && (
             <button
-              className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
               onClick={onMenuClick}
-              aria-label="Open menu"
+              aria-label="Open sidebar"
             >
               <Menu className="w-6 h-6 text-gray-700" />
             </button>
@@ -51,28 +52,28 @@ export default function LandingNavbar({
 
           <Link
             to="/"
-            className={cn(
-              "text-xl font-semibold text-gray-800 whitespace-nowrap",
-              isNoSidebarRoute ? "ml-0" : "ml-2 lg:ml-0"
-            )}
+            className="text-lg sm:text-xl font-semibold text-gray-900 whitespace-nowrap"
           >
             Digital Negotiation Book
           </Link>
         </div>
 
-    <div className="flex items-center gap-6">
-        <nav className="hidden lg:flex items-center gap-6 mr-4">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className="text-gray-600 hover:text-gray-900 font-medium transition whitespace-nowrap"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* RIGHT SECTION */}
+        <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className="text-gray-700 hover:text-gray-900 font-medium transition whitespace-nowrap"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
+          {/* Login Button */}
           <button
             onClick={handleLogin}
             className="button-styling whitespace-nowrap"
@@ -80,6 +81,7 @@ export default function LandingNavbar({
             Login
           </button>
 
+          {/* Mobile Menu Icon */}
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             onClick={() => setMobileMenuOpen(true)}
@@ -90,40 +92,54 @@ export default function LandingNavbar({
         </div>
       </div>
 
+      {/* MOBILE DRAWER */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/40 z-[9000] lg:hidden" role="dialog" aria-modal="true">
-          <div className="absolute top-0 right-0 w-72 h-full bg-white shadow-xl p-4 z-[9100]">
-            <div className="flex justify-between items-center mb-4">
+        <div
+          className="fixed inset-0 bg-black/40 lg:hidden z-[9000]"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className={cn(
+              "absolute top-0 right-0 h-full w-72 bg-white p-5 shadow-xl",
+              "transform transition-all duration-300 ease-out",
+              mobileMenuOpen ? "translate-x-0" : "translate-x-full",
+            )}
+          >
+            {/* Drawer Header */}
+            <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold">Menu</h3>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100"
+                className=" rounded-lg hover:bg-gray-100"
                 aria-label="Close menu"
               >
                 <X className="w-6 h-6 text-gray-700" />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-4">
+            {/* Drawer Navigation */}
+            <nav className="flex flex-col gap-5 text-lg">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-gray-700 text-lg font-medium"
+                  className="text-gray-800 font-medium"
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
 
-            <div className="mt-6">
+            {/* Login Button */}
+            <div className="mt-8">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   handleLogin();
                 }}
-                className="w-full px-4 py-2 bg-[#16a34a] text-white rounded-lg font-medium hover:bg-green-700"
+                className="w-full  py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
               >
                 Login
               </button>

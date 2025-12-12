@@ -67,6 +67,7 @@ const Profile = () => {
             setPaymentData(null);
           } else {
             const response = await res.json();
+            console.log("response from profile page...", response);
             setPaymentData(response?.data || null);
           }
         }
@@ -127,6 +128,9 @@ const Profile = () => {
   const payment = paymentData;
   const plan = paymentData?.Plan;
   const backendUser = paymentData?.User;
+  console.log("Plan info from profile page....", plan);
+  console.log("Backend user.....", backendUser);
+  console.log("Paymentinfo........", payment);
 
   const fullName = backendUser
     ? `${backendUser.first_name || ""} ${backendUser.last_name || ""}`.trim()
